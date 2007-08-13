@@ -65,11 +65,11 @@ HTTPD_BIN="/usr/sbin/apache2"
 
 # Configs
 <?php if (getenv('APPNAME_APACHE_HTTP_PORT') != 0) { ?>
-F_LOG_SRV=${HTTPD_HOME}/log/httpd-<?php echo getenv('APPNAME_APACHE_HTTP_PORT'); ?>.start.log
+F_LOG_SRV=${HTTPD_HOME}/log/<?php echo getenv('APPNAME_APACHE_HTTP_PORT'); ?>-error.log
 <?php } else if (getenv('APPNAME_APACHE_HTTPS_PORT') != 0) { ?>
-F_LOG_SRV=${HTTPD_HOME}/log/httpd-<?php echo getenv('APPNAME_APACHE_HTTPS_PORT'); ?>.start.log
+F_LOG_SRV=${HTTPD_HOME}/log/<?php echo getenv('APPNAME_APACHE_HTTPS_PORT'); ?>-error.log
 <?php } else { ?>
-F_LOG_SRV=${HTTPD_HOME}/log/httpd.start.log
+F_LOG_SRV=${HTTPD_HOME}/log/httpd-error.log
 <?php } ?>
 F_CNF=${HTTPD_HOME}/etc/httpd.conf
 F_PID=${HTTPD_HOME}/var/httpd.pid
