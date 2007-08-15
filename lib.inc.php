@@ -4,42 +4,7 @@ class LAMPBuilder
 {
   var $APPNAME = '';
   var $MODULES = array();
-  var $MODULES_LIST = array('apache', 'mysql', 'php', 'tomcat', 'ldap', 'tmpreaper', 'logrotate');
-  var $ENV          = array('HOME' =>
-                            array('Le chemin ou les modules seront installes (ex: /applis/monapp/home)',array()),
-                            'USER' =>
-                            array('Le nom de l\'utilisateur qui lancera les demons',array()),
-                            'GROUP' =>
-                            array('Le nom du groupe qui lancera les demons',array()),
-                            'ADMIN_MAIL' =>
-                            array('L\'email du responsable systeme de l\'application',array()));
-  var $ENV_MODULES =
-  array('tomcat' => array('TOMCAT_PORT' =>
-                          array('Le port d\'ecoute de tomcat',array()),
-                          'TOMCAT_SHUTDOWN_PORT' =>
-                          array('Le port utilise en interne pour eteindre tomcat', array()),
-                          ),
-        'apache' => array('APACHE_HTTP_PORT' =>
-                          array('Le port d\'ecoute en http (mettre 0 si on ne veut pas ecouter en http)', array()),
-                          'APACHE_HTTPS_PORT' =>
-                          array('Le port d\'ecoute en https (mettre 0 si on ne veut pas ecouter en https)', array()),
-                          ),
-        'mysql'  => array('MYSQL_PORT' =>
-                          array('Le port d\'ecoute de mysql', array()),
-                          ),
-        'php'    => array('PHP_VERSION' =>
-                          array('La version de php a utiliser dans apache', array(4,5)),
-                          ),
-        'ldap'   => array('LDAP_PORT' =>
-	                        array('Le port d\'ecoute',array()),
-                          'LDAP_SUFFIX' =>
-                          array('La racine de votre annuaire (ex: dc=intra,dc=inist,dc=fr)',array()),
-                          'LDAP_ROOTDN' =>
-                          array('Le login adminitrateur de votre annuaire (ex: cn=manager,dc=intra,dc=inist,dc=fr)',array()),
-                          'LDAP_ROOTPW' =>
-                          array('Le mot de passe adminitrateur de votre annuaire (ex: secret)',array()),
-                          ),
-        );
+  var $MODULES_LIST = array();
 
   var $env_path = null;
   var $src_path = null;
@@ -61,6 +26,7 @@ class LAMPBuilder
     $this->choose_appli_name();
     echo "Le nom d'application suivant sera utilise : ".$this->APPNAME."\n";
     echo "--- ETAPE 2 : Choisissez les modules a activer\n";
+    $this->build_module_list();
     $this->choose_modules();
     if (count($this->MODULES) > 1)
       echo "Les modules suivants seront utilises : ".implode(',',$this->MODULES)."\n";
@@ -77,6 +43,7 @@ class LAMPBuilder
     if ($this->dst_path == null)
     {
       $dst = $env[$this->APPNAME.'_HOME'];
+      if (!file_exists($dst)) @mkdir_r($dst);
       if (file_exists($dst))
         $this->dst_path = $dst;
       else
@@ -96,32 +63,19 @@ class LAMPBuilder
     
   }
 
-  // WRITE TPL INSTANCES
-  function write_tpl_instance()
+  function build_module_list()
   {
-    $tlist = $this->build_templates_list();
-    foreach($tlist as $m => $templates)
-      foreach($templates as $t)
-      {
-        $t_src = $this->src_path.'/'.$m.'/'.$t;
-        $t_dst = $this->dst_path.'/'.$t;
-        echo "Ecriture de ".$t_dst."\n";
-        if (file_exists($t_src) && !is_dir($t_src))
-        {
-          $output = shell_exec($this->php_path.' '.$t_src);
-          mkdir_r(dirname($t_dst));
-          file_put_contents($t_dst, $output);
-          // setting the rights
-          if (is_executable($t_src) || preg_match('/^bin\//',$t))
-            chmod($t_dst,0700);
-          else
-            chmod($t_dst,0600);
-        }
-        else if (substr($t_src,-1) == '/')
-          mkdir_r($t_dst);
-        else
-          trigger_error($t_src." cannot be found",E_USER_ERROR);
-      }
+    $this->MODULES_LIST = array();
+    $dir = dirname(__FILE__);
+    $d = opendir($dir);
+    while ($file = readdir($d))
+    {
+      if ($file == '.' || $file == '..' || $file == 'CVS' || $file == '.svn' || $file == 'core')
+        continue;
+      else if (is_dir($dir.'/'.$file))
+        $this->MODULES_LIST[] = $file;
+    }
+    closedir($d);
   }
   
   function choose_modules()
@@ -145,6 +99,9 @@ class LAMPBuilder
       echo "Entrez le nom des modules separes par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
       $this->MODULES = $this->_filter_valide_modules(explode(',',readline()));
     }
+    
+    // ajoute le module core dont tous les autres dependent en tout premier de la liste
+    $this->MODULES = array_merge(array('core'), $this->MODULES);
   }
 
   function _filter_valide_modules($modules_to_check)
@@ -215,10 +172,20 @@ class LAMPBuilder
   function _build_env_to_check()
   {
     // construit une liste des variables d'env a tester
-    $env_to_check = $this->ENV;
+    // en fonction des modules choisis
+    $env_to_check = array();
     foreach($this->MODULES as $m)
-      if (isset($this->ENV_MODULES[$m]))
-        $env_to_check = array_merge($env_to_check,$this->ENV_MODULES[$m]);
+    {
+      $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+      if (!file_exists($ini_path)) continue;
+      $ini_data = parse_ini_file($ini_path);
+      for ($i = 0 ; $i<count($ini_data['env']) ; $i++)
+      {
+        
+        $env_to_check[$ini_data['env'][$i]] = array( $ini_data['env-desc'][$i],
+                                                     $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array());
+      }
+    }
     return $env_to_check;
   }
   
@@ -232,7 +199,6 @@ class LAMPBuilder
 
     // construit une liste des variables d'env a tester
     $env_to_check = $this->_build_env_to_check();
-    
     foreach($env_to_check as $e => $e_option)
     {
       $e = $this->APPNAME.'_'.$e;
@@ -290,7 +256,11 @@ class LAMPBuilder
         if (is_file($l))
           if ( dirname($l) == $this->src_path )
             unset($list[$m][$n]);
-        if (trim($list[$m][$n]) == '' || trim($list[$m][$n]) == '/')
+        if (trim($list[$m][$n]) == '' ||
+            trim($list[$m][$n]) == '/' ||
+            // ne liste pas config.ini dans les templates a instancier
+            // car c'est un simple fichier de description
+            $list[$m][$n] == 'config.ini')
           unset($list[$m][$n]);
         $n++;
       }
@@ -298,7 +268,34 @@ class LAMPBuilder
     }
     return $ret;
   }
-  
+
+  // WRITE TPL INSTANCES
+  function write_tpl_instance()
+  {
+    $tlist = $this->build_templates_list();
+    foreach($tlist as $m => $templates)
+      foreach($templates as $t)
+      {
+        $t_src = $this->src_path.'/'.$m.'/'.$t;
+        $t_dst = $this->dst_path.'/'.$t;
+        echo "Ecriture de ".$t_dst."\n";
+        if (file_exists($t_src) && !is_dir($t_src))
+        {
+          $output = shell_exec($this->php_path.' '.$t_src);
+          mkdir_r(dirname($t_dst));
+          file_put_contents($t_dst, $output);
+          // setting the rights
+          if (is_executable($t_src) || preg_match('/^bin\//',$t))
+            chmod($t_dst,0700);
+          else
+            chmod($t_dst,0600);
+        }
+        else if (substr($t_src,-1) == '/')
+          mkdir_r($t_dst);
+        else
+          trigger_error($t_src." cannot be found",E_USER_ERROR);
+      }
+  }
 }
 
 
