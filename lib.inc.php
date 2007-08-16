@@ -38,7 +38,8 @@ class LAMPBuilder
     $this->load_env($env);
     $this->check_env($env);
     $this->write_env($env);
-    
+    $this->load_extra_env($env); // a faire apres write_env car on veut pas les sauvegarder
+
     // get the APPLI_HOME from the env
     if ($this->dst_path == null)
     {
@@ -242,6 +243,37 @@ class LAMPBuilder
     file_put_contents($filename,$data);
   }
 
+  /**
+   * Charge APPNAME_DSTART_LIST et APPNAME_DSTOP_LIST
+   */
+  function load_extra_env(&$env)
+  {
+    // construit une liste des demons a demarrer et arreter
+    // cette liste sera utilisee par appli.ksh pour lancer/arreter d'un coups tous les demons
+    $dstart_list   = array();
+    $dstop_list    = array();
+    $drestart_list = array();
+    foreach($this->MODULES as $m)
+    {
+      $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+      if (!file_exists($ini_path)) continue;
+      $ini_data = parse_ini_file($ini_path);
+      if (isset($ini_data['start-daemon']) && $ini_data['start-daemon'] != '')
+        $dstart_list[$m] = $ini_data['start-daemon'];
+      if (isset($ini_data['stop-daemon']) && $ini_data['stop-daemon'] != '')
+        $dstop_list[$m]  = $ini_data['stop-daemon'];
+      if (isset($ini_data['restart-daemon']) && $ini_data['restart-daemon'] != '')
+        $drestart_list[$m]  = $ini_data['restart-daemon'];
+    }
+    $dstart_list   = serialize($dstart_list);
+    $dstop_list    = serialize($dstop_list);
+    $drestart_list = serialize($drestart_list);
+    
+    putenv('APPNAME_DSTART_LIST='.$dstart_list);
+    putenv('APPNAME_DSTOP_LIST='.$dstop_list);
+    putenv('APPNAME_DRESTART_LIST='.$drestart_list);
+  }
+
 
   function build_templates_list()
   {
@@ -296,6 +328,7 @@ class LAMPBuilder
           trigger_error($t_src." cannot be found",E_USER_ERROR);
       }
   }
+
 }
 
 

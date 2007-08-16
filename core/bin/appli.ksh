@@ -57,13 +57,6 @@ fi
 #	--{                                            }--
 #	--{--{--{--{--{--{--{--{--}--}--}--}--}--}--}--}--
 
-
-# Traitement des interruptions
-trap 'RC=${?}; trap "" ERR INT; print >&2 Erreur ${RC} ligne ${LINENO} dans ${0}; exit ${RC}' ERR
-trap 'trap "" INT; print >&2 'Interruption' ;exit ${RC_ERR_BREAK}' INT
-
-
-
 # Controle du nombre de parametres d appel
 #''
 if [[ ${#} -ne 1 ]]
@@ -79,94 +72,63 @@ fi
 #	--{--{--{--{--{--{--{--{--}--}--}--}--}--}--}--}--
 
 
-HTTP_KSH=<?php echo getenv('APPNAME_HOME') ?>/bin/httpd.ksh
-MYSQL_KSH=<?php echo getenv('APPNAME_HOME') ?>/bin/mysql.ksh
-
-
 case ${1} in
 	-r )
-		# demarrage de l'application : serveur + base
-		
-		# Serveur Apache
-		${HTTP_KSH} -r
+<?php
+  $dstart_list = unserialize(getenv('APPNAME_DSTART_LIST'));
+  foreach($dstart_list as $module => $cmd) {
+?>
+		# Démarrage de <?php echo $module; ?> 
+		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $cmd; ?> 
 		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_YETSTARTED} ]]
 		then
 			exit ${?}
 		fi
-		
-		# Base Mysql
-		${MYSQL_KSH} -r
-		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_YETSTARTED} ]]
-		then
-			exit ${?}
-		fi
-		
+
+<?php } ?>		
 		;;
+
 	-s ) 
-		# arret de l'application : serveur + base
-		
-		# Serveur Apache
-		${HTTP_KSH} -s
+<?php
+  $dstop_list = unserialize(getenv('APPNAME_DSTOP_LIST'));
+  foreach($dstop_list as $module => $cmd) {
+?>
+		# Arret de <?php echo $module; ?> 
+		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $cmd; ?> 
 		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_NOTSTARTED}  &&  ${?} -ne ${RC_ERR_NOPROCESS} ]]
 		then
 			exit ${?}
 		fi
-		
-		# Base Mysql
-		${MYSQL_KSH} -s
-		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_NOTSTARTED}  &&  ${?} -ne ${RC_ERR_NOPROCESS} ]]
-		then   
-			exit ${?}
-		fi
-		
+
+<?php } ?>
 		;;
 		
 	-u ) 
-		# redemarrage de l'application : serveur + base
-		
-		# Serveur Apache
-		${HTTP_KSH} -u
+<?php
+  $drestart_list = unserialize(getenv('APPNAME_DRESTART_LIST'));
+  foreach($drestart_list as $module => $cmd) {
+?>
+		# Redemarrage de <?php echo $module; ?> 
+		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $cmd; ?> 
 		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_PROGRAM} ]]
 		then
 			exit ${?}
 		fi
-		
-		# Base Mysql
-		${MYSQL_KSH} -u
-		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_PROGRAM} ]]
-		then
-			exit ${?}
-		fi
-		
-		;;
-		
-	-a ) 
-		# verification du bon fonctionnement du serveur Apache
-		
-		${HTTP_KSH} -c
-		exit ${?}
-	
-		;;
-	 -m ) 
-		# verification du bon fonctionnement du serveur mysql
-		
-		${MYSQL_KSH} -c
-		exit ${?}
-		
-		;;
-	
+
+<?php } ?>
+	  ;;
+
 	*) 
 		# parametre invalide
 		
-			echo "usage: $0 ( -r | -s | -u | -a | -m )"
+			echo "usage: $0 ( -r | -s | -u | -h )"
 			cat <<EOF
 
-   -r   - start Apache + mysql
-   -s   - stop Apache + mysql
-   -u   - restart Apache + mysql if running by sending a SIGHUP or start if not running
-   -a   - Test running Apache
-   -m   - Test running mysql
-   
+   -r   - demarrage de <?php echo implode(', ',array_keys($dstart_list)); ?> 
+   -s   - arret de <?php echo implode(', ',array_keys($dstop_list)); ?> 
+   -u   - redemarrage de  <?php echo implode(', ',array_keys($drestart_list)); ?> 
+   -h   - cette page
+
 EOF
 		exit ${RC_ERR_PARAM}
 		;;
