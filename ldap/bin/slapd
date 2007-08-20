@@ -161,11 +161,6 @@ start_slapd() {
 			--pidfile "$SLAPD_PIDFILE" \
 			--exec /usr/sbin/slapd -- -h "$SLAPD_SERVICES" $SLAPD_OPTIONS 2>&1`"
 	fi
-
-	# Backward compatibility with OpenLDAP 2.1 client libraries.
-	if [ ! -h /var/run/ldapi ] && [ ! -e /var/run/ldapi ] ; then
-		ln -s slapd/ldapi /var/run/ldapi
-	fi
 }
 
 # Start the slurpd daemon and capture the error message if any to
