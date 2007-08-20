@@ -91,7 +91,7 @@ class LAMPBuilder
     {
       $data = file_get_contents($this->env_path);
       if (preg_match('/'.$this->APPNAME.'_MODULES=(.+)/i',$data,$res))
-        $this->MODULES = $this->_filter_valide_modules(explode(',',$res[1]));
+        $this->MODULES = $this->_filter_valide_modules(explode(',',trim($res[1],'" ')));
     }
     
     // si rien n'a ete trouve alors on demande a l'utilisateur d'entrer des modules au clavier
@@ -126,8 +126,8 @@ class LAMPBuilder
     else if (file_exists($this->env_path))
     {
       $data = file_get_contents($this->env_path);
-      if (preg_match('/APPNAME=([a-z]+)/i',$data,$res))
-        $this->APPNAME = $res[1];
+      if (preg_match('/APPNAME=(.+)/i',$data,$res))
+        $this->APPNAME = trim($res[1],'" ');
     }
 
     // rien n'a ete trouve alors on demande a l'utilisateur de l'entrer au clavier
@@ -161,8 +161,8 @@ class LAMPBuilder
       {
         if (preg_match('/export\s+'.$e.'=(.*)/',$data,$res))
         {
-          $env[$e] = trim($res[1]);
-          putenv("$e=".trim($res[1]));
+          $env[$e] = trim($res[1],'" ');
+          putenv('$e="'.$env[$e].'"');
         }
       }
       else
@@ -233,7 +233,7 @@ class LAMPBuilder
     foreach($env as $k => $v)
     {
       // ecriture dans le fichier src.env.ksh
-      $data .= "export $k=$v\n";
+      $data .= sprintf("export %s=\"%s\"\n", $k, $v);
       
       // ecriture dans l'environnement
       // on replace tout les prefixes par APPNAME car c'est le prefix des variables d'env dans nos templates
