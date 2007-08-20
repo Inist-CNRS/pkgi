@@ -5,6 +5,53 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <title>Package Installer</title>
+  <style type="text/css">
+body {
+  font-family: sans-serif;
+}
+table {
+border:3px solid #6495ed;
+border-collapse:collapse;
+width:90%;
+margin:auto;
+}
+thead, tfoot {
+background-color:#D0E3FA;
+border:1px solid #6495ed;
+}
+tbody {
+background-color:#FFFFFF;
+border:1px solid #6495ed;
+}
+th {
+font-family:monospace;
+border:1px dotted #6495ed;
+padding:5px;
+background-color:#EFF6FF;
+width:25%;
+}
+td {
+font-family:sans-serif;
+font-size:80%;
+border:1px solid #6495ed;
+padding:5px;
+text-align:left;
+}
+caption {
+font-family:sans-serif;
+}
+code, pre {
+  background-color: #f6fcff;
+  border: solid 1px #6495ed;
+}
+h3 {
+color: #19abff;
+  border-bottom: 1px solid #19abff;
+}
+.section {
+margin-left: 30px;
+width: 800px;
+}</style>
   <meta name="generator" content="Amaya, see http://www.w3.org/Amaya/" />
 </head>
 
@@ -15,7 +62,264 @@
 indépendants sous debian etch. Chaque application peut ainsi sélectionner
 très facilement les modules qu'elle souhaite utiliser :
 apache,mysql,tomcat,php...</p>
-<p>Page du projet sourcesup : <a href="http://sourcesup.cru.fr/projects/pkgi/">http://sourcesup.cru.fr/projects/pkgi/</a></p>
-<p>Télécharger par subversion : <code>svn co https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
+
+<p>Page du projet sourcesup : <a
+href="http://sourcesup.cru.fr/projects/pkgi/">http://sourcesup.cru.fr/projects/pkgi/</a></p>
+
+<p>Télécharger par subversion : <code>svn co
+https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
+
+<div class="section">
+<h2>Installation</h2>
+
+<div class="section">
+<h3>Pré requis</h3>
+<ol>
+  <li class="level1">
+    <div class="li">
+    Avoir les droits sur son appli que l’on supposera installée dans
+    /applis/monappli</div>
+  </li>
+  <li class="level1">
+    <div class="li">
+    Être sur une machine debian etch (ida ou hippo par exemple)</div>
+  </li>
+  <li>Avoir php5 d'installé en ligne de commande</li>
+</ol>
+</div>
+
+<div class="section">
+<h3><a name="etape_1_installez_les_templates1"
+id="etape_1_installez_les_templates1">Etape 1 : récupération des
+sources</a></h3>
+
+<p>Placez vous dans votre homedir <code>/applis/monappli/home/</code> et
+utilisez SVN pour récupérer les sources : </p>
+<pre><strong>svn export https://subversion.cru.fr/pkgi/trunk src</strong></pre>
+
+<p>Vous avez alors un répertoire <code>src/</code> dans votre homedir, il
+contient les templates des fichiers de configuration et des lanceurs de votre
+application : </p>
+<ul>
+  <li class="level1">
+    <div class="li">
+    <code>src/build.ksh</code> : c’est le script qui va vous permettre
+    d’instancier les templates, il vous demandera les paramètres de votre
+    application (port, user, group ...)</div>
+  </li>
+  <li class="level1">
+    <div class="li">
+    <code>src/apache/bin/*</code> : les lanceurs apache</div>
+  </li>
+  <li class="level1">
+    <div class="li">
+    <code>src/mysql/bin/*</code> : les lanceurs mysql</div>
+  </li>
+  <li class="level1">
+    <div class="li">
+    <code>src/apache/etc/*</code> : les fichiers de config d’apache</div>
+  </li>
+  <li class="level1">
+    <div class="li">
+    <code>src/mysql/etc/*</code> : les fichiers de config de mysql</div>
+  </li>
+</ul>
+</div>
+
+<div class="section">
+<h3><a name="etape_2_instancier_les_templates1"
+id="etape_2_instancier_les_templates1">Etape 2 : Instancier les
+templates</a></h3>
+
+<div class="level2">
+<p>Lancez <code>build.ksh</code> (par exemple : placez-vous dans votre
+homedir et tapez <code>src/build.ksh</code>). Il suffit alors de répondre
+aux questions. Une fois terminé, vous aurez à votre disposition les
+instances des lanceurs et des fichiers de config dans : </p>
+<ul>
+  <li class="level1">
+    <div class="li">
+    <code>/applis/monappli/home/bin/</code> pour les lanceurs</div>
+  </li>
+  <li class="level1">
+    <div class="li">
+    <code>/applis/monappli/home/etc/</code> pour les fichiers de config</div>
+  </li>
+  <li class="level1">
+    <div class="li">
+    <code>/applis/monappli/home/src.env.ksh</code> : les variables
+    d’environnement de votre application qui seront automatiquement
+    chargées par les lanceurs (les variables seront ainsi disponibles dans
+    vos scripts php).</div>
+  </li>
+</ul>
+
+<p>A tout moment, vous pouvez relancer <code>build.ksh</code> pour
+régénérer les fichiers. Les questions ne seront alors plus posées car les
+variables seront automatiquement extraites de
+<code>/applis/monappli/home/src.env.ksh</code> </p>
+</div>
+</div>
+
+<div class="section">
+<h3><a name="etape_3_lancer_les_demons2"
+id="etape_3_lancer_les_demons2">Etape 3 : lancer les démons</a></h3>
+
+<table border="1" cellpadding="0" cellspacing="0">
+  <thead>
+    <tr>
+      <td>Modules</td>
+      <td>Commandes</td>
+    </tr>
+  </thead>
+  <tbody style="border: solid 1px #000000;">
+    <tr>
+      <td>apache</td>
+      <td><ul>
+          <li class="level1">
+            <div class="li">
+            Pour lancer le serveur http :
+            <code>/applis/monappli/home/bin/httpd.ksh -r</code></div>
+          </li>
+          <li>
+            <div class="li">
+            Pour arreter le serveur http :
+            <code>/applis/monappli/home/bin/httpd.ksh -s</code></div>
+          </li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>mysql</td>
+      <td><ul>
+          <li class="level1">
+            <div class="li">
+            Commencez par initialiser la base mysql :
+            <code>/applis/monappli/home/bin/mysql.ksh -i</code><br />
+            (cette commande va créer l’arborescence minimale nécessaire
+            dans <code>/applis/monappli/home/var/mysql/</code> )</div>
+          </li>
+          <li class="level1">
+            <div class="li">
+            Pour lancez le serveur mysql :
+            <code>/applis/monappli/home/bin/mysql.ksh -r</code></div>
+          </li>
+          <li>
+            <div class="li">
+            Pour arreter le serveur mysql :
+            <code>/applis/monappli/home/bin/mysql.ksh -s</code></div>
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pour vérifier que vos serveurs sont lancés correctement, utilisez la
+commande <code>lsof -i</code>, elle devrait vous retourner quelque chose qui
+ressemble à ça : <pre class="code">COMMAND   PID USER   FD   TYPE DEVICE SIZE NODE NAME
+apache2  7362 bcmi    3u  IPv6  42819       TCP *:55579 (LISTEN)
+mysqld   7453 bcmi   12u  IPv4  43028       TCP *:55679 (LISTEN)
+apache2 26124 bcmi    3u  IPv6  42819       TCP *:55579 (LISTEN)
+apache2 26125 bcmi    3u  IPv6  42819       TCP *:55579 (LISTEN)</pre>
+
+<p>( Cela signifie que le démon apache2 écoute sur le port 55579 et que le
+démon mysqld écoute sur le port 55679 )<br />
+Dans le cas où rien ne s’affiche, consultez les logs dans
+<code>/applis/monappli/home/log/*</code> </p>
+</p>
+</div>
+
+<div class="section">
+<h3><a name="etape_3_lancer_les_demons11"
+id="etape_3_lancer_les_demons11">Etape 4 : configurations</a></h3>
+
+<div>
+
+<div class="section">
+<h4>Configurer mysql et phpmyadmin</h4>
+
+<p><p>Donnez les droit de connexion au serveur mysql au serveur hébergeant
+phpmyadmin (votre machine par exemple) :<br />
+<code>/applis/monappli/home/bin/mysql.ksh -mr gully.ads.intra.inist.fr</code>
+</p>
+
+<p>(remplacez <strong>gully.ads.intra.inist.fr</strong> par le nom de la
+machine hébergeant phpmyadmin. Vous pouvez également donner les droits à
+tout le monde avec <code>/applis/monappli/home/bin/mysql.ksh -mr %</code>)</p>
+
+<p>Il reste ensuite a configurer phpmyadmin. Voici un exemple de
+configuration à placer dans votre fichier de config phpmyadmin : </p>
+<pre name="code" class="php">$i++;
+$cfg['Servers'][$i]['host']          = 'ida.intra.inist.fr'; // MySQL hostname or IP address
+$cfg['Servers'][$i]['port']          = '50102';          // MySQL port - leave blank for default port
+$cfg['Servers'][$i]['socket']        = '';          // Path to the socket - leave blank for default socket
+$cfg['Servers'][$i]['connect_type']  = 'tcp';    // How to connect to MySQL server ('tcp' or 'socket')
+$cfg['Servers'][$i]['extension']     = 'mysql';     // The php MySQL extension to use ('mysql' or 'mysqli')
+$cfg['Servers'][$i]['compress']      = FALSE;       // Use compressed protocol for the MySQL connection
+$cfg['Servers'][$i]['auth_type']     = 'cookie';    // Authentication method (config, http or cookie based)?
+$cfg['Servers'][$i]['verbose']       = 'ida (corpo)';          // Verbose name for this host - leave blank to show the hostname</pre>
+</p>
+</div>
+
+<div class="section">
+<h4>Installer PEAR</h4>
+
+<p>Cette étape necessite d'avoir installé le module php. Dans un premier
+temps il faut télécharger les packages pear de base. Lancez alors la
+commande suivante : <code>/applis/monappli/home/install-pear.sh</code></p>
+
+<p>Plusieurs fichiers seront téléchargés et installés dont :</p>
+<ul>
+  <li><code>/applis/monappli/home/bin/pear</code> : le binaire de pear, c'est
+    celui la que vous devrez utiliser par la suite pour installer des
+  packages</li>
+  <li><code>/applis/monappli/home/lib/pear/*</code> : c'est là où tous les
+    packages initiaux de pear ont été installés, ce chemin est configuré
+    automatiquement dans la variable <code>include_path</code> de php dans
+    votre module apache.</li>
+</ul>
+
+<p>Pour installer un package, il ne vous reste plus qu'à utiliser la
+commande bin/pear. Par exemple pour installer le package <a
+href="http://www.pxxo.net">Pxxo</a>, procédez comme cela :</p>
+<pre>cd /applis/monappli/home/
+bin/pear channel-discover pear.pxxo.net
+bin/pear install pxxo/Pxxo</pre>
+</div>
+</div>
+</div>
+</div>
+<!-- Coloristion syntaxique  -->
+<script type="text/javascript"
+src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shCore.js">
+</script>
+<script type="text/javascript"
+src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushPhp.js">
+</script>
+<!--
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushCSharp.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushJScript.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushJava.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushVb.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushSql.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushXml.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushDelphi.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushPython.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushRuby.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushCss.js"></script>
+<script type="text/javascript" src="http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/shBrushCpp.js"></script>
+-->
+<script type="text/javascript">
+if(window.isBloggerMode == true)
+	dp.SyntaxHighlighter.BloggerMode();
+dp.SyntaxHighlighter.ClipboardSwf = 'http://www.pkgi.net/syntaxhighlighter-1.5.1/Scripts/clipboard.swf';
+dp.SyntaxHighlighter.HighlightAll('code');
+// chargement de la feuille de style
+var oLink = document.createElement("link")
+oLink.href = "http://www.pkgi.net/syntaxhighlighter-1.5.1/Styles/SyntaxHighlighter.css";
+oLink.rel = "stylesheet";
+oLink.type = "text/css";
+document.body.appendChild(oLink);</script>
 </body>
 </html>
