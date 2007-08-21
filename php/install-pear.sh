@@ -22,12 +22,16 @@ if ( getenv('http_proxy') !== FALSE || getenv('HTTP_PROXY') !== FALSE)
 $ct = stream_context_create($ct_params);
 $gopear = file_get_contents("http://pear.php.net/go-pear", false, $ct);
 
+// reglages des chemins
 $gopear = str_replace('detect_install_dirs();','detect_install_dirs();
 $prefix    = dirname(__FILE__);
 $temp_dir  = $prefix."/tmp/pear";
 $php_dir   = $prefix."/lib/pear";
 $cache_dir = $prefix."/tmp/pear/cache";
 ',$gopear);
+$gopear = str_replace('PEAR_Config::singleton()',
+                      'PEAR_Config::singleton(\''.getenv('APPNAME_HOME').'/etc/pear.conf'.'\')',
+                      $gopear);
 
 // repond automatiquement aux questions et retire les "press Enter to continue"
 $gopear = str_replace('fgets($tty, 1024);','',$gopear);
@@ -44,7 +48,12 @@ DIR=`dirname "$0"`
 cd "$DIR"
 $PHP -C -q -d output_buffering=1 "$FILE" $@
 mkdir -p '.getenv('APPNAME_HOME').'/tmp/pear/cache
+$PHP -r \'$f="'.getenv('APPNAME_HOME').'/bin/pear"; file_put_contents($f,str_replace("pearcmd.php \\"$@\\"","pearcmd.php -c '.getenv('APPNAME_HOME').'/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
+$PHP -r \'$f="'.getenv('APPNAME_HOME').'/bin/peardev"; file_put_contents($f,str_replace("pearcmd.php \\"$@\\"","pearcmd.php -c '.getenv('APPNAME_HOME').'/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
+$PHP -r \'$f="'.getenv('APPNAME_HOME').'/bin/pecl"; file_put_contents($f,str_replace("pearcmd.php \\"$@\\"","peclcmd.php -c '.getenv('APPNAME_HOME').'/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
 '.getenv('APPNAME_HOME').'/bin/pear config-set cache_dir '.getenv('APPNAME_HOME').'/tmp/pear/cache
+'.getenv('APPNAME_HOME').'/bin/pear config-set auto_discover 1
+'.getenv('APPNAME_HOME').'/bin/pear channel-discover pear.pxxo.net
 '.getenv('APPNAME_HOME').'/bin/pear config-show
 exit
 <?php
