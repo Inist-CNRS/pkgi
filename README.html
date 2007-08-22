@@ -10,39 +10,42 @@ body {
   font-family: sans-serif;
 }
 table {
-border:3px solid #6495ed;
-border-collapse:collapse;
-width:90%;
-margin:auto;
+  border:3px solid #6495ed;
+  border-collapse:collapse;
+  width:90%;
+  margin:auto;
 }
 thead, tfoot {
-background-color:#D0E3FA;
-border:1px solid #6495ed;
+  background-color:#D0E3FA;
+  border:1px solid #6495ed;
 }
 tbody {
-background-color:#FFFFFF;
-border:1px solid #6495ed;
+  background-color:#FFFFFF;
+  border:1px solid #6495ed;
 }
 th {
-font-family:monospace;
-border:1px dotted #6495ed;
-padding:5px;
-background-color:#EFF6FF;
-width:25%;
+  font-family:monospace;
+  border:1px dotted #6495ed;
+  padding:5px;
+  background-color:#EFF6FF;
+  width:25%;
 }
 td {
-font-family:sans-serif;
-font-size:80%;
-border:1px solid #6495ed;
-padding:5px;
-text-align:left;
+  font-family:sans-serif;
+  font-size:80%;
+  border:1px solid #6495ed;
+  padding:5px;
+  text-align:left;
 }
 caption {
-font-family:sans-serif;
+  font-family:sans-serif;
 }
 code, pre {
   background-color: #f6fcff;
   border: solid 1px #6495ed;
+}
+pre {
+  padding: 2px;
 }
 h3 {
 color: #19abff;
@@ -78,7 +81,7 @@ https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
   <li class="level1">
     <div class="li">
     Avoir les droits sur son appli que l’on supposera installée dans
-    /applis/monappli</div>
+    <code>/applis/monappli</code></div>
   </li>
   <li class="level1">
     <div class="li">
@@ -265,27 +268,27 @@ $cfg['Servers'][$i]['verbose']       = 'ida (corpo)';          // Verbose name f
 <div class="section">
 <h4>Installer PEAR</h4>
 
-<p>Cette étape necessite d'avoir installé le module php. Dans un premier
-temps il faut télécharger les packages pear de base. Lancez alors la
-commande suivante : <code>/applis/monappli/home/install-pear.sh</code></p>
+<p>Cette étape necessite d'avoir installé le module php. Ensuite, la
+première étape est de télécharger et installer les packages PEAR de base,
+pour cela il suffit de lancer la commande suivante :
+<code>/applis/monappli/home/lib/pear/install-pear.sh</code></p>
 
 <p>Plusieurs fichiers seront téléchargés et installés dont :</p>
 <ul>
-  <li><code>/applis/monappli/home/bin/pear</code> : le binaire de pear, c'est
-    celui la que vous devrez utiliser par la suite pour installer des
-  packages</li>
-  <li><code>/applis/monappli/home/lib/pear/*</code> : c'est là où tous les
-    packages initiaux de pear ont été installés, ce chemin est configuré
-    automatiquement dans la variable <code>include_path</code> de php dans
-    votre module apache.</li>
+  <li><code>/applis/monappli/home/lib/pear/bin/pear</code> : le binaire de
+    pear, c'est celui la que vous devrez utiliser par la suite pour installer
+    des packages</li>
+  <li><code>/applis/monappli/home/lib/pear/php/</code> : c'est ici que seront
+    placées toutes les sources php des différents packages que vous
+    installerez. Ce chemin sera configuré automatiquement dans la variable
+    <code>include_path</code> du module php d'apache.</li>
 </ul>
 
 <p>Pour installer un package, il ne vous reste plus qu'à utiliser la
-commande bin/pear. Par exemple pour installer le package <a
+commande <code>lib/bin/pear</code>. Par exemple pour installer le package <a
 href="http://www.pxxo.net">Pxxo</a>, procédez comme cela :</p>
 <pre>cd /applis/monappli/home/
-bin/pear channel-discover pear.pxxo.net
-bin/pear install pxxo/Pxxo</pre>
+lib/bin/pear install pxxo/Pxxo</pre>
 </div>
 </div>
 </div>
