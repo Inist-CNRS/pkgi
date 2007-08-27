@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
   <title>Package Installer</title>
@@ -62,9 +62,13 @@ width: 800px;
 <h1>PkgInstaller</h1>
 
 <p>Ce programme permet la création rapide d'environnements applicatifs
-indépendants sous debian etch. Chaque application peut ainsi sélectionner
-très facilement les modules qu'elle souhaite utiliser :
-apache,mysql,tomcat,php...</p>
+indépendants sous debian etch. Chaque application peut ainsi installer très
+facilement les modules qu'elle souhaite utiliser : apache, mysql, tomcat,
+php...</p>
+
+<p>Le principe de pkgi est de générer les instances des fichiers de
+configuration et des lanceurs à partir de templates et de variables
+d'environnements. </p>
 
 <p>Page du projet sourcesup : <a
 href="http://sourcesup.cru.fr/projects/pkgi/">http://sourcesup.cru.fr/projects/pkgi/</a></p>
@@ -237,7 +241,23 @@ Dans le cas où rien ne s’affiche, consultez les logs dans
 <h3><a name="etape_3_lancer_les_demons11"
 id="etape_3_lancer_les_demons11">Etape 4 : configurations</a></h3>
 
-<div>
+<div class="section">
+<h4>Principes</h4>
+
+<p>La personnalisation des fichiers de configuration doit être faite de
+préférence dans les fichiers template eux-même. Ainsi lorsqu'un nouveau
+build sera lancé, vos modifications ne seront pas écrasées.</p>
+
+<p>Dans chaque fichier de config, vous trouverez des références aux
+variables d'environnements du type : <code>&lt;?php echo
+getenv('APPNAME_HOME'); ?&gt;</code>. Ceci fait référence à la variable
+<code>XXX_HOME</code> qui vous a été demandé lors du premier build. Il est
+important de conserver le préfixe <code>APPNAME_</code> car il sera
+remplacé automatiquement pas le vrai nom de votre application au moment du
+build. Ceci permet un développement plus pratique de pkgi, mais surtout
+procéder ainsi permet de changer de nom d'application à tout moment sans
+devoir repartir de zéro.</p>
+</div>
 
 <div class="section">
 <h4>Configurer mysql et phpmyadmin</h4>
@@ -268,7 +288,7 @@ $cfg['Servers'][$i]['verbose']       = 'ida (corpo)';          // Verbose name f
 <div class="section">
 <h4>Installer PEAR</h4>
 
-<p>Cette étape necessite d'avoir installé le module php. Ensuite, la
+<p>Cette étape nécessite d'avoir installé le module php. Ensuite, la
 première étape est de télécharger et installer les packages PEAR de base,
 pour cela il suffit de lancer la commande suivante :
 <code>/applis/monappli/home/lib/pear/install-pear.sh</code></p>
@@ -289,7 +309,6 @@ commande <code>lib/bin/pear</code>. Par exemple pour installer le package <a
 href="http://www.pxxo.net">Pxxo</a>, procédez comme cela :</p>
 <pre>cd /applis/monappli/home/
 lib/bin/pear install pxxo/Pxxo</pre>
-</div>
 </div>
 </div>
 </div>
