@@ -1,20 +1,22 @@
 <?php
 
-class LAMPBuilder
+class Pkgi
 {
   var $APPNAME = '';
   var $MODULES = array();
   var $MODULES_LIST = array();
 
   var $env_path = null;
-  var $src_path = null;
+  var $tpl_path = null;
   var $dst_path = null;
   var $php_path = null;
 
-  function LAMPBuilder($env_path = null, $src_path = null, $dst_path = null)
+  function Pkgi($env_path = null, $tpl_path = null, $dst_path = null)
   {
-    $this->env_path = ($env_path == null) ? dirname(__FILE__).'/../src.env.ksh' : $env_path;
-    $this->src_path = ($src_path == null) ? realpath(dirname(__FILE__)) : $src_path;
+    $current_dir = substr(dirname(__FILE__), strrpos(dirname(__FILE__),'/')+1);
+    if (!preg_match('/^[a-z]+$/i',$current_dir)) $current_dir = 'src';
+    $this->env_path = ($env_path == null) ? dirname(__FILE__).'/../'.$current_dir.'.env.ksh' : $env_path;
+    $this->tpl_path = ($tpl_path == null) ? realpath(dirname(__FILE__)) : $tpl_path;
     $this->dst_path = $dst_path;
     $this->php_path = getenv('PHP');
     if ($this->php_path === false)  $this->php_path = '/usr/bin/php'; 
@@ -280,13 +282,13 @@ class LAMPBuilder
     $ret = array();
     foreach($this->MODULES as $m)
     {
-      $list[$m] = array_values(ls($this->src_path.'/'.$m,"//i"));
+      $list[$m] = array_values(ls($this->tpl_path.'/'.$m,"//i"));
       $n = 0;
       foreach( $list[$m] as $l)
       {
-        $list[$m][$n] = str_replace($this->src_path.'/'.$m.'/', '', $list[$m][$n]);
+        $list[$m][$n] = str_replace($this->tpl_path.'/'.$m.'/', '', $list[$m][$n]);
         if (is_file($l))
-          if ( dirname($l) == $this->src_path )
+          if ( dirname($l) == $this->tpl_path )
             unset($list[$m][$n]);
         if (trim($list[$m][$n]) == '' ||
             trim($list[$m][$n]) == '/' ||
@@ -308,7 +310,7 @@ class LAMPBuilder
     foreach($tlist as $m => $templates)
       foreach($templates as $t)
       {
-        $t_src = $this->src_path.'/'.$m.'/'.$t;
+        $t_src = $this->tpl_path.'/'.$m.'/'.$t;
         $t_dst = $this->dst_path.'/'.$t;
         echo "Ecriture de ".$t_dst."\n";
         if (file_exists($t_src) && !is_dir($t_src))

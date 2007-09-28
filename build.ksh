@@ -15,11 +15,9 @@ ob_end_clean();
 set_time_limit(0);
 ob_implicit_flush(true);
 
-require_once dirname(__FILE__).'/lib.inc.php';
+require_once dirname(__FILE__).'/pkgi.inc.php';
 
-
-$lampb = new LAMPBuilder( dirname(__FILE__).'/../src.env.ksh', realpath(dirname(__FILE__)) );
-$lampb->run();
-
+$pkgi = new Pkgi( null, realpath(dirname(__FILE__)) );
+$pkgi->run();
 
 ?>
