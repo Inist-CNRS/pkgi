@@ -43,7 +43,10 @@ SLAPD_SERVICES="ldap://0.0.0.0:<?php echo getenv('APPNAME_LDAP_PORT'); ?>/"
 SLAPD_OPTIONS=""
 SLURPD_OPTIONS=""
 
-
+# Pour la gestion des log
+SLAPD_LOG="<?php echo getenv('APPNAME_HOME'); ?>/logs/ldap.log"
+SLAPD_LOGLEVEL="-d 256"
+#SLAPD_LOGLEVEL="-d 16383"
 
 # Load the default location of the slapd config file
 if [ -z "$SLAPD_CONF" ]; then
@@ -153,13 +156,9 @@ EOF
 start_slapd() {
 	echo -n " slapd"
 	if [ -z "$SLAPD_SERVICES" ]; then
-		reason="`start-stop-daemon --start --quiet --oknodo \
-			--pidfile "$SLAPD_PIDFILE" \
-			--exec /usr/sbin/slapd -- $SLAPD_OPTIONS 2>&1`"
+			/usr/sbin/slapd $SLAPD_OPTIONS $SLAPD_LOGLEVEL >> $SLAPD_LOG 2>&1 &
 	else
-		reason="`start-stop-daemon --start --quiet --oknodo \
-			--pidfile "$SLAPD_PIDFILE" \
-			--exec /usr/sbin/slapd -- -h "$SLAPD_SERVICES" $SLAPD_OPTIONS 2>&1`"
+			/usr/sbin/slapd -h "$SLAPD_SERVICES" $SLAPD_OPTIONS $SLAPD_LOGLEVEL >> $SLAPD_LOG 2>&1 &
 	fi
 }
 
