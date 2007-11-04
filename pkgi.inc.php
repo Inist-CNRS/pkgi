@@ -246,7 +246,11 @@ class Pkgi
   }
 
   /**
-   * Charge APPNAME_DSTART_LIST et APPNAME_DSTOP_LIST
+   * Charge :
+   * APPNAME_DSTART_LIST
+   * APPNAME_DSTOP_LIST
+   * APPNAME_DRESTART_LIST
+   * APPNAME_ENV_FILE_PATH
    */
   function load_extra_env(&$env)
   {
@@ -274,6 +278,9 @@ class Pkgi
     putenv('APPNAME_DSTART_LIST='.$dstart_list);
     putenv('APPNAME_DSTOP_LIST='.$dstop_list);
     putenv('APPNAME_DRESTART_LIST='.$drestart_list);
+
+    // ajout du chemin vers le fichier d'environement cree
+    putenv('APPNAME_ENV_FILE_PATH='.realpath($this->env_path));
   }
 
 
