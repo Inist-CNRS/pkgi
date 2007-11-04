@@ -5,8 +5,9 @@ set -e
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 # Charge les variables utilisateur
-if [ -f <?php echo getenv('APPNAME_HOME'); ?>/src.env.ksh ]; then
-	. <?php echo getenv('APPNAME_HOME'); ?>/src.env.ksh
+if [[ -f <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> ]]
+then
+  . <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> 
 fi
 
 . /lib/lsb/init-functions

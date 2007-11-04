@@ -35,9 +35,9 @@ else
 fi
 
 # ENV generiques de l'appli (port http, port mysql ...)
-if [[ -f <?php echo getenv('APPNAME_HOME') ?>/src.env.ksh ]]
+if [[ -f <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> ]]
 then
-  . <?php echo getenv('APPNAME_HOME') ?>/src.env.ksh
+  . <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> 
 fi
 
 # ENV specifiques de l'appli
