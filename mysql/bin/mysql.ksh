@@ -124,7 +124,8 @@ case ${1} in
 				exit ${RC_ERR_YETSTARTED}
 			fi
 		fi
-		${MYSQLD_BIN} --defaults-file=${F_CNF} --basedir=${D_BAS} --language=french &
+    # les options 2>/dev/null 1>/dev/null permettent d'eviter de bloquer les scriptes de surveillance
+		${MYSQLD_BIN} --defaults-file=${F_CNF} --basedir=${D_BAS} --language=french 2>/dev/null 1>/dev/null &
 		sleep 2
 		running
 		;;
@@ -145,7 +146,7 @@ case ${1} in
 			kill -s TERM ${pid} 2> /dev/null
   echo "Stopping mysql on <?php
 $ports = array();
-if (getenv('APPNAME_MYSQL_PORT')!= 0)  $ports[] = 'http='.getenv('APPNAME_MYSQL_PORT');
+if (getenv('APPNAME_MYSQL_PORT')!= 0)  $ports[] = getenv('APPNAME_MYSQL_PORT');
 echo implode(', ', $ports);
 ?>"
       sleep 3
