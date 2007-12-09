@@ -181,12 +181,20 @@ class Pkgi
     {
       $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
       if (!file_exists($ini_path)) continue;
+
+      // execute les balises php eventuelles contenues dans config.ini
+      $output = shell_exec($this->php_path.' '.$ini_path);
+      $ini_path = dirname(__FILE__).'/config.ini.tmp';
+      file_put_contents($ini_path,$output);
+      
       $ini_data = parse_ini_file($ini_path);
       for ($i = 0 ; $i<count($ini_data['env']) ; $i++)
       {
         
-        $env_to_check[$ini_data['env'][$i]] = array( $ini_data['env-desc'][$i],
-                                                     $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array());
+        $env_to_check[$ini_data['env'][$i]] = array();
+        $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-desc'][$i];
+        $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array();
+        $env_to_check[$ini_data['env'][$i]][] = isset($ini_data['env-default'][$i]) ? $ini_data['env-default'][$i] : '';
       }
     }
     return $env_to_check;
@@ -199,7 +207,7 @@ class Pkgi
   function &check_env(&$env)
   {
     echo "Verification de la presence des variables d'environnement ...\n";
-
+    
     // construit une liste des variables d'env a tester
     $env_to_check = $this->_build_env_to_check();
     foreach($env_to_check as $e => $e_option)
@@ -215,8 +223,10 @@ class Pkgi
           echo "Signification de $e : ".$e_option[0]."\n";
           if (count($e_option[1]) > 0)
             echo "Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n";
-          echo "La variable $e est indefinie, entrez sa valeur : ";
+          $v_default = $e_option[2] != '' ? "[defaut=".$e_option[2]."] " : '';
+          echo "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
           $v = readline();
+          if ($v == '') $v = $e_option[2]; // si on a rien repondu, on prend la valeur par defaut
         }
         $env[$e] = $v;
         putenv("$e=$v");
