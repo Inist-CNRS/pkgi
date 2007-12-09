@@ -14,10 +14,6 @@
 # blocage de l'execution en cas de variable non definie
 set -u
 
-<?php if ( getenv('APPNAME_APACHE_HTTP_PORT') == 0 && getenv('APPNAME_APACHE_HTTPS_PORT') == 0) { ?>
-exit ${RC_OK_TERMINE}
-<?php die(); } ?>
-
 # on met a zero l'environement
 env -i
 
@@ -101,24 +97,19 @@ trap 'trap "" INT; rm -f ${L_DEL}' EXIT
 
 
 function running {
-	if [[ ! -f ${F_PID} ]]
-	then
-    echo "ERROR: httpd pid file does not exist"
-		exit ${RC_ERR_NOTSTARTED}
-	fi
-	pid=`cat ${F_PID}`
-	ps -ef | cut -c 10-14,48- | grep "${pid}" > /dev/null
-	if [[ ${?} -ne 0 ]]
-	then
-    echo "ERROR : httpd process is not running"
-		exit ${RC_ERR_NOPROCESS}
-	fi
-  echo "httpd is listening on <?php
-$ports = array();
-if (getenv('APPNAME_APACHE_HTTP_PORT')!= 0)  $ports[] = getenv('APPNAME_APACHE_HTTP_PORT').'(http)';
-if (getenv('APPNAME_APACHE_HTTPS_PORT')!= 0) $ports[] = 'https='.getenv('APPNAME_APACHE_HTTPS_PORT').'(https)';
-echo implode(', ', $ports);
-?>"
+    if [[ ! -f ${F_PID} ]]
+    then
+        echo "ERROR: httpd pid file does not exist"
+        exit ${RC_ERR_NOTSTARTED}
+    fi
+    pid=`cat ${F_PID}`
+    ps -ef | cut -c 10-14,48- | grep "${pid}" > /dev/null
+    if [[ ${?} -ne 0 ]]
+    then
+        echo "ERROR : httpd process is not running"
+        exit ${RC_ERR_NOPROCESS}
+    fi
+    echo "httpd is listening on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
 }
 
 
@@ -144,37 +135,32 @@ case ${1} in
 			fi
 		fi
 		${HTTPD_BIN} -f ${F_CNF} 2>| ${F_LOG_SRV} &
-		sleep 2
+		sleep 3
 		running
 		;;
 	-s | stop )
 		# arret de l'application
 		if [[ ! -f ${F_PID} ]]
 		then
-      echo "ERROR : cannot stop httpd because its pid file doesn't exist"
-			exit ${RC_ERR_NOTSTARTED}
+                    echo "ERROR : cannot stop httpd because its pid file doesn't exist"
+                    exit ${RC_ERR_NOTSTARTED}
 		fi
 		pid=`cat ${F_PID}`
 		kill -s TERM ${pid} 2> /dev/null
 		if [[ ${?} -ne 0 ]]
-		then
-      echo "ERROR : cannot stop httpd because its process doesn't exist"
-			exit ${RC_ERR_NOPROCESS}
+                then
+                    echo "ERROR : cannot stop httpd because its process doesn't exist"
+                    exit ${RC_ERR_NOPROCESS}
 		else
-			kill -s TERM ${pid} 2> /dev/null
-  echo "Stopping httpd on <?php
-$ports = array();
-if (getenv('APPNAME_APACHE_HTTP_PORT')!= 0)  $ports[] = 'http='.getenv('APPNAME_APACHE_HTTP_PORT');
-if (getenv('APPNAME_APACHE_HTTPS_PORT')!= 0) $ports[] = 'https='.getenv('APPNAME_APACHE_HTTPS_PORT');
-echo implode(', ', $ports);
-?>"
-      sleep 2
+                    kill -s TERM ${pid} 2> /dev/null
+                    echo "Stopping httpd on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
+                    sleep 3
 		fi
 		;;
 	-u )
-		# redemarrage de l'application
-    <?php echo getenv('APPNAME_HOME') ?>/bin/httpd.ksh -s
-    <?php echo getenv('APPNAME_HOME') ?>/bin/httpd.ksh -r
+	        # redemarrage de l'application
+                <?php echo getenv('APPNAME_HOME') ?>/bin/httpd.ksh -s
+                <?php echo getenv('APPNAME_HOME') ?>/bin/httpd.ksh -r
 		;;
 	-c )
 		# verification du bon fonctionnement de l'application
