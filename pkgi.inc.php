@@ -241,7 +241,7 @@ class Pkgi
   {
     $filename = $this->env_path;
     echo "Ecriture des variables d'environnement dans ".realpath($filename)."\n";
-    $data = '';
+    $data = '# Attention : n\'editez pas ce fichier manuellement car il sera regenere par pkgi au prochain build.ksh'."\n";
     foreach($env as $k => $v)
     {
       // ecriture dans le fichier src.env.ksh
