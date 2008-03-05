@@ -61,20 +61,21 @@ width: 800px;
 <body>
 <h1>pkgi</h1>
 
-<p>Ce programme permet la création rapide d'environnements applicatifs
-indépendants sous debian etch (fonctionne peut-être sur d'autres versions). Chaque application peut ainsi installer très
-facilement les modules qu'elle souhaite utiliser : apache, mysql, tomcat,
-php...</p>
+<p>Ce logiciel permet la création rapide d'environnements applicatifs
+indépendants sous debian etch et ses futures version stables. Chaque
+application peut ainsi installer très facilement les modules qu'elle
+souhaite utiliser : apache, mysql, tomcat, php...</p>
 
 <p>Le principe de pkgi est de générer les instances des fichiers de
 configuration et des lanceurs à partir de templates et de variables
 d'environnements. </p>
 
-<p>Page du projet sourcesup : <a
-href="http://sourcesup.cru.fr/projects/pkgi/">http://sourcesup.cru.fr/projects/pkgi/</a></p>
+<p>Le programme est sous licence LGPL et nous remercions la plateforme <a
+href="http://sourcesup.cru.fr/projects/pkgi/">sourcesup</a> pour
+l'hébergement.</p>
 
-<p>Télécharger par subversion : <code>svn co
-https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
+<p>Vous pouvez récupérer la version de développement en utilisant
+subversion : <code>svn co https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
 
 <div class="section">
 <h2>Installation</h2>
@@ -101,8 +102,9 @@ id="etape_1_installez_les_templates1">Etape 1 : récupération des
 sources</a></h3>
 
 <p>Placez vous dans votre homedir <code>/applis/monappli/home/</code> et
-utilisez SVN pour récupérer les sources : </p>
-<pre><strong>svn export https://subversion.cru.fr/pkgi/trunk src</strong></pre>
+utilisez SVN pour récupérer les sources (remplacez 1.9 par le <a
+href="https://subversion.cru.fr/pkgi/tags/">tag</a> que vous souhaitez) : </p>
+<pre><strong>svn export https://subversion.cru.fr/pkgi/tags/1.9 src</strong></pre>
 
 <p>Vous avez alors un répertoire <code>src/</code> dans votre homedir, il
 contient les templates des fichiers de configuration et des lanceurs de votre
@@ -171,6 +173,11 @@ variables seront automatiquement extraites de
 <div class="section">
 <h3><a name="etape_3_lancer_les_demons2"
 id="etape_3_lancer_les_demons2">Etape 3 : lancer les démons</a></h3>
+
+<p>Une commande à retenir : <code>/applis/monappli/home/bin/appli.ksh
+-r</code><br />
+Cette commande va lancer automatiquement tous les démons. Si vous désirez
+plus de finesse pour lancer/arrêter un module en particulier :</p>
 
 <table border="1" cellpadding="0" cellspacing="0">
   <thead>
@@ -262,7 +269,7 @@ devoir repartir de zéro.</p>
 <div class="section">
 <h4>Configurer mysql et phpmyadmin</h4>
 
-<p><p>Donnez les droit de connexion au serveur mysql au serveur hébergeant
+<p>Donnez les droit de connexion au serveur mysql au serveur hébergeant
 phpmyadmin (votre machine par exemple) :<br />
 <code>/applis/monappli/home/bin/mysql.ksh -mr gully.ads.intra.inist.fr</code>
 </p>
@@ -282,7 +289,6 @@ $cfg['Servers'][$i]['extension']     = 'mysql';     // The php MySQL extension t
 $cfg['Servers'][$i]['compress']      = FALSE;       // Use compressed protocol for the MySQL connection
 $cfg['Servers'][$i]['auth_type']     = 'cookie';    // Authentication method (config, http or cookie based)?
 $cfg['Servers'][$i]['verbose']       = 'ida (corpo)';          // Verbose name for this host - leave blank to show the hostname</pre>
-</p>
 </div>
 
 <div class="section">
@@ -309,6 +315,33 @@ commande <code>lib/bin/pear</code>. Par exemple pour installer le package <a
 href="http://www.pxxo.net">Pxxo</a>, procédez comme cela :</p>
 <pre>cd /applis/monappli/home/
 lib/bin/pear install pxxo/Pxxo</pre>
+</div>
+
+<div class="section">
+<h4>Configuration avancée : modularisation</h4>
+
+<p>Si vous désirez ne pas modifier directement les templates pour ainsi
+pouvoir mettre à jour plus facilement pkgi lors de ses futures versions,
+vous pouvez créer un module (ex: "monmodule") pour votre application. Voici
+un exemple concret :</p>
+<ol>
+  <li>Créez un répertoire <code>src/monmodule/</code> qui contiendra les
+    fichiers de configuration de votre application (son nom peut-être tout
+    simplement celui de votre application)</li>
+  <li>Ajouter la chaîne <code>monmodule</code> dans <code>src.env.ksh</code>
+    dans la section <code>MODULES</code>, tout à la fin de la liste (c'est
+    important pour que vos paramètres surchargent ceux par défaut)</li>
+  <li>Créez les fichiers de configurations que vous souhaitez surcharger,
+    par exemple : 
+    <ul>
+      <li><code>src/monmodule/etc/httpd.conf.d/maconf.conf</code></li>
+      <li><code>src/monmodule/etc/my.cnf</code></li>
+    </ul>
+    <p>(ici, <code>maconf.conf</code> sera chargé par apache en plus du
+    classique <code>httpd.conf</code> et notre <code>my.cnf</code> sera
+    chargé par mysql)</p>
+  </li>
+</ol>
 </div>
 </div>
 </div>

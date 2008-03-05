@@ -73,7 +73,9 @@ class Pkgi
     $d = opendir($dir);
     while ($file = readdir($d))
     {
-      if ($file == '.' || $file == '..' || $file == 'CVS' || $file == '.svn' || $file == 'core')
+      if ($file == '.' || $file == '..' ||
+          $file == 'CVS' || $file == '.svn' ||
+          $file == 'core')
         continue;
       else if (is_dir($dir.'/'.$file))
         $this->MODULES_LIST[] = $file;
@@ -363,7 +365,9 @@ function ls($dir, $mask /*.php$|.txt$*/)
   $empty = true;
   while ($file = readdir($d))
   {
-    if ($file == '.' || $file == '..' || $file == 'CVS' || $file == '.svn' || $file == '.dummy' || !preg_match($mask, $file) ) continue;
+    if ($file == '.' || $file == '..' ||
+        $file == 'CVS' || $file == '.svn' || $file == '.dummy' || preg_match('/~$/',$file) ||
+        !preg_match($mask, $file)) continue;
     $empty = false;
     if (is_dir($dir.'/'.$file))
     {
