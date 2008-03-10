@@ -73,7 +73,7 @@ fi
 
 
 case ${1} in
-	-r )
+	-r | start )
 <?php
   $dstart_list = unserialize(getenv('APPNAME_DSTART_LIST'));
   foreach($dstart_list as $module => $cmd) {
@@ -88,7 +88,7 @@ case ${1} in
 <?php } ?>		
 		;;
 
-	-s ) 
+	-s | stop ) 
 <?php
   $dstop_list = unserialize(getenv('APPNAME_DSTOP_LIST'));
   foreach($dstop_list as $module => $cmd) {
@@ -103,7 +103,7 @@ case ${1} in
 <?php } ?>
 		;;
 		
-	-u ) 
+	-u | restart ) 
 <?php
   $drestart_list = unserialize(getenv('APPNAME_DRESTART_LIST'));
   foreach($drestart_list as $module => $cmd) {
@@ -121,13 +121,13 @@ case ${1} in
 	*) 
 		# parametre invalide
 		
-			echo "usage: $0 ( -r | -s | -u | -h )"
-			cat <<EOF
+		echo "usage: $0 ( -r | -s | -u | -h )"
+		cat <<EOF
 
-   -r   - demarrage de <?php echo implode(', ',array_keys($dstart_list)); ?> 
-   -s   - arret de <?php echo implode(', ',array_keys($dstop_list)); ?> 
-   -u   - redemarrage de  <?php echo implode(', ',array_keys($drestart_list)); ?> 
-   -h   - cette page
+   -r | start   - demarrage de <?php echo implode(', ',array_keys($dstart_list)); ?> 
+   -s | stop    - arret de <?php echo implode(', ',array_keys($dstop_list)); ?> 
+   -u | restart - redemarrage de  <?php echo implode(', ',array_keys($drestart_list)); ?> 
+   -h | help    - cette page
 
 EOF
 		exit ${RC_ERR_PARAM}

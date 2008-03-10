@@ -53,20 +53,13 @@ then
   . <?php echo getenv('APPNAME_HOME') ?>/env.ksh
 fi
 
-# HOME
-HTTPD_HOME=<?php echo getenv('APPNAME_HOME') ?>
-
-# Executable
-HTTPD_BIN="/usr/sbin/apache2"
+# Binaires
+HTTPD_HOME=<?php echo getenv('APPNAME_HOME') ?> 
+APACHE2CTL="/usr/sbin/apache2ctl"
 
 # Configs
-<?php if (getenv('APPNAME_APACHE_HTTP_PORT') != 0) { ?>
-F_LOG_SRV=${HTTPD_HOME}/log/<?php echo getenv('APPNAME_APACHE_HTTP_PORT'); ?>-error.log
-<?php } else if (getenv('APPNAME_APACHE_HTTPS_PORT') != 0) { ?>
-F_LOG_SRV=${HTTPD_HOME}/log/<?php echo getenv('APPNAME_APACHE_HTTPS_PORT'); ?>-error.log
-<?php } else { ?>
-F_LOG_SRV=${HTTPD_HOME}/log/httpd-error.log
-<?php } ?>
+F_LOG_SRV=${HTTPD_HOME}/log/httpd.error.log
+F_LOG_LEVEL=debug
 F_CNF=${HTTPD_HOME}/etc/httpd.conf
 F_PID=${HTTPD_HOME}/var/httpd.pid
 
@@ -99,14 +92,14 @@ trap 'trap "" INT; rm -f ${L_DEL}' EXIT
 function running {
     if [[ ! -f ${F_PID} ]]
     then
-        echo "ERROR: httpd pid file does not exist"
+        echo "Error: httpd pid file does not exist"
         exit ${RC_ERR_NOTSTARTED}
     fi
     pid=`cat ${F_PID}`
     ps -ef | cut -c 10-14,48- | grep "${pid}" > /dev/null
     if [[ ${?} -ne 0 ]]
     then
-        echo "ERROR : httpd process is not running"
+        echo "Error: httpd process is not running"
         exit ${RC_ERR_NOPROCESS}
     fi
     echo "httpd is listening on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
@@ -125,44 +118,32 @@ function running {
 case ${1} in
 	-r | start )
 		# demarrage de l'application
-		if [[ -f ${F_PID} ]]
+		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e debug -k start
+		if [[ ${?} -eq 0 ]]
 		then
-			kill -s 0 `cat ${F_PID}` 2> /dev/null
-			if [[ ${?} -eq 0 ]]
-			then
-        echo "ERROR : httpd is yet started"
-				exit ${RC_ERR_YETSTARTED}
-			fi
+		    echo "httpd is listening on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
+		else
+		    echo "An error occurred, please consult the logs ${F_LOG_SRV}"
+		    exit ${RC_ERR_NOTSTARTED}
 		fi
-		${HTTPD_BIN} -f ${F_CNF} 2>| ${F_LOG_SRV} &
-		sleep 3
-		running
 		;;
 	-s | stop )
 		# arret de l'application
-		if [[ ! -f ${F_PID} ]]
-		then
-                    echo "ERROR : cannot stop httpd because its pid file doesn't exist"
-                    exit ${RC_ERR_NOTSTARTED}
-		fi
-		pid=`cat ${F_PID}`
-		kill -s TERM ${pid} 2> /dev/null
-		if [[ ${?} -ne 0 ]]
-                then
-                    echo "ERROR : cannot stop httpd because its process doesn't exist"
-                    exit ${RC_ERR_NOPROCESS}
-		else
-                    kill -s TERM ${pid} 2> /dev/null
-                    echo "Stopping httpd on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
-                    sleep 3
-		fi
+		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e debug -k stop
+		echo "httpd stopped"
 		;;
-	-u )
+	-u | restart )
 	        # redemarrage de l'application
-                <?php echo getenv('APPNAME_HOME') ?>/bin/httpd.ksh -s
-                <?php echo getenv('APPNAME_HOME') ?>/bin/httpd.ksh -r
+		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e debug -k restart
+		if [[ ${?} -eq 0 ]]
+		then
+		    echo "httpd is listening on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
+		else
+		    echo "An error occurred, please consult the logs ${F_LOG_SRV}"
+		    exit ${RC_ERR_NOTSTARTED}
+		fi
 		;;
-	-c )
+	-c | check )
 		# verification du bon fonctionnement de l'application
 		running
 		;;
@@ -170,13 +151,13 @@ case ${1} in
 		# parametre invalide
 		#'''''''''''''''''''''''
 
-			echo "usage: $0 (-r | -s | -u | -c )"
-			cat <<EOF
+		echo "usage: $0 (-r | -s | -u | -c )"
+		cat <<EOF
 
-   -r | start  - start httpd
-   -s | stop   - stop httpd
-   -u          - restart httpd if running by sending a SIGHUP or start if not running
-   -c          - Test running
+   -r | start   - start httpd
+   -s | stop    - stop httpd
+   -u | restart - restart httpd if running by sending a SIGHUP or start if not running
+   -c | check   - Test running
 
 EOF
 
