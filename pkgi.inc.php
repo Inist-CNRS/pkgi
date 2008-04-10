@@ -87,9 +87,9 @@ class Pkgi
   {
     // on recherche MODULES dans l'environement
     // si on le trouve pas alors on pose la question
-    if (preg_match('/'.$this->APPNAME.'_MODULES=(.+)/i', getenv($this->APPNAME.'_MODULES'), $res))
+    if ($s = getenv($this->APPNAME.'_MODULES'))
     {
-      $this->MODULES = $this->_filter_valide_modules(explode(',',$res[1]));
+      $this->MODULES = $this->_filter_valide_modules(explode(',',$s));
     }
     else if (file_exists($this->env_path))
     {
@@ -123,9 +123,9 @@ class Pkgi
   {
     // on recherche APPNAME dans l'environement
     // si on le trouve pas alors on cherche dans le fichier src.env.ksh
-    if (preg_match('/APPNAME=([a-z]+)/i', getenv('APPNAME'), $res))
+    if ($s = getenv('APPNAME'))
     {
-      $this->APPNAME = $res[1];
+      $this->APPNAME = $s;
     }
     else if (file_exists($this->env_path))
     {

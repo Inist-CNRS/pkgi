@@ -317,6 +317,29 @@ href="http://www.pxxo.net">Pxxo</a>, procédez comme cela :</p>
 lib/bin/pear install pxxo/Pxxo</pre>
 </div>
 
+
+<div class="section">
+<h4>Configuration avancée : Fixer "en dur" certains parametres</h4>
+
+<p>Si vous désirez que certaines questions ne soient plus posées au lancement de la commande <code>build.ksh</code>, vous pouvez 
+prédéfinir les réponses. Ainsi au lancement vous ne serez plus obligé de répondre à toutes les questions.
+</p>
+<p>
+Cela est utile dans le cas ou vous intégrez PKGI dans votre application et que vous souhaitez prédéfinir certain réglage
+tout en permettant un déploiement de l'application par la commande <code>build.ksh</code>.
+</p>
+<p>
+Pour se faire, il suffit de créer au coté du fichier <code>build.ksh</code> un fichier nommé <code>build.env.ksh</code>
+qui contiendra les variables d'environnements que vous souhaitez fixer "en dur".
+</p>
+<h5>Exemple</h5>
+<pre>
+export APPNAME="EXEMPLE"
+export EXEMPLE_MODULES="core,php,apache,tmpreaper,logrotate"
+export EXEMPLE_PHP_VERSION="5"
+</pre>
+</div>
+
 <div class="section">
 <h4>Configuration avancée : modularisation</h4>
 

@@ -1,15 +1,17 @@
-#/bin/sh
+#!/bin/sh
 
-PHP=${PHP:=php}
+PHP="${PHP:=php}"
 PHP="${PHP} -d short_open_tag=0 "
 export PHP
 
-FILE=`basename "$0"`
-DIR=`dirname "$0"`
+FILE="`basename "$0"`"
+DIR="`dirname "$0"`"
+ENV="$DIR/build.env.ksh"
 
 cd "$DIR"
+[[ -f "$ENV" ]] && . "$ENV"
 exec $PHP -C -q -d output_buffering=1 "$FILE" $@ 
-exit ${?}
+exit $?
 <?php
 ob_end_clean();
 set_time_limit(0);
