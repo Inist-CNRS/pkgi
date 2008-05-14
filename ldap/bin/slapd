@@ -37,7 +37,7 @@ SLURPD_START=auto
 # sockets.
 # Example usage:
 # SLAPD_SERVICES="ldap://127.0.0.1:389/ ldaps:/// ldapi:///"
-SLAPD_SERVICES="ldap://0.0.0.0:<?php echo getenv('APPNAME_LDAP_PORT'); ?>/"
+SLAPD_SERVICES="ldap://<?php echo getenv('APPNAME_LDAP_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_LDAP_PORT'); ?>/"
 
 # Additional options to pass to slapd and slurpd
 SLAPD_OPTIONS=""
