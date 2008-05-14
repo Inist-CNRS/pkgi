@@ -77,8 +77,8 @@
     -->
 
     <!-- Define a non-SSL HTTP/1.1 Connector on port 8180 -->
-    <Connector port="<?php echo getenv('APPNAME_TOMCAT_PORT'); ?>" maxHttpHeaderSize="8192"
-               maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+    <Connector port="<?php echo getenv('APPNAME_TOMCAT_PORT'); ?>" address="<?php echo getenv('APPNAME_TOMCAT_LISTEN_INTERFACE'); ?>"
+               maxHttpHeaderSize="8192" maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
                enableLookups="false" redirectPort="8443" acceptCount="100"
                connectionTimeout="20000" disableUploadTimeout="true" />
 
@@ -95,8 +95,8 @@
 
     <!-- Define a SSL HTTP/1.1 Connector on port 8443 -->
 <!--
-    <Connector port="<?php echo getenv('APPNAME_TOMCAT_PORT'); ?>" maxHttpHeaderSize="8192"
-               maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+    <Connector port="<?php echo getenv('APPNAME_TOMCAT_PORT'); ?>" address="<?php echo getenv('APPNAME_TOMCAT_LISTEN_INTERFACE'); ?>"
+               maxHttpHeaderSize="8192" maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
                enableLookups="false" disableUploadTimeout="true"
                acceptCount="100" scheme="https" secure="true" sslProtocol="TLS"
                clientAuth="want"
