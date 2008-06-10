@@ -6,7 +6,7 @@ export PHP
 
 FILE="`basename "$0"`"
 DIR="`dirname "$0"`"
-ENV="$DIR/build.env.ksh"
+ENV="build.env.ksh"
 
 cd "$DIR"
 [[ -f "$ENV" ]] && . "$ENV"

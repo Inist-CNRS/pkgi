@@ -10,6 +10,10 @@
 #---------------------------------------------------------------------------
 #---------------------------------------------------------------------------
 
+<?php
+// preparation des tableaux d'options
+$version = explode(',',getenv('APPNAME_VERSION'));
+?>
 
 # blocage de l'execution en cas de variable non definie
 set -u
@@ -59,7 +63,7 @@ APACHE2CTL="/usr/sbin/apache2ctl"
 
 # Configs
 F_LOG_SRV=${HTTPD_HOME}/log/httpd.error.log
-F_LOG_LEVEL=debug
+F_LOG_LEVEL=<?php if (in_array('dev',$version)) { ?>debug<?php } else { ?>warn<?php } ?> 
 F_CNF=${HTTPD_HOME}/etc/httpd.conf
 F_PID=${HTTPD_HOME}/var/httpd.pid
 
@@ -118,7 +122,7 @@ function running {
 case ${1} in
 	-r | start )
 		# demarrage de l'application
-		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e debug -k start
+		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e ${F_LOG_LEVEL} -k start
 		if [[ ${?} -eq 0 ]]
 		then
 		    echo "httpd is listening on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
@@ -129,12 +133,12 @@ case ${1} in
 		;;
 	-s | stop )
 		# arret de l'application
-		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e debug -k stop
+		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e ${F_LOG_LEVEL} -k stop
 		echo "httpd stopped"
 		;;
 	-u | restart )
 	        # redemarrage de l'application
-		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e debug -k restart
+		${APACHE2CTL} -f <?php echo getenv('APPNAME_HOME') ?>/etc/httpd.conf -E ${F_LOG_SRV} -e ${F_LOG_LEVEL} -k restart
 		if [[ ${?} -eq 0 ]]
 		then
 		    echo "httpd is listening on <?php echo getenv('APPNAME_APACHE_LISTEN_PORTS'); ?>"
