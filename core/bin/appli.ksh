@@ -1,12 +1,3 @@
-#---------------------------------------------------------------------------#
-#----------                                                       ----------#
-#----------     Lancement d'Apache et Mysql                       ----------# 
-#----------                                                       ----------#
-#----------             2005     I.N.I.S.T                        ----------#
-#----------                                                       ----------#
-#---------------------------------------------------------------------------#
-       
-
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-
 #=-=-                                                         =-=-
 #=-=-   Environnement de l'application                        =-=-
@@ -79,7 +70,10 @@ case ${1} in
   foreach($dstart_list as $module => $cmd) {
 ?>
 		# Démarrage de <?php echo $module; ?> 
-		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $cmd; ?> 
+                <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+                <?php foreach( $cmd as $c ) { ?>
+                <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+                <?php } ?>
 		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_YETSTARTED} ]]
 		then
 			exit ${?}
@@ -94,7 +88,10 @@ case ${1} in
   foreach($dstop_list as $module => $cmd) {
 ?>
 		# Arret de <?php echo $module; ?> 
-		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $cmd; ?> 
+                <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+                <?php foreach( $cmd as $c ) { ?>
+                <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+                <?php } ?>
 		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_NOTSTARTED}  &&  ${?} -ne ${RC_ERR_NOPROCESS} ]]
 		then
 			exit ${?}
@@ -109,7 +106,10 @@ case ${1} in
   foreach($drestart_list as $module => $cmd) {
 ?>
 		# Redemarrage de <?php echo $module; ?> 
-		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $cmd; ?> 
+                <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+                <?php foreach( $cmd as $c ) { ?>
+                <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+                <?php } ?>
 		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_PROGRAM} ]]
 		then
 			exit ${?}
