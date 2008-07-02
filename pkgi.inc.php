@@ -332,7 +332,7 @@ class Pkgi
         $t_src = $this->tpl_path.'/'.$m.'/'.$t;
         $t_dst = $this->dst_path.'/'.$t;
         echo "Ecriture de ".$t_dst."\n";
-        if (file_exists($t_src) && !is_dir($t_src))
+        if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src))
         {
           $output = shell_exec($this->php_path.' '.$t_src);
           mkdir_r(dirname($t_dst));
@@ -342,6 +342,11 @@ class Pkgi
             chmod($t_dst,0700);
           else
             chmod($t_dst,0600);
+        }
+        else if (is_link($t_src)) {
+            // manage symlinks
+            @unlink($t_dst);
+            symlink(readlink($t_src),$t_dst);
         }
         else if (substr($t_src,-1) == '/')
           mkdir_r($t_dst);
