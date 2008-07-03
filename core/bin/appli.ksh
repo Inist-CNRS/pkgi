@@ -91,11 +91,12 @@ case ${1} in
                 <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
                 <?php foreach( $cmd as $c ) { ?>
                 <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
-                <?php } ?>
-		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_NOTSTARTED}  &&  ${?} -ne ${RC_ERR_NOPROCESS} ]]
+                RCODE=${?}
+		if [[ ${RCODE} -ne ${RC_OK_TERMINE} && ${RCODE} -ne ${RC_ERR_NOTSTARTED}  &&  ${RCODE} -ne ${RC_ERR_NOPROCESS} ]]
 		then
-			exit ${?}
+			exit ${RCODE}
 		fi
+                <?php } ?>
 
 <?php } ?>
 		;;
@@ -109,11 +110,30 @@ case ${1} in
                 <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
                 <?php foreach( $cmd as $c ) { ?>
                 <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
-                <?php } ?>
-		if [[ ${?} -ne ${RC_OK_TERMINE} && ${?} -ne ${RC_ERR_PROGRAM} ]]
+                RCODE=${?}
+		if [[ ${RCODE} -ne ${RC_OK_TERMINE} && ${RCODE} -ne ${RC_ERR_PROGRAM} ]]
 		then
-			exit ${?}
+			exit ${RCODE}
 		fi
+                <?php } ?>
+<?php } ?>
+	  ;;
+
+	-c | check | status ) 
+<?php
+  $dstatus_list = unserialize(getenv('APPNAME_DSTATUS_LIST'));
+  foreach($dstatus_list as $module => $cmd) {
+?>
+		# Status de <?php echo $module; ?> 
+                <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+                <?php foreach( $cmd as $c ) { ?>
+                <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+                RCODE=${?}
+		if [[ ${RCODE} -ne ${RC_OK_TERMINE} ]]
+		then
+			exit ${RCODE}
+		fi
+                <?php } ?>
 
 <?php } ?>
 	  ;;

@@ -70,7 +70,7 @@ fi
 export CATALINA_HOME CATALINA_BASE CATALINA_OPTS CATALINA_PID JSSE_HOME JAVA_HOME
 
 case "$1" in
-  start)
+  -r | start)
 	if [ -z "$JAVA_HOME" ]; then
 		log_failure_msg "Not starting Tomcat: no Java Development Kit found."
 		exit 1
@@ -112,7 +112,7 @@ case "$1" in
 	fi
 	log_end_msg 0
 	;;
-  stop)
+  -s | stop)
 	log_daemon_msg "Stopping $DESC" "$NAME"
         if start-stop-daemon --test --start --pidfile "$CATALINA_PID" \
 		--user "$TOMCAT5_USER" --startas "$JAVA_HOME/bin/java" \
@@ -139,7 +139,7 @@ case "$1" in
 	fi
 	log_end_msg 0
 	;;
-   status)
+   -c | check | status)
         if start-stop-daemon --test --start --pidfile "$CATALINA_PID" \
 		--user $TOMCAT5_USER --startas "$JAVA_HOME/bin/java" \
 		>/dev/null; then
@@ -160,7 +160,7 @@ case "$1" in
 	log_failure_msg "Reload is not implemented!"
 	exit 3
   	;;
-  restart|force-reload)
+  -u | restart | force-reload)
 	$0 stop
 	sleep 1
 	$0 start

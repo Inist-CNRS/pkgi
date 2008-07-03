@@ -246,18 +246,18 @@ status() {
 }
 
 case "$1" in
-  start)
+  -r | start)
   	start ;;
-  stop)
+  -s | stop)
   	stop ;;
-  status)
+  -c | check | status)
   	status ;;
-  restart|force-reload)
+  -u | restart | force-reload)
   	stop
 	start
 	;;
   *)
-  	echo "Usage: $0 {start|stop|restart|force-reload}"
+  	echo "Usage: $0 {start|stop|restart|force-reload|status}"
 	exit 1
 	;;
 esac
