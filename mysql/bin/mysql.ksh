@@ -152,12 +152,12 @@ echo implode(', ', $ports);
       sleep 3
 		fi
 		;;
-	-u )
+	-u restart )
 		# redemarrage de l'application
     <?php echo getenv('APPNAME_HOME') ?>/bin/mysql.ksh -s
     <?php echo getenv('APPNAME_HOME') ?>/bin/mysql.ksh -r
 		;;
-	-c )
+	-c | check | status )
 		# Verification du bon fonctionnement de l'application
 		running
 		;;
@@ -247,13 +247,13 @@ echo implode(', ', $ports);
 		# parametre invalide
 		#'''''''''''''''''''''''
 
-			echo "usage: $0 (-r | -s | -u | -c )"
+			echo "usage: $0 (start | stop | restart | status )"
 			cat <<EOF
 
    -r | start     - start mysql
    -s | stop      - stop mysql
-   -u             - restart mysql if running by sending a SIGHUP or start if not running
-   -c             - Verification du bon fonctionnement du serveur
+   -u | restart   - restart mysql if running by sending a SIGHUP or start if not running
+   -c | status    - Verification du bon fonctionnement du serveur
    -cmd           - Permet de lancer la commande mysql (placez vos parametres a la suite)
    -d | dump      - Permet de lancer la commande mysqldump (placez vos parametres a la suite)
    -mr | makeroot - Permet de donner les droits de connexion a un host passe en parametre
