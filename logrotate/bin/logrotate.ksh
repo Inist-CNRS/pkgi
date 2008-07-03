@@ -16,6 +16,6 @@ else
   RC_ERR_PROGRAM=255;    # RC_LIB[255]="Autre erreur."
 fi
 
-/usr/sbin/logrotate --state <?php echo getenv('APPNAME_HOME') ?>/var/logrotate.status <?php echo getenv('APPNAME_HOME') ?>/etc/logrotate.conf
+/usr/sbin/logrotate --state <?php echo getenv('APPNAME_HOME') ?>/var/logrotate.status <?php echo getenv('APPNAME_HOME') ?>/etc/logrotate.conf $*
 
 exit $RC_OK_TERMINE
