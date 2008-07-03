@@ -4,6 +4,22 @@ set -e
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
+# INIST
+if [[ -f /inist/env/inist.env.ksh ]]
+then
+  # la machine est correctement installée, tout va bien
+  . /inist/env/inist.env.ksh
+else
+  # dans le cas ou la machine ne contient pas les fichiers d'environement inist
+  # on defini en dur ceux dont on aura besoin
+  RC_OK_TERMINE=0;       # RC_LIB[0]="Sortie normale."
+  RC_ERR_PARAM=103;      # RC_LIB[103]="Erreur dans les parametres d'appel."
+  RC_ERR_YETSTARTED=240; # RC_LIB[240]="L'application tourne deja."
+  RC_ERR_NOTSTARTED=241; # RC_LIB[241]="L'application ne tourne pas."
+  RC_ERR_NOPROCESS=242;  # RC_LIB[242]="Le processus ne tourne pas."
+  RC_ERR_PROGRAM=255;    # RC_LIB[255]="Autre erreur."
+fi
+
 # Charge les variables utilisateur
 if [[ -f <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> ]]
 then
@@ -54,7 +70,7 @@ fi
 export CATALINA_HOME CATALINA_BASE CATALINA_OPTS CATALINA_PID JSSE_HOME JAVA_HOME
 
 case "$1" in
-  start)
+  -r | start)
 	if [ -z "$JAVA_HOME" ]; then
 		log_failure_msg "Not starting Tomcat: no Java Development Kit found."
 		exit 1
@@ -96,7 +112,7 @@ case "$1" in
 	fi
 	log_end_msg 0
 	;;
-  stop)
+  -s | stop)
 	log_daemon_msg "Stopping $DESC" "$NAME"
         if start-stop-daemon --test --start --pidfile "$CATALINA_PID" \
 		--user "$TOMCAT5_USER" --startas "$JAVA_HOME/bin/java" \
@@ -123,28 +139,28 @@ case "$1" in
 	fi
 	log_end_msg 0
 	;;
-   status)
+   -c | check | status)
         if start-stop-daemon --test --start --pidfile "$CATALINA_PID" \
 		--user $TOMCAT5_USER --startas "$JAVA_HOME/bin/java" \
 		>/dev/null; then
 
 		if [ -f "$CATALINA_PID" ]; then
 		    log_success_msg "$DESC is not running, but pid file exists."
-		    exit 1
+		    exit ${RC_ERR_NOTSTARTED}
 		else
 		    log_success_msg "$DESC is not running."
-		    exit 3
+		    exit ${RC_ERR_NOPROCESS}
 		fi
 	else
 		log_success_msg "$DESC is running with Java pid $CATALINA_PID"
-		exit 0
+		exit ${RC_OK_TERMINE}
 	fi
         ;;
   reload)
 	log_failure_msg "Reload is not implemented!"
 	exit 3
   	;;
-  restart|force-reload)
+  -u | restart | force-reload)
 	$0 stop
 	sleep 1
 	$0 start
@@ -155,4 +171,4 @@ case "$1" in
 	;;
 esac
 
-exit 0
+exit ${RC_OK_TERMINE}

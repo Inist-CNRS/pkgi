@@ -147,7 +147,7 @@ case ${1} in
 		    exit ${RC_ERR_NOTSTARTED}
 		fi
 		;;
-	-c | check )
+	-c | check | status )
 		# verification du bon fonctionnement de l'application
 		running
 		;;
@@ -155,13 +155,13 @@ case ${1} in
 		# parametre invalide
 		#'''''''''''''''''''''''
 
-		echo "usage: $0 (-r | -s | -u | -c )"
+		echo "usage: $0 (start | stop | restart | status )"
 		cat <<EOF
 
    -r | start   - start httpd
    -s | stop    - stop httpd
    -u | restart - restart httpd if running by sending a SIGHUP or start if not running
-   -c | check   - Test running
+   -c | status  - Test running
 
 EOF
 

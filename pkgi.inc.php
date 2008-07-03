@@ -262,6 +262,7 @@ class Pkgi
    * APPNAME_DSTART_LIST
    * APPNAME_DSTOP_LIST
    * APPNAME_DRESTART_LIST
+   * APPNAME_DSTATUS_LIST
    * APPNAME_ENV_FILE_PATH
    */
   function load_extra_env(&$env)
@@ -271,6 +272,7 @@ class Pkgi
     $dstart_list   = array();
     $dstop_list    = array();
     $drestart_list = array();
+    $dstatus_list  = array();
     foreach($this->MODULES as $m)
     {
       $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
@@ -282,14 +284,18 @@ class Pkgi
         $dstop_list[$m]  = $ini_data['stop-daemon'];
       if (isset($ini_data['restart-daemon']) && $ini_data['restart-daemon'] != '')
         $drestart_list[$m]  = $ini_data['restart-daemon'];
+      if (isset($ini_data['status-daemon']) && $ini_data['status-daemon'] != '')
+        $dstatus_list[$m]  = $ini_data['status-daemon'];
     }
     $dstart_list   = serialize($dstart_list);
     $dstop_list    = serialize($dstop_list);
     $drestart_list = serialize($drestart_list);
+    $dstatus_list  = serialize($dstatus_list);
     
     putenv('APPNAME_DSTART_LIST='.$dstart_list);
     putenv('APPNAME_DSTOP_LIST='.$dstop_list);
     putenv('APPNAME_DRESTART_LIST='.$drestart_list);
+    putenv('APPNAME_DSTATUS_LIST='.$dstatus_list);
 
     // ajout du chemin vers le fichier d'environement cree
     putenv('APPNAME_ENV_FILE_PATH='.realpath($this->env_path));
