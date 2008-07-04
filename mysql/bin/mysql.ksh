@@ -152,7 +152,7 @@ echo implode(', ', $ports);
       sleep 3
 		fi
 		;;
-	-u restart )
+	-u | restart )
 		# redemarrage de l'application
     <?php echo getenv('APPNAME_HOME') ?>/bin/mysql.ksh -s
     <?php echo getenv('APPNAME_HOME') ?>/bin/mysql.ksh -r
