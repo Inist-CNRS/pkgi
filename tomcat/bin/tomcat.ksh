@@ -32,13 +32,21 @@ fi
 NAME=tomcat5.5
 DESC="Tomcat servlet engine"
 CATALINA_HOME=/usr/share/$NAME
-DAEMON=$CATALINA_HOME/bin/catalina.sh
-CATALINA_OPTS="-Djava.awt.headless=true -Xmx128M -server"
+DAEMON=<?php echo getenv('APPNAME_HOME'); ?>/bin/catalina.sh
 CATALINA_BASE=<?php echo getenv('APPNAME_HOME'); ?> 
 TOMCAT5_USER=<?php echo getenv('APPNAME_USER'); ?> 
-TOMCAT5_SECURITY=yes
-TOMCAT5_SHUTDOWN=30
 JAVA_HOME=/usr/lib/jvm/java-1.5.0-sun
+TOMCAT5_SHUTDOWN=30
+if [ -z "$CATALINA_OPTS" ]; then
+  CATALINA_OPTS="-Djava.awt.headless=true -Xmx128M -server"
+fi
+if [ -z "$TOMCAT5_SECURITY" ]; then
+  TOMCAT5_SECURITY=yes
+fi
+if [ -z "$TOMCAT5_ENDORSED_DIRS" ]; then
+  TOMCAT5_ENDORSED_DIRS="<?php echo getenv('APPNAME_HOME'); ?>/common/endorsed"
+fi
+
 
 test -f $DAEMON || exit 0
 
@@ -67,7 +75,7 @@ if [ -z "${JSSE_HOME}" -a -r "${JAVA_HOME}/jre/lib/jsse.jar" ]; then
     JSSE_HOME="${JAVA_HOME}/jre/"
 fi
 
-export CATALINA_HOME CATALINA_BASE CATALINA_OPTS CATALINA_PID JSSE_HOME JAVA_HOME
+export CATALINA_HOME CATALINA_BASE CATALINA_OPTS CATALINA_PID JSSE_HOME JAVA_HOME TOMCAT5_ENDORSED_DIRS
 
 case "$1" in
   -r | start)
@@ -90,11 +98,6 @@ case "$1" in
 		rm -rf "$CATALINA_BASE"/temp/* \
 			"$CATALINA_BASE/logs/catalina.out"
 		mkfifo -m700 "$CATALINA_BASE/logs/catalina.out"
-		chown --dereference "$TOMCAT5_USER" "$CATALINA_BASE/conf" \
-			"$CATALINA_BASE/conf/tomcat-users.xml" \
-			"$CATALINA_BASE/logs" "$CATALINA_BASE/temp" \
-			"$CATALINA_BASE/webapps" "$CATALINA_BASE/work" \
-			"$CATALINA_BASE/logs/catalina.out" || true
 
 		# Look for rotatelogs/rotatelogs2
 		if [ -x /usr/sbin/rotatelogs ]; then

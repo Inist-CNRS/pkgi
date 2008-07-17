@@ -416,7 +416,7 @@ function ls($dir, $mask /*.php$|.txt$*/)
             $file == 'CVS' || $file == '.svn' || $file == '.dummy' || preg_match('/~$/',$file) ||
             !preg_match($mask, $file)) continue;
         $empty = false;
-        if (is_dir($dir.'/'.$file))
+        if (is_dir($dir.'/'.$file) && !is_link($dir.'/'.$file))
         {
             $files += ls($dir.'/'.$file, $mask);
             continue;
