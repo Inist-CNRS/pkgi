@@ -102,33 +102,33 @@ sources</a></h3>
 
 <p>Placez vous dans votre homedir <code>/applis/monappli/home/</code> et
 utilisez SVN pour récupérer les sources de la  <a href="https://subversion.cru.fr/pkgi/tags/">dernière version</a> : </p>
-<pre><strong>svn export https://subversion.cru.fr/pkgi/tags/1.22 src</strong></pre>
+<pre><strong>svn export https://subversion.cru.fr/pkgi/tags/1.22 pkgi</strong></pre>
 
-<p>Vous avez alors un répertoire <code>src/</code> dans votre homedir, il
+<p>Vous avez alors un répertoire <code>pkgi/</code> dans votre homedir, il
 contient les templates des fichiers de configuration et des lanceurs de votre
 application : </p>
 <ul>
   <li class="level1">
     <div class="li">
-    <code>src/build.ksh</code> : c’est le script qui va vous permettre
+    <code>pkgi/build.ksh</code> : c’est le script qui va vous permettre
     d’instancier les templates, il vous demandera les paramètres de votre
     application (port, user, group ...)</div>
   </li>
   <li class="level1">
     <div class="li">
-    <code>src/apache/bin/*</code> : les lanceurs apache</div>
+    <code>pkgi/apache/bin/*</code> : les lanceurs apache</div>
   </li>
   <li class="level1">
     <div class="li">
-    <code>src/mysql/bin/*</code> : les lanceurs mysql</div>
+    <code>pkgi/mysql/bin/*</code> : les lanceurs mysql</div>
   </li>
   <li class="level1">
     <div class="li">
-    <code>src/apache/etc/*</code> : les fichiers de config d’apache</div>
+    <code>pkgi/apache/etc/*</code> : les fichiers de config d’apache</div>
   </li>
   <li class="level1">
     <div class="li">
-    <code>src/mysql/etc/*</code> : les fichiers de config de mysql</div>
+    <code>pkgi/mysql/etc/*</code> : les fichiers de config de mysql</div>
   </li>
 </ul>
 </div>
@@ -140,7 +140,7 @@ templates</a></h3>
 
 <div class="level2">
 <p>Lancez <code>build.ksh</code> (par exemple : placez-vous dans votre
-homedir et tapez <code>src/build.ksh</code>). Il suffit alors de répondre
+homedir et tapez <code>pkgi/build.ksh</code>). Il suffit alors de répondre
 aux questions. Une fois terminé, vous aurez à votre disposition les
 instances des lanceurs et des fichiers de config dans : </p>
 <ul>
@@ -154,7 +154,7 @@ instances des lanceurs et des fichiers de config dans : </p>
   </li>
   <li class="level1">
     <div class="li">
-    <code>/applis/monappli/home/src.env.ksh</code> : les variables
+    <code>/applis/monappli/home/pkgi.env.ksh</code> : les variables
     d’environnement de votre application qui seront automatiquement
     chargées par les lanceurs (les variables seront ainsi disponibles dans
     vos scripts php).</div>
@@ -164,7 +164,7 @@ instances des lanceurs et des fichiers de config dans : </p>
 <p>A tout moment, vous pouvez relancer <code>build.ksh</code> pour
 régénérer les fichiers. Les questions ne seront alors plus posées car les
 variables seront automatiquement extraites de
-<code>/applis/monappli/home/src.env.ksh</code> </p>
+<code>/applis/monappli/home/pkgi.env.ksh</code> </p>
 </div>
 </div>
 
@@ -346,17 +346,17 @@ pouvoir mettre à jour plus facilement pkgi lors de ses futures versions,
 vous pouvez créer un module (ex: "monmodule") pour votre application. Voici
 un exemple concret :</p>
 <ol>
-  <li>Créez un répertoire <code>src/monmodule/</code> qui contiendra les
+  <li>Créez un répertoire <code>pkgi/monmodule/</code> qui contiendra les
     fichiers de configuration de votre application (son nom peut-être tout
     simplement celui de votre application)</li>
-  <li>Ajouter la chaîne <code>monmodule</code> dans <code>src.env.ksh</code>
+  <li>Ajouter la chaîne <code>monmodule</code> dans <code>pkgi.env.ksh</code>
     dans la section <code>MODULES</code>, tout à la fin de la liste (c'est
     important pour que vos paramètres surchargent ceux par défaut)</li>
   <li>Créez les fichiers de configurations que vous souhaitez surcharger,
     par exemple : 
     <ul>
-      <li><code>src/monmodule/etc/httpd.conf.d/maconf.conf</code></li>
-      <li><code>src/monmodule/etc/my.cnf</code></li>
+      <li><code>pkgi/monmodule/etc/httpd.conf.d/maconf.conf</code></li>
+      <li><code>pkgi/monmodule/etc/my.cnf</code></li>
     </ul>
     <p>(ici, <code>maconf.conf</code> sera chargé par apache en plus du
     classique <code>httpd.conf</code> et notre <code>my.cnf</code> sera
