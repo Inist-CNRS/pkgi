@@ -25,6 +25,11 @@ if [[ -f <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> ]]
 then
   . <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> 
 fi
+# ENV specifiques de l'appli
+if [[ -f <?php echo getenv('APPNAME_HOME') ?>/env.ksh ]]
+then
+  . <?php echo getenv('APPNAME_HOME') ?>/env.ksh
+fi
 
 . /lib/lsb/init-functions
 . /etc/default/rcS
