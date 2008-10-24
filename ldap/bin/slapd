@@ -1,5 +1,4 @@
-#!/bin/sh
-
+<?php echo '#!/bin/sh'; ?> 
 
 # Specify path variable
 PATH=/sbin:/usr/sbin:/bin:/usr/bin

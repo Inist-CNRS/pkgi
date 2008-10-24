@@ -1,4 +1,4 @@
-#!/bin/sh
+<?php echo '#!/bin/sh'; ?> 
 
 # INIST
 if [[ -f /inist/env/inist.env.ksh ]]

@@ -1,4 +1,4 @@
-#!/bin/sh
+<?php echo '#!/bin/sh'; ?> 
 
 set -e
 

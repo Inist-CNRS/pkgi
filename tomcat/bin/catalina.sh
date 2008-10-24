@@ -1,4 +1,4 @@
-#!/bin/sh
+<?php echo '#!/bin/sh'; ?> 
 # -----------------------------------------------------------------------------
 # Start/Stop Script for the CATALINA Server
 #

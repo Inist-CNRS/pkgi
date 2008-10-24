@@ -1,4 +1,4 @@
-#!/bin/sh
+<?php echo '#!/bin/sh'; ?> 
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
 if ! [ -x /usr/sbin/tmpreaper ]; then
