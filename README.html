@@ -68,10 +68,12 @@ indépendantes utilisant chacune un ou plusieurs modules : apache, mysql,
 tomcat, php, ldap...</p>
 
 <p>Le principe de pkgi est de générer, à partir de templates et de variables
-d'environnements, des fichiers de configurations et des lanceurs. Les binaire
-des démons sont eux mutualisés au niveau du système et seuls les fichiers de
-configuration sont spécifiques à chaques instances. Le templates sont écrits
-avec le language PHP mais restent très simple d'approche.</p>
+d'environnements, des fichiers de configurations et des lanceurs. Les binaires
+des démons sont eux mutualisés au niveau du système (les packages debian
+correspondant doivent donc être préinstallés sur la machine) et seuls les
+fichiers de configurations sont spécifiques à chaques instances. Les
+templates sont écrits avec le language PHP mais restent très simple
+d'approche.</p>
 
 <p>Le programme est sous licence LGPL et nous remercions la plateforme <a
 href="http://sourcesup.cru.fr/projects/pkgi/">sourcesup</a> pour
