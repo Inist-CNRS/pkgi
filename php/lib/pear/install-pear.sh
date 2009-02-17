@@ -44,6 +44,7 @@ $gopear = str_replace('$alter_phpini = !stristr(fgets($tty, 1024), "n");','$alte
 $gopear = '#/bin/sh
 PHP=${PHP:=php}
 PHP="${PHP} -d short_open_tag=0 "
+export PHPRC='.getenv('APPNAME_HOME').'/etc
 export PHP
 FILE=`basename "$0"`
 DIR=`dirname "$0"`
