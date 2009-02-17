@@ -51,7 +51,7 @@ h3 {
 color: #19abff;
   border-bottom: 1px solid #19abff;
 }
-.section {
+ .section {
 margin-left: 30px;
 width: 800px;
 }</style>
@@ -62,19 +62,23 @@ width: 800px;
 <h1>pkgi</h1>
 
 <p>Ce logiciel permet la création rapide d'environnements applicatifs
-indépendants sous debian etch et ses futures version stables. Sur un même serveur physique, on peut ainsi déployer facilement plusieurs applications utilisant chacunes les modules qu'elle
-souhaite utiliser : apache, mysql, tomcat, php...</p>
+indépendants sous debian etch et ses futures version stables. Sur un même
+serveur physique, vous pouvez ainsi déployer facilement plusieurs applications
+indépendantes utilisant chacune un ou plusieurs modules : apache, mysql,
+tomcat, php, ldap...</p>
 
-<p>Le principe de pkgi est de générer les instances des fichiers de
-configuration et des lanceurs à partir de templates et de variables
-d'environnements. Les binaire sont toujours mutualisés au niveau du système et seuls les fichiers de configuration sont spécifiques à chaques instances.</p>
+<p>Le principe de pkgi est de générer, à partir de templates et de variables
+d'environnements, des fichiers de configurations et des lanceurs. Les binaire
+des démons sont eux mutualisés au niveau du système et seuls les fichiers de
+configuration sont spécifiques à chaques instances. Le templates sont écrits
+avec le language PHP mais restent très simple d'approche.</p>
 
 <p>Le programme est sous licence LGPL et nous remercions la plateforme <a
 href="http://sourcesup.cru.fr/projects/pkgi/">sourcesup</a> pour
 l'hébergement.</p>
 
-<p>Vous pouvez récupérer la version de développement en utilisant
-subversion : <code>svn co https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
+<p>Vous pouvez récupérer la version de développement en utilisant subversion
+: <code>svn co https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
 
 <div class="section">
 <h2>Installation</h2>
@@ -84,14 +88,17 @@ subversion : <code>svn co https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
 <ol>
   <li class="level1">
     <div class="li">
-    Avoir les droits sur son appli que l’on supposera installée dans
+    Avoir les droits sur son application que l’on supposera installée dans
     <code>/applis/monappli</code></div>
   </li>
   <li class="level1">
     <div class="li">
-    Être sur une machine debian etch (ida ou hippo par exemple)</div>
+    Être sur une machine debian stable</div>
   </li>
-  <li>Avoir php5 d'installé en ligne de commande</li>
+  <li>Avoir php5 d'installé en ligne de commande (php est utilisé pour
+    instancier les templates)<br />
+    Sous débian il suffit de vérifier que le package <code>php5-cli</code>
+    est installé</li>
 </ol>
 </div>
 
@@ -100,8 +107,10 @@ subversion : <code>svn co https://subversion.cru.fr/pkgi/trunk pkgi</code></p>
 id="etape_1_installez_les_templates1">Etape 1 : récupération des
 sources</a></h3>
 
-<p>Placez vous dans votre homedir <code>/applis/monappli/home/</code> et
-utilisez SVN pour récupérer les sources de la  <a href="https://subversion.cru.fr/pkgi/tags/">dernière version</a> : </p>
+<p>Placez vous dans votre homedir de votre application
+<code>/applis/monappli/home/</code> et utilisez par exemple SVN pour
+récupérer les sources de la <a
+href="https://subversion.cru.fr/pkgi/tags/">dernière version</a> : </p>
 <pre><strong>svn export https://subversion.cru.fr/pkgi/tags/1.25 pkgi</strong></pre>
 
 <p>Vous avez alors un répertoire <code>pkgi/</code> dans votre homedir, il
@@ -139,10 +148,10 @@ id="etape_2_instancier_les_templates1">Etape 2 : Instancier les
 templates</a></h3>
 
 <div class="level2">
-<p>Lancez <code>build.ksh</code> (par exemple : placez-vous dans votre
-homedir et tapez <code>pkgi/build.ksh</code>). Il suffit alors de répondre
-aux questions. Une fois terminé, vous aurez à votre disposition les
-instances des lanceurs et des fichiers de config dans : </p>
+<p>Lancez <code>build.ksh</code> (par exemple : placez-vous dans votre homedir
+et tapez <code>pkgi/build.ksh</code>). Il suffit alors de répondre aux
+questions. Une fois terminé, vous aurez à votre disposition les instances des
+lanceurs et des fichiers de config dans : </p>
 <ul>
   <li class="level1">
     <div class="li">
@@ -155,27 +164,28 @@ instances des lanceurs et des fichiers de config dans : </p>
   <li class="level1">
     <div class="li">
     <code>/applis/monappli/home/pkgi.env.ksh</code> : les variables
-    d’environnement de votre application qui seront automatiquement
-    chargées par les lanceurs (les variables seront ainsi disponibles dans
-    vos scripts php).</div>
+    d’environnement de votre application qui seront automatiquement chargées
+    par les lanceurs (les variables seront ainsi disponibles dans vos scripts
+    php).</div>
   </li>
 </ul>
 
-<p>A tout moment, vous pouvez relancer <code>build.ksh</code> pour
-régénérer les fichiers. Les questions ne seront alors plus posées car les
-variables seront automatiquement extraites de
+<p>A tout moment, vous pouvez relancer <code>build.ksh</code> pour régénérer
+les fichiers. Les questions ne seront alors plus posées car les variables
+seront automatiquement extraites de
 <code>/applis/monappli/home/pkgi.env.ksh</code> </p>
 </div>
 </div>
 
 <div class="section">
-<h3><a name="etape_3_lancer_les_demons2"
-id="etape_3_lancer_les_demons2">Etape 3 : lancer les démons</a></h3>
+<h3><a name="etape_3_lancer_les_demons2" id="etape_3_lancer_les_demons2">Etape
+3 : lancer les démons</a></h3>
 
-<p>Une commande à retenir : <code>/applis/monappli/home/bin/appli.ksh
--r</code><br />
-Cette commande va lancer automatiquement tous les démons. Si vous désirez
-plus de finesse pour lancer/arrêter un module en particulier :</p>
+<p>La commande à retenir est la suivante :
+<code>/applis/monappli/home/bin/appli.ksh start</code><br />
+Cette commande va lancer automatiquement tous les modules de votre application
+(ex: démons apache, mysql, ldap). Si vous désirez plus de finesse pour
+lancer/arrêter un module en particulier :</p>
 
 <table border="1" cellpadding="0" cellspacing="0">
   <thead>
@@ -191,12 +201,17 @@ plus de finesse pour lancer/arrêter un module en particulier :</p>
           <li class="level1">
             <div class="li">
             Pour lancer le serveur http :
-            <code>/applis/monappli/home/bin/httpd.ksh -r</code></div>
+            <code>/applis/monappli/home/bin/httpd.ksh start</code></div>
           </li>
           <li>
             <div class="li">
             Pour arreter le serveur http :
-            <code>/applis/monappli/home/bin/httpd.ksh -s</code></div>
+            <code>/applis/monappli/home/bin/httpd.ksh stop</code></div>
+          </li>
+          <li>
+            <div class="li">
+            Pour consulter l'état du serveur http :
+            <code>/applis/monappli/home/bin/httpd.ksh status</code></div>
           </li>
         </ul>
       </td>
@@ -214,12 +229,20 @@ plus de finesse pour lancer/arrêter un module en particulier :</p>
           <li class="level1">
             <div class="li">
             Pour lancez le serveur mysql :
-            <code>/applis/monappli/home/bin/mysql.ksh -r</code></div>
+            <code>/applis/monappli/home/bin/mysql.ksh start</code></div>
           </li>
           <li>
             <div class="li">
             Pour arreter le serveur mysql :
-            <code>/applis/monappli/home/bin/mysql.ksh -s</code></div>
+            <code>/applis/monappli/home/bin/mysql.ksh stop</code></div>
+          </li>
+          <li>
+            <div class="li">
+
+            <div class="li">
+            Pour consulter l'état du serveur mysql :
+            <code>/applis/monappli/home/bin/mysql.ksh status</code></div>
+            </div>
           </li>
         </ul>
       </td>
@@ -227,9 +250,9 @@ plus de finesse pour lancer/arrêter un module en particulier :</p>
   </tbody>
 </table>
 
-<p>Pour vérifier que vos serveurs sont lancés correctement, utilisez la
-commande <code>lsof -i</code>, elle devrait vous retourner quelque chose qui
-ressemble à ça : <pre class="code">COMMAND   PID USER   FD   TYPE DEVICE SIZE NODE NAME
+<p>Pour vérifier que vos serveurs sont correctement lancés, vous pouvez
+également utilisez la commande <code>lsof -i</code>, elle devrait vous
+retourner quelque chose qui ressemble à ça : <pre class="code">COMMAND   PID USER   FD   TYPE DEVICE SIZE NODE NAME
 apache2  7362 bcmi    3u  IPv6  42819       TCP *:55579 (LISTEN)
 mysqld   7453 bcmi   12u  IPv4  43028       TCP *:55679 (LISTEN)
 apache2 26124 bcmi    3u  IPv6  42819       TCP *:55579 (LISTEN)
@@ -244,31 +267,32 @@ Dans le cas où rien ne s’affiche, consultez les logs dans
 
 <div class="section">
 <h3><a name="etape_3_lancer_les_demons11"
-id="etape_3_lancer_les_demons11">Etape 4 : configurations</a></h3>
+id="etape_3_lancer_les_demons11">Etape 4 : personnalisations</a></h3>
 
 <div class="section">
 <h4>Principes</h4>
 
 <p>La personnalisation des fichiers de configuration doit être faite de
-préférence dans les fichiers template eux-même. Ainsi lorsqu'un nouveau
+préférence dans les fichiers templates eux-même. Ainsi lorsqu'un nouveau
 build sera lancé, vos modifications ne seront pas écrasées.</p>
 
-<p>Dans chaque fichier de config, vous trouverez des références aux
-variables d'environnements du type : <code>&lt;?php echo
-getenv('APPNAME_HOME'); ?&gt;</code>. Ceci fait référence à la variable
-<code>XXX_HOME</code> qui vous a été demandé lors du premier build. Il est
-important de conserver le préfixe <code>APPNAME_</code> car il sera
-remplacé automatiquement pas le vrai nom de votre application au moment du
-build. Ceci permet un développement plus pratique de pkgi, mais surtout
-procéder ainsi permet de changer de nom d'application à tout moment sans
-devoir repartir de zéro.</p>
+<p>Dans chaque fichier de config, vous trouverez des références aux variables
+d'environnements du type : <code>&lt;?php echo getenv('APPNAME_HOME');
+?&gt;</code>. Ceci fait référence à la variable <code>XXX_HOME</code> qui
+vous a été demandé lors du premier build. Il est important de conserver le
+préfixe <code>APPNAME_</code> car il sera remplacé automatiquement pas le
+vrai nom de votre application au moment du build. Procéder ainsi vous permet
+de déployer rapidement et facilement votre application sans vous soucier des
+chemins et du nom de votre application, vous pouvez en chagez par simple
+édition des variables d'environnement contenues dans le fichier
+<code>pkgi.env.ksh</code></p>
 </div>
 
 <div class="section">
 <h4>Configurer mysql et phpmyadmin</h4>
 
-<p>Donnez les droit de connexion au serveur mysql au serveur hébergeant
-phpmyadmin (votre machine par exemple) :<br />
+<p>Pour donner les droits de connexions d'un phpmyadmin (hébergé sur votre
+machine par exemple) vers votre serveur mysql :<br />
 <code>/applis/monappli/home/bin/mysql.ksh -mr gully.ads.intra.inist.fr</code>
 </p>
 
@@ -276,8 +300,8 @@ phpmyadmin (votre machine par exemple) :<br />
 machine hébergeant phpmyadmin. Vous pouvez également donner les droits à
 tout le monde avec <code>/applis/monappli/home/bin/mysql.ksh -mr %</code>)</p>
 
-<p>Il reste ensuite a configurer phpmyadmin. Voici un exemple de
-configuration à placer dans votre fichier de config phpmyadmin : </p>
+<p>Il reste ensuite a configurer phpmyadmin. Voici un exemple de configuration
+à placer dans votre fichier de config phpmyadmin : </p>
 <pre name="code" class="php">$i++;
 $cfg['Servers'][$i]['host']          = 'ida.intra.inist.fr'; // MySQL hostname or IP address
 $cfg['Servers'][$i]['port']          = '50102';          // MySQL port - leave blank for default port
@@ -305,46 +329,46 @@ pour cela il suffit de lancer la commande suivante :
   <li><code>/applis/monappli/home/lib/pear/php/</code> : c'est ici que seront
     placées toutes les sources php des différents packages que vous
     installerez. Ce chemin sera configuré automatiquement dans la variable
-    <code>include_path</code> du module php d'apache.</li>
+    <code>include_path</code> du <code>php.ini</code>.</li>
 </ul>
 
-<p>Pour installer un package, il ne vous reste plus qu'à utiliser la
-commande <code>lib/bin/pear</code>. Par exemple pour installer le package <a
+<p>Pour installer un package, il ne vous reste plus qu'à utiliser la commande
+<code>lib/bin/pear</code>. Par exemple pour installer le package <a
 href="http://www.pxxo.net">Pxxo</a>, procédez comme cela :</p>
 <pre>cd /applis/monappli/home/
 lib/bin/pear install pxxo/Pxxo</pre>
 </div>
 
-
 <div class="section">
 <h4>Configuration avancée : Fixer "en dur" certains parametres</h4>
 
-<p>Si vous désirez que certaines questions ne soient plus posées au lancement de la commande <code>build.ksh</code>, vous pouvez 
-prédéfinir les réponses. Ainsi au lancement vous ne serez plus obligé de répondre à toutes les questions.
+<p>Si vous désirez que certaines questions ne soient plus posées au lancement
+de la commande <code>build.ksh</code>, vous pouvez prédéfinir les réponses.
+Ainsi au lancement vous ne serez plus obligé de répondre à toutes les
+questions. </p>
+
+<p>Cela est utile dans le cas ou vous intégrez PKGI dans votre application et
+que vous souhaitez prédéfinir certain réglage tout en permettant un
+déploiement de l'application par la commande <code>build.ksh</code>. </p>
+
+<p>Pour se faire, il suffit de créer au coté du fichier
+<code>build.ksh</code> un fichier nommé <code>build.env.ksh</code> qui
+contiendra les variables d'environnements que vous souhaitez fixer "en dur".
 </p>
-<p>
-Cela est utile dans le cas ou vous intégrez PKGI dans votre application et que vous souhaitez prédéfinir certain réglage
-tout en permettant un déploiement de l'application par la commande <code>build.ksh</code>.
-</p>
-<p>
-Pour se faire, il suffit de créer au coté du fichier <code>build.ksh</code> un fichier nommé <code>build.env.ksh</code>
-qui contiendra les variables d'environnements que vous souhaitez fixer "en dur".
-</p>
+
 <h5>Exemple</h5>
-<pre>
-export APPNAME="EXEMPLE"
+<pre>export APPNAME="EXEMPLE"
 export EXEMPLE_MODULES="core,php,apache,tmpreaper,logrotate"
-export EXEMPLE_PHP_VERSION="5"
-</pre>
+export EXEMPLE_PHP_VERSION="5"</pre>
 </div>
 
 <div class="section">
 <h4>Configuration avancée : modularisation</h4>
 
 <p>Si vous désirez ne pas modifier directement les templates pour ainsi
-pouvoir mettre à jour plus facilement pkgi lors de ses futures versions,
-vous pouvez créer un module (ex: "monmodule") pour votre application. Voici
-un exemple concret :</p>
+pouvoir mettre à jour plus facilement pkgi lors de ses futures versions, vous
+pouvez créer un module (ex: "monmodule") pour votre application. Voici un
+exemple concret :</p>
 <ol>
   <li>Créez un répertoire <code>pkgi/monmodule/</code> qui contiendra les
     fichiers de configuration de votre application (son nom peut-être tout
@@ -352,15 +376,15 @@ un exemple concret :</p>
   <li>Ajouter la chaîne <code>monmodule</code> dans <code>pkgi.env.ksh</code>
     dans la section <code>MODULES</code>, tout à la fin de la liste (c'est
     important pour que vos paramètres surchargent ceux par défaut)</li>
-  <li>Créez les fichiers de configurations que vous souhaitez surcharger,
-    par exemple : 
+  <li>Créez les fichiers de configurations que vous souhaitez surcharger, par
+    exemple : 
     <ul>
       <li><code>pkgi/monmodule/etc/httpd.conf.d/maconf.conf</code></li>
       <li><code>pkgi/monmodule/etc/my.cnf</code></li>
     </ul>
     <p>(ici, <code>maconf.conf</code> sera chargé par apache en plus du
-    classique <code>httpd.conf</code> et notre <code>my.cnf</code> sera
-    chargé par mysql)</p>
+    classique <code>httpd.conf</code> et notre <code>my.cnf</code> sera chargé
+    par mysql)</p>
   </li>
 </ol>
 </div>
@@ -397,26 +421,12 @@ oLink.href = "http://www.pkgi.net/syntaxhighlighter-1.5.1/Styles/SyntaxHighlight
 oLink.rel = "stylesheet";
 oLink.type = "text/css";
 document.body.appendChild(oLink);</script>
-
-
-
-
-
-
-
-
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</script>
 <script type="text/javascript">
 var pageTracker = _gat._getTracker("UA-3458230-3");
 pageTracker._initData();
-pageTracker._trackPageview();
-</script>
-
-
-
-
+pageTracker._trackPageview();</script>
 </body>
 </html>
