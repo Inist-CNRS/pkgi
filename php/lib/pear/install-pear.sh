@@ -42,10 +42,8 @@ $gopear = str_replace('$install_pfc = !stristr(fgets($tty, 1024), "n");','$insta
 $gopear = str_replace('$alter_phpini = !stristr(fgets($tty, 1024), "n");','$alter_phpini = !stristr("n", "n");',$gopear);
 
 $gopear = '#/bin/sh
-PHP=${PHP:=php}
-PHP="${PHP} -d short_open_tag=0 "
+export PHP="/usr/bin/php -d short_open_tag=0 "
 export PHPRC='.getenv('APPNAME_HOME').'/etc
-export PHP
 FILE=`basename "$0"`
 DIR=`dirname "$0"`
 cd "$DIR"
