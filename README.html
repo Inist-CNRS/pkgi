@@ -303,7 +303,7 @@ machine hébergeant phpmyadmin. Vous pouvez également donner les droits à
 tout le monde avec <code>/applis/monappli/home/bin/mysql.ksh -mr %</code>)</p>
 
 <p>Il reste ensuite a configurer phpmyadmin. Voici un exemple de configuration
-à placer dans votre fichier de config phpmyadmin : </p>
+à placer dans votre fichier de config phpmyadmin (config.inc.php) : </p>
 <pre name="code" class="php">$i++;
 $cfg['Servers'][$i]['host']          = 'ida.intra.inist.fr'; // MySQL hostname or IP address
 $cfg['Servers'][$i]['port']          = '50102';          // MySQL port - leave blank for default port
