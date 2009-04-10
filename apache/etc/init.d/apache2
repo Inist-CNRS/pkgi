@@ -1,4 +1,5 @@
 #!/bin/sh -e
+#!/bin/sh -e
 ### BEGIN INIT INFO
 # Provides:          apache2
 # Required-Start:    $local_fs $remote_fs $network $syslog
@@ -95,6 +96,27 @@ pidof_apache() {
     return 1
 }
 
+pidof_apache_noexit() {
+    # if pidof is null for some reasons the script exits automagically
+    # classified as good/unknown feature
+    PIDS=`pidof apache2` || true
+
+    [ -e $PIDFILE ] && PIDS2=`cat $PIDFILE`
+    
+    # if there is a pid we need to verify that belongs to apache2
+    # for real
+    for i in $PIDS; do
+    	if [ "$i" = "$PIDS2" ]; then
+            # in this case the pid stored in the
+            # pidfile matches one of the pidof apache
+            # so a simple kill will make it
+            echo $i
+            return 0
+        fi
+    done
+    return 0
+}
+
 apache_stop() {
 	if `$APACHE2CTL -t > /dev/null 2>&1`; then
 		# if the config is ok than we just stop normaly
@@ -153,7 +175,7 @@ apache_wait_stop() {
 case $1 in
 	start)
                 touch <?php echo getenv('APPNAME_HOME') ?>/etc/apache2/httpd.conf
-		log_daemon_msg "Starting web server" "apache2"
+		log_daemon_msg "Starting web server (listening on <?php echo getenv('APPNAME_APACHE_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_APACHE_LISTEN_PORTS')?>)" "apache2"
 		if $APACHE2CTL -k start; then
 			if check_htcacheclean ; then
 				log_progress_msg htcacheclean
@@ -225,7 +247,7 @@ case $1 in
 			log_end_msg 0
 	;;
 	status)
-		PID=$(pidof_apache)
+		PID=$(pidof_apache_noexit)
 		if [ -n "$PID" ]; then
 			log_success_msg "Apache is running (pid $PID, listening on <?php echo getenv('APPNAME_APACHE_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_APACHE_LISTEN_PORTS')?>)."
 			exit 0

@@ -1,0 +1,15 @@
+<?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/*.log {
+	weekly
+	missingok
+	rotate 52
+	compress
+	delaycompress
+	notifempty
+	create 640 root adm
+	sharedscripts
+	postrotate
+		if [ -f "<?php echo getenv('APPNAME_HOME') ?>/var/run/apache2.pid" ]; then
+			<?php echo getenv('APPNAME_HOME') ?>/etc/init.d/apache2 reload > /dev/null
+		fi
+	endscript
+}

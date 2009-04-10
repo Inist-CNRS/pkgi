@@ -15,7 +15,7 @@ class Pkgi
     {
         $current_dir = substr(dirname(__FILE__), strrpos(dirname(__FILE__),'/')+1);
         if (!preg_match('/^[a-z]+$/i',$current_dir)) $current_dir = 'src';
-        $this->env_path = ($env_path == null) ? dirname(__FILE__).'/../'.$current_dir.'.env.ksh' : $env_path;
+        $this->env_path = ($env_path == null) ? dirname(__FILE__).'/../'.$current_dir.'.env' : $env_path;
         $this->tpl_path = ($tpl_path == null) ? realpath(dirname(__FILE__)) : $tpl_path;
         $this->dst_path = $dst_path;
         $this->php_path = getenv('PHP');
@@ -56,13 +56,11 @@ class Pkgi
         echo "--- ETAPE 4 : Ecrit l'instance des templates\n";
         $this->write_tpl_instance();
 
-        echo "********************************************************************************************\n";
         echo "* Votre application ".$this->APPNAME." est prette.\n";
         echo "* Elle dispose des modules suivants : ".implode(',',$this->MODULES)."\n";
-        echo "* Les parametres ont ete sauvegardes dans : ".realpath($this->env_path)."\n";
-        echo "* Vous pouvez a tout moment modifier un parametre.\n";
-        echo "* Pensez alors a relancer le build.ksh pour regenerer les fichiers de conf et les lanceurs\n";
-        echo "********************************************************************************************\n";
+        echo "* Les paramètres ont été sauvegardés dans : ".realpath($this->env_path)."\n";
+        echo "* Vous pouvez à tout moment modifier un parametre.\n";
+        echo "* Pensez alors à relancer le build pour regénérer les fichiers de conf et les lanceurs.\n";
     
     }
 
@@ -122,7 +120,7 @@ class Pkgi
     function choose_appli_name()
     {
         // on recherche APPNAME dans l'environement
-        // si on le trouve pas alors on cherche dans le fichier src.env.ksh
+        // si on le trouve pas alors on cherche dans le fichier XXXX.env
         if ($s = getenv('APPNAME'))
         {
             $this->APPNAME = $s;
@@ -147,7 +145,7 @@ class Pkgi
 
     /**
      * Charge dans le tableau passé en parametre toutes les variables d'env trouvées
-     * soit dans l'environement courant, soit dans le fichier src.env.ksh
+     * soit dans l'environement courant, soit dans le fichier XXX.env
      */
     function load_env(&$env)
     {
@@ -243,10 +241,10 @@ class Pkgi
     {
         $filename = $this->env_path;
         echo "Ecriture des variables d'environnement dans ".realpath($filename)."\n";
-        $data = '# Attention : n\'editez pas ce fichier manuellement car il sera regenere par pkgi au prochain build.ksh'."\n";
+        $data = '# Attention : n\'éditez pas ce fichier manuellement car il sera regénéré par pkgi au prochain build'."\n";
         foreach($env as $k => $v)
         {
-            // ecriture dans le fichier src.env.ksh
+            // ecriture dans le fichier XXX.env
             $data .= sprintf("export %s=\"%s\"\n", $k, $v);
       
             // ecriture dans l'environnement
@@ -268,7 +266,7 @@ class Pkgi
     function load_extra_env(&$env)
     {
         // construit une liste des demons a demarrer et arreter
-        // cette liste sera utilisee par appli.ksh pour lancer/arreter d'un coups tous les demons
+        // cette liste sera utilisee par appli pour lancer/arreter d'un coups tous les demons
         $dstart_list   = array();
         $dstop_list    = array();
         $drestart_list = array();
