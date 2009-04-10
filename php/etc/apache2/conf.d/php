@@ -1,0 +1,10 @@
+#
+# Chargement du module php dans Apache
+#
+Include /etc/apache2/mods-available/php5.load
+Include /etc/apache2/mods-available/php5.conf
+
+#
+# Utilisation du php.ini locale
+#
+PHPIniDir <?php echo getenv('APPNAME_HOME') ?>/etc/php5/php.ini 
