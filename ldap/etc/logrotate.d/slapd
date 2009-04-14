@@ -1,0 +1,15 @@
+<?php echo getenv('APPNAME_HOME') ?>/var/log/ldap/ldap.log {
+        weekly
+        missingok
+        rotate 52
+        compress
+        delaycompress
+        notifempty
+        create 640 <?php echo getenv('APPNAME_USER') ?> <?php echo getenv('APPNAME_GROUP') ?> 
+        sharedscripts
+	postrotate
+		if [ -f "<?php echo getenv('APPNAME_HOME') ?>/var/run/slapd/slapd.pid" ]; then
+			<?php echo getenv('APPNAME_HOME') ?>/etc/init.d/slapd restart > /dev/null
+		fi
+	endscript
+}
