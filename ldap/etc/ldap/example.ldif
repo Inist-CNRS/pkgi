@@ -13,7 +13,7 @@ objectClass: top
 objectClass: dcObject
 objectClass: organization
 o: <?php echo $dc; ?> 
-dc: <?php echo $dc; ?>  
+dc: <?php echo $dc; ?> 
 
 dn: ou=people,<?php echo $suffix; ?> 
 objectClass: top

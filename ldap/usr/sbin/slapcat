@@ -1,0 +1,3 @@
+#!/bin/sh
+#!/bin/sh
+/usr/sbin/slapcat -f <?php echo getenv('APPNAME_HOME'); ?>/etc/ldap/slapd.conf $* 
