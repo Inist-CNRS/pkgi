@@ -31,6 +31,9 @@ if [ -f "<?php echo getenv('APPNAME_HOME') ?>/etc/default/slapd" ]; then
 	. <?php echo getenv('APPNAME_HOME') ?>/etc/default/slapd
 fi
 
+# Load the pkgi profile
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+
 # Load the default location of the slapd config file
 if [ -z "$SLAPD_CONF" ]; then
 	SLAPD_CONF="<?php echo getenv('APPNAME_HOME') ?>/etc/ldap/slapd.conf"

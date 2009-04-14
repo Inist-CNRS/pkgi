@@ -23,7 +23,7 @@ ENV="env -i LANG=C PATH=/usr/local/bin:/usr/bin:/bin"
 #echo "You haven't enabled any sites yet, so I'm not starting apache2." && \
 #echo "To add and enable a host, use addhost and enhost." && exit 0
 
-#edit /etc/default/apache2 to change this.
+#edit <?php echo getenv('APPNAME_HOME') ?>/etc/default/apache2 to change this.
 HTCACHECLEAN_RUN=auto
 HTCACHECLEAN_MODE=daemon
 HTCACHECLEAN_SIZE=300M
@@ -42,7 +42,10 @@ fi
 . /lib/lsb/init-functions
 
 test -f /etc/default/rcS && . /etc/default/rcS
-test -f /etc/default/apache2 && . /etc/default/apache2
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/default/apache2 && . <?php echo getenv('APPNAME_HOME') ?>/etc/default/apache2
+
+# Load the pkgi profile
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
 
 APACHE2CTL="$ENV /usr/sbin/apache2ctl -f <?php echo getenv('APPNAME_HOME') ?>/etc/apache2/apache2.conf -E <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/error.log -e <?php if (in_array('dev',$version)) { ?>debug<?php } else { ?>warn<?php } ?>"
 HTCACHECLEAN="$ENV /usr/sbin/htcacheclean"
