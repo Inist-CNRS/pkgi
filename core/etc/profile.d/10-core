@@ -1,0 +1,3 @@
+PATH="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin:<?php echo getenv('APPNAME_HOME') ?>/usr/bin:$PATH"
+
+export PATH
