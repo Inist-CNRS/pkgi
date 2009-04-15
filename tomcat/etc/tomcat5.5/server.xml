@@ -77,11 +77,10 @@
     -->
 
     <!-- Define a non-SSL HTTP/1.1 Connector on port 8180 -->
-    <Connector port="<?php echo getenv('APPNAME_TOMCAT_PORT'); ?>" address="<?php echo getenv('APPNAME_TOMCAT_LISTEN_INTERFACE'); ?>"
-               maxHttpHeaderSize="8192" maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+    <Connector port="<?php echo getenv('APPNAME_TOMCAT_PORT'); ?>" address="<?php echo getenv('APPNAME_TOMCAT_LISTEN_INTERFACE'); ?>" maxHttpHeaderSize="8192"
+               maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
                enableLookups="false" redirectPort="8443" acceptCount="100"
                connectionTimeout="20000" disableUploadTimeout="true" />
-
     <!-- Note : To disable connection timeouts, set connectionTimeout value
      to 0 -->
 	
@@ -94,30 +93,24 @@
 	-->
 
     <!-- Define a SSL HTTP/1.1 Connector on port 8443 -->
-<!--
-    <Connector port="<?php echo getenv('APPNAME_TOMCAT_PORT'); ?>" address="<?php echo getenv('APPNAME_TOMCAT_LISTEN_INTERFACE'); ?>"
-               maxHttpHeaderSize="8192" maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+    <!--
+    <Connector port="8443" maxHttpHeaderSize="8192"
+               maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
                enableLookups="false" disableUploadTimeout="true"
-               acceptCount="100" scheme="https" secure="true" sslProtocol="TLS"
-               clientAuth="want"
-	       truststoreType="JKS"
-	       truststoreFile="<?php echo getenv('APPNAME_HOME'); ?>/conf/truststore.jks"
-	       truststorePass="federation"
-	       keystoreFile="<?php echo getenv('APPNAME_HOME'); ?>/conf/tomcat.p12"
-	       keystoreType="PKCS12"
-	       keystorePass="fede" />
--->
+               acceptCount="100" scheme="https" secure="true"
+               clientAuth="false" sslProtocol="TLS" />
+    -->
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
     <!--
-    <Connector port="9009" 
+    <Connector port="8009" 
                enableLookups="false" redirectPort="8443" protocol="AJP/1.3" />
     -->
 
     <!-- Define a Proxied HTTP/1.1 Connector on port 8082 -->
     <!-- See proxy documentation for more information about using this. -->
     <!--
-    <Connector port="9082" 
+    <Connector port="8082" 
                maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
                enableLookups="false" acceptCount="100" connectionTimeout="20000"
                proxyPort="80" disableUploadTimeout="true" />
@@ -203,7 +196,6 @@
       <Host name="localhost" appBase="webapps"
        unpackWARs="true" autoDeploy="true"
        xmlValidation="false" xmlNamespaceAware="false">
-
 
         <!-- Defines a cluster for this node,
              By defining this element, means that every manager will be changed.
