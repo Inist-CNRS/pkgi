@@ -196,6 +196,7 @@ class Pkgi
                 $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array();
                 $env_to_check[$ini_data['env'][$i]][] = isset($ini_data['env-default'][$i]) ? $ini_data['env-default'][$i] : '';
             }
+            unlink($ini_path);
         }
         return $env_to_check;
     }
