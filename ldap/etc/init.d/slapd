@@ -171,7 +171,7 @@ start_ldap() {
 	trap 'report_failure' 0
 	start_slapd
 	trap "-" 0
-	echo .
+        echo " (listening on <?php echo getenv('APPNAME_LDAP_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_LDAP_PORT'); ?>)"
 }
 
 # Stop the OpenLDAP daemons

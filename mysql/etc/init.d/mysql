@@ -101,7 +101,7 @@ case "${1:-''}" in
   'start')
 	sanity_checks;
 	# Start daemon
-	log_daemon_msg "Starting MySQL database server (listening on <?php echo getenv('APPNAME_MYSQL_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_MYSQL_LISTEN_PORTS')?>)" "mysqld"
+	log_daemon_msg "Starting MySQL database server (listening on <?php echo getenv('APPNAME_MYSQL_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_MYSQL_PORT')?>)" "mysqld"
 	if mysqld_status check_alive nowarn; then
 	   log_progress_msg "already running"
 	   log_end_msg 0
