@@ -321,6 +321,7 @@ class Pkgi
                     unset($list[$m][$n]);
                 $n++;
             }
+            sort($list[$m]);
             $ret = array_merge($ret,$list);
         }
         return $ret;
