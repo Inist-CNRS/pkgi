@@ -1,0 +1,3 @@
+grant codeBase "file:/usr/share/struts1.2/struts.jar" {
+  permission java.security.AllPermission;
+};

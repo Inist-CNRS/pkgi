@@ -1,0 +1,21 @@
+#!/bin/sh
+#!/bin/sh
+#
+# Ce script concatene les fichiers trouves dans <?php echo getenv('APPNAME_HOME') ?>/etc/cron.d/
+# pour en faire une unique crontab qu'il charge dans la crontab utilisateur
+#
+
+CRONTMP=<?php echo getenv('APPNAME_HOME') ?>/tmp/crontab
+echo "" > $CRONTMP
+for f in `ls <?php echo getenv('APPNAME_HOME') ?>/etc/cron.d/` ; do
+  cat <?php echo getenv('APPNAME_HOME') ?>/etc/cron.d/$f >> $CRONTMP
+done
+
+echo "Old crontab was:"
+/usr/bin/crontab -l
+echo "----"
+
+echo "New crontab is:"
+/usr/bin/crontab $CRONTMP
+/usr/bin/crontab -l
+echo "----"

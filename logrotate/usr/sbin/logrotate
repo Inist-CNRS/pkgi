@@ -1,0 +1,3 @@
+#!/bin/sh
+#!/bin/sh
+/usr/sbin/logrotate --state <?php echo getenv('APPNAME_HOME') ?>/var/logrotate.status <?php echo getenv('APPNAME_HOME') ?>/etc/logrotate.conf $*

@@ -1,0 +1,4 @@
+
+# run the logrotate task at 5h15 each days
+15 05 * * * <?php echo getenv('APPNAME_HOME') ?>/usr/sbin/logrotate > /dev/null
+

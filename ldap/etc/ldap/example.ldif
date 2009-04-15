@@ -1,0 +1,22 @@
+#
+# This is an example of a classic ldap DIT
+#
+<?php
+$suffix = getenv('APPNAME_LDAP_SUFFIX');
+
+preg_match('/^dc=([^,]*)/i',$suffix,$matches);
+$dc = $matches[1];
+
+?>
+dn: <?php echo $suffix ?> 
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: <?php echo $dc; ?> 
+dc: <?php echo $dc; ?> 
+
+dn: ou=people,<?php echo $suffix; ?> 
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+description: Users branche

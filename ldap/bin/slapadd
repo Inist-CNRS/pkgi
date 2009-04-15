@@ -1,2 +1,0 @@
-#!/bin/sh
-/usr/sbin/slapadd -f <?php echo getenv('APPNAME_HOME'); ?>/etc/slapd.conf $* 
