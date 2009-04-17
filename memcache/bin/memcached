@@ -1,0 +1,79 @@
+<?php echo '#!/bin/sh'; ?>
+
+#
+# skeleton	example file to build /etc/init.d/ scripts.
+#		This file should be used to construct scripts for /etc/init.d.
+#
+#		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+#		Modified for Debian 
+#		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+#
+# Modified for PKGI
+#		by Nicolas Thouvenin <nthouvenin@gmail.com>
+#
+#
+# Version:	@(#)skeleton  1.9  26-Feb-2001  miquels@cistron.nl
+#
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/memcached
+DAEMONBOOTSTRAP=<?php echo getenv('APPNAME_HOME'); ?>/share/memcached/scripts/start-memcached
+NAME=memcached
+DESC=memcached
+PIDFILE=<?php echo getenv('APPNAME_HOME'); ?>/var/run/$NAME.pid
+
+test -x $DAEMON || exit 0
+test -x $DAEMONBOOTSTRAP || exit 0
+
+set -e
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	start-stop-daemon --start --quiet --exec $DAEMONBOOTSTRAP
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON 
+	echo "$NAME."
+	rm -f $PIDFILE
+	;;
+  status)
+  	if [[ ! -f $PIDFILE ]]
+	then
+		echo "Memcache not started"
+		exit 1
+	fi
+	pid=`cat $PIDFILE`
+    ps -ef | cut -c 10-14,48- | grep "${pid}" | grep "${MEMCACHE_PORT}" > /dev/null
+	if [[ ${?} -ne 0 ]]
+	then
+        echo "Memcache process not found"
+		exit 1
+	fi  
+        echo "Memcache is listening on <?php echo getenv('APPNAME_MEMCACHE_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_MEMCACHE_PORT'); ?> with pid ${pid}"
+	;;
+
+  restart|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: "
+	start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
+	rm -f $PIDFILE
+	sleep 1
+	start-stop-daemon --start --quiet --exec $DAEMONBOOTSTRAP
+	echo "$NAME."
+	;;
+  *)
+	N=<?php echo getenv('APPNAME_HOME'); ?>/bin/$NAME
+	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
