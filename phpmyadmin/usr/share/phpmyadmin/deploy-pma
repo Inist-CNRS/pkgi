@@ -1,0 +1,18 @@
+<?php
+
+$h = getenv('APPNAME_HOME');
+if (!$h) exit;
+chdir($h.'/usr/share/phpmyadmin/');
+
+foreach(glob('/usr/share/phpmyadmin/*') as $src) {
+  $dst = basename($src);
+  if ($dst == 'config.inc.php') continue;
+  echo $src."\n";
+  echo $dst."\n";
+  @unlink($dst);
+  symlink($src,$dst);
+}
+
+// mise en place de la config locale
+@unlink('config.inc.php');
+symlink($h.'/etc/phpmyadmin/config.inc.php', 'config.inc.php');
