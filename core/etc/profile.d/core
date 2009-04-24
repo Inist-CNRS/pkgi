@@ -2,4 +2,4 @@
 export PATH="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin:<?php echo getenv('APPNAME_HOME') ?>/usr/bin:$PATH"
 
 # chargement des variables d'environnement de pkgi pour qu'elles soient à disposition des différents modules
-source <?php echo getenv('APPNAME_ENV_FILE_PATH') ?>
+. <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> 

@@ -10,7 +10,7 @@ cd "$DIR"
 
 # chargement des eventuels definitions d'environnements 
 for i in `ls .` ; do
-  [[ -f "$i/pkgi.env" ]] && . "$i/pkgi.env"
+  test -f "$i/pkgi.env" && . "$i/pkgi.env"
 done
 
 exec $PHP -C -q -d output_buffering=1 "$FILE" $@ 
