@@ -253,7 +253,12 @@ class Pkgi
             if (preg_match('/'.$this->APPNAME.'_(.+)/',$k,$res))
                 putenv("APPNAME_".$res[1]."=$v");
         }
+        $set_fmode = (!file_exists($filename));
         file_put_contents($filename,$data);
+        if ($set_fmode) {
+            // si le fichier d'env est ecrit pour la premiere fois on regle les droits pour une bonne sécurité
+            chmod($filename, 0600);
+        }
     }
 
     /**
