@@ -1,7 +1,7 @@
 #!/bin/sh
 
-PHP="${PHP:=php}"
-PHP="${PHP} -d short_open_tag=0 "
+PHPRAW="${PHP:=`which php`}"
+PHP="${PHPRAW} -d short_open_tag=0 "
 export PHP
 
 FILE="`basename "$0"`"
@@ -12,6 +12,15 @@ cd "$DIR"
 for i in `ls .` ; do
   test -f "$i/pkgi.env" && . "$i/pkgi.env"
 done
+
+# test de l'existance du binaire php en ligne de commande
+PHPNOTFOUND=1
+test -f "$PHPRAW" && PHPNOTFOUND=0
+if [ $PHPNOTFOUND = 1 ]
+then
+    echo "php is not found, please install the php command line binary (php5-cli package on debian)"
+    exit 1
+fi
 
 exec $PHP -C -q -d output_buffering=1 "$FILE" $@ 
 exit $?
