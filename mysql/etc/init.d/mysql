@@ -27,7 +27,7 @@ test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv(
 
 SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
 CONF=<?php echo getenv('APPNAME_HOME') ?>/etc/mysql/my.cnf
-MYADMIN="/usr/bin/mysqladmin --defaults-file=<?php echo getenv('APPNAME_HOME') ?>/etc/mysql/my.cnf"
+MYADMIN="/usr/bin/mysqladmin --defaults-file=<?php echo getenv('APPNAME_HOME') ?>/etc/mysql/debian.cnf"
 
 # priority can be overriden and "-s" adds output to stderr
 ERR_LOGGER="logger -p daemon.err -t <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql -i"

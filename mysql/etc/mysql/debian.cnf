@@ -1,0 +1,23 @@
+<?php
+
+$password = md5(uniqid(rand(), true));
+
+// recuperation de l'eventuel mot de passe si il existait deja
+$debian_cnf_file = getenv('APPNAME_HOME').'/etc/mysql/debian.cnf';
+if (file_exists($debian_cnf_file)) {
+   if (preg_match('/password\s*\=\s*([a-zA-Z0-9]+)\s*/', file_get_contents($debian_cnf_file), $matches)) {
+     $password = $matches[1];
+   }
+}
+
+?>
+[client]
+host     = localhost
+user     = debian-sys-maint
+password = <?php echo $password; ?> 
+socket   = <?php echo getenv('APPNAME_HOME') ?>/var/run/mysqld/mysqld.sock
+[mysql_upgrade]
+user     = debian-sys-maint
+password = <?php echo $password; ?> 
+socket   = <?php echo getenv('APPNAME_HOME') ?>/var/run/mysqld/mysqld.sock
+basedir  = /usr
