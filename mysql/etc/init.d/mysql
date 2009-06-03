@@ -180,7 +180,7 @@ case "${1:-''}" in
 
   'status')
 	if mysqld_status check_alive nowarn; then
-            log_action_msg "MySQL is running (listening on <?php echo getenv('APPNAME_APACHE_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_APACHE_LISTEN_PORTS')?>)"
+            log_action_msg "MySQL is running (listening on <?php echo getenv('APPNAME_MYSQL_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_MYSQL_PORT')?>)"
 	    log_action_msg "$($MYADMIN status)"
 	else
 	  log_action_msg "MySQL is stopped."
