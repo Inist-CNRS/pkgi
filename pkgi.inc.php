@@ -46,7 +46,7 @@ class Pkgi
         if ($this->dst_path == null)
         {
             $dst = $env[$this->APPNAME.'_HOME'];
-            if (!file_exists($dst)) @mkdir_r($dst);
+            if (!file_exists($dst)) @mkdir($dst, 0777, true);
             if (file_exists($dst))
                 $this->dst_path = $dst;
             else
@@ -378,8 +378,8 @@ class Pkgi
                 echo "Ecriture de ".$t_dst."\n";
                 if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src))
                 {
+                    @mkdir(dirname($t_dst), 0777, true);
                     $output = shell_exec($this->php_path.' '.$t_src);
-                    mkdir_r(dirname($t_dst));
                     file_put_contents($t_dst, $output);
                     // setting the rights
                     if (is_executable($t_src) || preg_match('/^bin\//',$t))
@@ -387,7 +387,7 @@ class Pkgi
                     else
                         chmod($t_dst,0600);
                     // store the file md5
-                    mkdir_r(dirname($t_dst_md5));
+                    @mkdir(dirname($t_dst_md5), 0777, true);
                     file_put_contents($t_dst_md5, md5($output));
                 }
                 else if (is_link($t_src)) {
@@ -396,7 +396,7 @@ class Pkgi
                     symlink(readlink($t_src),$t_dst);
                 }
                 else if (substr($t_src,-1) == '/')
-                    mkdir_r($t_dst);
+                    @mkdir($t_dst, 0777, true);
                 else
                     trigger_error($t_src." cannot be found",E_USER_ERROR);
             }
@@ -433,17 +433,6 @@ function ls($dir, $mask /*.php$|.txt$*/)
     return $files;
 }
 
-
-
-function mkdir_r($dirName, $rights=0777){
-    $dirs = explode('/', $dirName);
-    $dir='';
-    foreach ($dirs as $part) {
-        $dir.=$part.'/';
-        if (!is_dir($dir) && strlen($dir)>0)
-            mkdir($dir, $rights);
-    }
-}
 
 
 if (!function_exists('readline'))
