@@ -99,8 +99,8 @@ class Pkgi
         // si rien n'a ete trouve alors on demande a l'utilisateur d'entrer des modules au clavier
         while (count($this->MODULES) == 0)
         {
-            echo "Entrez le nom des modules separes par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
-            $this->MODULES = $this->_filter_valide_modules(explode(',',readline()));
+            $prompt = "Entrez le nom des modules separes par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
+            $this->MODULES = $this->_filter_valide_modules(explode(',',readline($prompt)));
         }
     
         // ajoute le module core dont tous les autres dependent en tout premier de la liste
@@ -136,8 +136,8 @@ class Pkgi
         if ($this->APPNAME == '')
         {
             do {
-                echo "Entrez le nom de votre application (en lettres majuscules): ";
-                $this->APPNAME = readline();
+                $prompt = "Entrez le nom de votre application (en lettres majuscules): ";
+                $this->APPNAME = readline($prompt);
             } while (!preg_match('/[A-Z]+/',$this->APPNAME));
         }
     }
@@ -225,8 +225,8 @@ class Pkgi
                     if (count($e_option[1]) > 0)
                         echo "Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n";
                     $v_default = $e_option[2] != '' ? "[defaut=".$e_option[2]."] " : '';
-                    echo "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
-                    $v = readline();
+                    $prompt = "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
+                    $v = readline($prompt);
                     if ($v == '') $v = $e_option[2]; // si on a rien repondu, on prend la valeur par defaut
                 }
                 $env[$e] = $v;
@@ -359,10 +359,10 @@ class Pkgi
         if (count($modified_file) > 0)
         {
             do {
-                echo "Les fichiers suivants ont été modifié manuellement depuis le dernier build :\n".
+                $prompt = "Les fichiers suivants ont été modifié manuellement depuis le dernier build :\n".
                     implode("\n",$modified_file)."\n".
                     "Voulez vous les écraser (o/n) ? :\n";
-                $answer = readline();
+                $answer = readline($prompt);
             } while (!preg_match('/^[on]+/i',$answer));
             if (preg_match('/^n/i',$answer))
                 die("Build interrompu !\n");
@@ -437,13 +437,12 @@ function ls($dir, $mask /*.php$|.txt$*/)
 
 if (!function_exists('readline'))
 {
-    function readline()
-        {
-            //    $fp = fopen("php://stdin", "r");
-            $in = trim(fgets(STDIN)); // Maximum windows buffer size
-            //    fclose ($fp);
-            return $in;
-        }
+    function readline($prompt)
+    {
+        echo $prompt;
+        $in = trim(fgets(STDIN)); // Maximum windows buffer size
+        return $in;
+    }
 }
 
 
