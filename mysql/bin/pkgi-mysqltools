@@ -32,7 +32,7 @@ case ${1} in
 USE mysql;
 REPLACE INTO user SET host='localhost', user='debian-sys-maint', password=password('$pass'), Select_priv='Y', Insert_priv='Y', Update_priv='Y', Delete_priv='Y', Create_priv='Y', Drop_priv='Y', Reload_priv='Y', Shutdown_priv='Y', Process_priv='Y',  File_priv='Y', Grant_priv='Y', References_priv='Y', Index_priv='Y', Alter_priv='Y', Show_db_priv='Y', Super_priv='Y', Create_tmp_table_priv='Y', Lock_tables_priv='Y', Execute_priv='Y', Repl_slave_priv='Y', Repl_client_priv='Y';
 EOF
-	MYSQL_BOOTSTRAP="/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-bdb --skip-innodb --skip-ndbcluster"
+	MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-bdb --skip-innodb --skip-ndbcluster"
 	$MYSQL_BOOTSTRAP <$tfile
         if [ "$?" != "0" ]; then
           echo "Error: debian-sys-maint cannot be created."
@@ -59,7 +59,7 @@ EOF
           exit 1
         fi
         ROOT_PASSWORD=$2
-	MYSQL_BOOTSTRAP="/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-bdb --skip-innodb --skip-ndbcluster"
+	MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-bdb --skip-innodb --skip-ndbcluster"
 	tfile=`mktemp`
 	if [ ! -f "$tfile" ]; then
 	    return 1
@@ -113,12 +113,12 @@ EOF
         then
             REMOTE_PORT="3306"
         fi
-        /usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} -e "exit" 
+        <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} -e "exit" 
         if [[ ${?} -ne 0 ]]
         then
             exit 1
         else
-            <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --opt ${BASES} | /usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT}
+            <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT}
         fi
         ;;
     
@@ -140,12 +140,12 @@ EOF
         then
             REMOTE_PORT="3306"
         fi
-        /usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} -e "exit" 
+        <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} -e "exit" 
         if [[ ${?} -ne 0 ]]
         then
             exit 1
         else
-            /usr/bin/mysqldump --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+            <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
         fi
         ;;
 
