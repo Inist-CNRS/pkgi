@@ -345,17 +345,25 @@ class Pkgi
             {
                 $t_dst     = $this->dst_path.'/'.$t;
                 $t_dst_md5 = $this->dst_path.'/.pkgi/lastmd5/'.$t;
-                if (!is_dir($t_dst) &&
-                    !is_link($t_dst) &&
-                    file_exists($t_dst) &&
-                    file_exists($t_dst_md5))
-                {
-                    $md5_current   = md5(file_get_contents($t_dst));
-                    $md5_lastbuild = file_get_contents($t_dst_md5);
-                    if ($md5_current != $md5_lastbuild)
+	        if (is_link($t_dst)) {
+		  // handle symlinks
+		  if (file_exists($t_dst_md5) && readlink($t_dst) != readlink($t_dst_md5)) {
                         $modified_file[] = $t_dst;
+		  }
+		} else if (is_dir($t_dst)) {
+		} else if (is_file($t_dst)) {
+  		  // handle files
+                  if (file_exists($t_dst) &&
+                      file_exists($t_dst_md5))
+                  {
+                      $md5_current   = md5(file_get_contents($t_dst));
+                      $md5_lastbuild = file_get_contents($t_dst_md5);
+                      if ($md5_current != $md5_lastbuild)
+                          $modified_file[] = $t_dst;
+	    	  }
                 }
             }
+
         if (count($modified_file) > 0)
         {
             do {
@@ -394,6 +402,8 @@ class Pkgi
                     // manage symlinks
                     @unlink($t_dst);
                     symlink(readlink($t_src),$t_dst);
+                    @unlink($t_dst_md5);
+                    symlink(readlink($t_src),$t_dst_md5);
                 }
                 else if (substr($t_src,-1) == '/')
                     @mkdir($t_dst, 0777, true);
