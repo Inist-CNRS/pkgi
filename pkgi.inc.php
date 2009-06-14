@@ -343,6 +343,8 @@ class Pkgi
         foreach($tlist as $m => $templates)
             foreach($templates as $t)
             {
+                if ($t == 'pkgi.env') continue; // special case for this file, do not touch it ! 
+
                 $t_dst     = $this->dst_path.'/'.$t;
                 $t_dst_md5 = $this->dst_path.'/.pkgi/lastmd5/'.$t;
 	        if (is_link($t_dst)) {
@@ -380,6 +382,8 @@ class Pkgi
         foreach($tlist as $m => $templates)
             foreach($templates as $t)
             {
+                if ($t == 'pkgi.env') continue; // special case for this file, do not touch it ! 
+
                 $t_src     = $this->tpl_path.'/'.$m.'/'.$t;
                 $t_dst     = $this->dst_path.'/'.$t;
                 $t_dst_md5 = $this->dst_path.'/.pkgi/lastmd5/'.$t;
