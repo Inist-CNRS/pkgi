@@ -227,10 +227,10 @@ case $1 in
 			log_daemon_msg "Restarting web server" "apache2"
 		fi
 		PID=$(pidof_apache) || true
-		if ! apache_wait_stop; then
-                        log_end_msg 1 || true
-                fi
-		if $APACHE2CTL -k start; then
+#		if ! apache_wait_stop; then
+#                        log_end_msg 1 || true
+#                fi
+		if $APACHE2CTL -k restart; then
 			if check_htcacheclean ; then
 				start_htcacheclean || log_end_msg 1
 			fi
