@@ -178,7 +178,7 @@ apache_wait_stop() {
 case $1 in
 	start)
                 touch <?php echo getenv('APPNAME_HOME') ?>/etc/apache2/httpd.conf
-		log_daemon_msg "Starting web server (listening on <?php echo getenv('APPNAME_APACHE_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_APACHE_LISTEN_PORTS')?>)" "apache2"
+		log_daemon_msg "Starting web server (listening on <?php echo getenv('APPNAME_APACHE_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_APACHE_LISTEN_PORT')?>)" "apache2"
 		if $APACHE2CTL -k start; then
 			if check_htcacheclean ; then
 				log_progress_msg htcacheclean
@@ -252,7 +252,7 @@ case $1 in
 	status)
 		PID=$(pidof_apache_noexit)
 		if [ -n "$PID" ]; then
-			log_success_msg "Apache is running (pid $PID, listening on <?php echo getenv('APPNAME_APACHE_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_APACHE_LISTEN_PORTS')?>)."
+			log_success_msg "Apache is running (pid $PID, listening on <?php echo getenv('APPNAME_APACHE_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_APACHE_LISTEN_PORT')?>)."
 			exit 0
 		else
 			log_failure_msg "Apache is not running."
