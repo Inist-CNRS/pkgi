@@ -47,7 +47,7 @@ test -f <?php echo getenv('APPNAME_HOME') ?>/etc/default/apache2 && . <?php echo
 # Load the pkgi profile
 test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
 
-APACHE2CTL="$ENV /usr/sbin/apache2ctl -f <?php echo getenv('APPNAME_HOME') ?>/etc/apache2/apache2.conf -E <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/error.log -e <?php if (in_array('dev',$version)) { ?>debug<?php } else { ?>warn<?php } ?>"
+APACHE2CTL="$ENV <?php echo getenv('APPNAME_HOME') ?>/usr/sbin/apache2ctl"
 HTCACHECLEAN="$ENV /usr/sbin/htcacheclean"
 
 PIDFILE="<?php echo getenv('APPNAME_HOME') ?>/var/run/apache2.pid"

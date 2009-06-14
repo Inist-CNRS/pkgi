@@ -1,0 +1,7 @@
+#!/bin/sh
+#!/bin/sh
+<?php
+$version = explode(',',getenv('APPNAME_VERSION'));
+$logoptions = '-E '.getenv('APPNAME_HOME').'/var/log/apache2/error.log -e '.(in_array('dev',$version) ? 'debug' : 'warn');
+?>
+/usr/sbin/apache2ctl -f <?php echo getenv('APPNAME_HOME') ?>/etc/apache2/apache2.conf <?php echo $logoptions; ?> $*
