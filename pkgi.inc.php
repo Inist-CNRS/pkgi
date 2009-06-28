@@ -150,6 +150,7 @@ class Pkgi
     function load_env(&$env)
     {
         $env['APPNAME'] = $this->APPNAME;
+        putenv('APPNAME='.$this->APPNAME);
         $env[$this->APPNAME.'_MODULES'] = implode(',',$this->MODULES);
 
         // construit une liste des variables d'env a tester

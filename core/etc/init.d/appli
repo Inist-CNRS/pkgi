@@ -3,6 +3,16 @@
 ### BEGIN INIT INFO
 # Short-Description: Start/stop the whole application
 ### END INIT INFO
+<?php
+
+$applink = trim(getenv('APPNAME_HOME').'/etc/init.d/'.strtolower(getenv('APPNAME')));
+@unlink($applink);
+@symlink(
+  getenv('APPNAME_HOME').'/etc/init.d/appli',
+  $applink
+);
+
+?>
 
 case "$1" in
     start)
@@ -15,8 +25,7 @@ case "$1" in
             <?php foreach( $cmd as $c ) { ?>
 		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
             <?php } ?>
-	    if [[ ${?} -ne 0 ]]
-	    then
+	    if [ ${?} -ne 0 ] ; then
 		exit ${?}
 	    fi
             echo "----"
@@ -32,8 +41,7 @@ case "$1" in
             <?php foreach( $cmd as $c ) { ?>
 		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
                 RCODE=${?}
-		if [[ ${RCODE} -ne 0 ]]
-		then
+		if [ ${RCODE} -ne 0 ]; then
 		    exit ${RCODE}
 		fi
             <?php } ?>
@@ -50,8 +58,7 @@ case "$1" in
             <?php foreach( $cmd as $c ) { ?>
 		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
                 RCODE=${?}
-		if [[ ${RCODE} -ne 0 ]]
-		then
+		if [ ${RCODE} -ne 0 ]; then
 		    exit ${RCODE}
 		fi
             <?php } ?>
@@ -68,8 +75,7 @@ case "$1" in
             <?php foreach( $cmd as $c ) { ?>
                 <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
                 RCODE=${?}
-		if [[ ${RCODE} -ne 0 ]]
-		then
+		if [ ${RCODE} -ne 0 ]; then
 		    exit ${RCODE}
 		fi
 	    <?php } ?>
