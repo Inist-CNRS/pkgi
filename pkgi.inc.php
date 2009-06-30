@@ -389,8 +389,7 @@ class Pkgi
                 $t_dst     = $this->dst_path.'/'.$t;
                 $t_dst_md5 = $this->dst_path.'/.pkgi/lastmd5/'.$t;
                 echo "Ecriture de ".$t_dst."\n";
-                if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src))
-                {
+                if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src)) {
                     @mkdir(dirname($t_dst), 0777, true);
                     $output = shell_exec($this->php_path.' '.$t_src);
                     file_put_contents($t_dst, $output);
@@ -402,18 +401,18 @@ class Pkgi
                     // store the file md5
                     @mkdir(dirname($t_dst_md5), 0777, true);
                     file_put_contents($t_dst_md5, md5($output));
-                }
-                else if (is_link($t_src)) {
+                } else if (is_link($t_src)) {
                     // manage symlinks
                     @unlink($t_dst);
                     symlink(readlink($t_src),$t_dst);
                     @unlink($t_dst_md5);
+                    @mkdir(dirname($t_dst_md5), 0777, true);
                     symlink(readlink($t_src),$t_dst_md5);
-                }
-                else if (substr($t_src,-1) == '/')
+                } else if (substr($t_src,-1) == '/') {
                     @mkdir($t_dst, 0777, true);
-                else
+                } else {
                     trigger_error($t_src." cannot be found",E_USER_ERROR);
+                }
             }
     }
 
