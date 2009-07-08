@@ -6,10 +6,10 @@ export PHP
 
 FILE="`basename "$0"`"
 DIR="`dirname "$0"`"
-ENV="build.env.ksh"
+ENV=${DIR}"/build.env.ksh"
 
 cd "$DIR"
-[[ -f "$ENV" ]] && . "$ENV"
+test -f "$ENV" && . "$ENV"
 exec $PHP -C -q -d output_buffering=1 "$FILE" $@ 
 exit $?
 <?php

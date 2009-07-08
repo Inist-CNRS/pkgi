@@ -1,4 +1,5 @@
-<?php echo '#!/bin/sh'; ?> 
+<?php echo '#!/usr/bin/ksh'; ?> 
+
 #---------------------------------------------------------------------------
 #---------------------------------------------------------------------------
 #-----                                                                 -----
@@ -43,6 +44,10 @@ export LANG=C
 export ORACLE_HOME=/usr/lib/oracle/xe/app/oracle/product/10.2.0/client
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 
+# Réglages pour un répertoire temporaire local
+TMP=<?php echo getenv('APPNAME_HOME'); ?>/tmp
+TMPDIR=<?php echo getenv('APPNAME_HOME'); ?>/tmp
+TEMP=<?php echo getenv('APPNAME_HOME'); ?>/tmp
 
 # ENV generiques de l'appli (port http, port mysql ...)
 if [[ -f <?php echo getenv('APPNAME_ENV_FILE_PATH') ?> ]]

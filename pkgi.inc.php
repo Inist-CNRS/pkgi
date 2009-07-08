@@ -102,7 +102,7 @@ class Pkgi
         while (count($this->MODULES) == 0)
         {
             echo "Entrez le nom des modules separes par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
-            $this->MODULES = $this->_filter_valide_modules(explode(',',readline()));
+            $this->MODULES = $this->_filter_valide_modules(explode(',',readline('')));
         }
     
         // ajoute le module core dont tous les autres dependent en tout premier de la liste
@@ -139,7 +139,7 @@ class Pkgi
         {
             do {
                 echo "Entrez le nom de votre application (en lettres majuscules): ";
-                $this->APPNAME = readline();
+                $this->APPNAME = readline('');
             } while (!preg_match('/[A-Z]+/',$this->APPNAME));
         }
     }
@@ -227,7 +227,7 @@ class Pkgi
                         echo "Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n";
                     $v_default = $e_option[2] != '' ? "[defaut=".$e_option[2]."] " : '';
                     echo "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
-                    $v = readline();
+                    $v = readline('');
                     if ($v == '') $v = $e_option[2]; // si on a rien repondu, on prend la valeur par defaut
                 }
                 $env[$e] = $v;
@@ -357,7 +357,7 @@ class Pkgi
                 echo "Les fichiers suivants ont été modifié manuellement depuis le dernier build :\n".
                     implode("\n",$modified_file)."\n".
                     "Voulez vous les écraser (o/n) ? :\n";
-                $answer = readline();
+                $answer = readline('');
             } while (!preg_match('/^[on]+/i',$answer));
             if (preg_match('/^n/i',$answer))
                 die("Build interrompu !\n");
