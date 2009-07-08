@@ -41,6 +41,11 @@ $gopear = str_replace('trim(fgets($tty, 1024));','"";',$gopear);
 $gopear = str_replace('$install_pfc = !stristr(fgets($tty, 1024), "n");','$install_pfc = !stristr("Y", "n");',$gopear);
 $gopear = str_replace('$alter_phpini = !stristr(fgets($tty, 1024), "n");','$alter_phpini = !stristr("n", "n");',$gopear);
 
+// force l'installation des packages de pear
+// (ceci permet de remettre d'aplomb un pear bancale sans provoquer d'erreur)
+$gopear = str_replace('if ($registry->packageExists($pkg) || $registry->packageExists($pkg_basename)) {',
+                      '$options[\'force\'] = true; if (0) {', $gopear);
+ 
 $gopear = '#/bin/sh
 export PHP="/usr/bin/php -d short_open_tag=0 "
 export PHPRC='.getenv('APPNAME_HOME').'/etc
