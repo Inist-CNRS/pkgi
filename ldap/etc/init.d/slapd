@@ -1,4 +1,5 @@
 #!/bin/sh
+#!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          slapd
 # Required-Start:    $remote_fs $network $syslog
@@ -185,14 +186,14 @@ stop_ldap() {
 
 # Check if ldap is running
 status() {
-	if [[ ! -f ${SLAPD_PIDFILE} ]]
+	if [ ! -f ${SLAPD_PIDFILE} ]
 	then
                 echo "OpenLDAP not started"
 		exit 1
 	fi
 	pid=`cat ${SLAPD_PIDFILE}`
         ps -ef | cut -c 10-14,48- | grep "${pid}" | grep "<?php echo getenv('APPNAME_LDAP_PORT'); ?>" > /dev/null
-	if [[ ${?} -ne 0 ]]
+	if [ ${?} -ne 0 ]
 	then
                 echo "OpenLDAP process not found"
 		exit 1
