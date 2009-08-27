@@ -5,10 +5,12 @@ case ${1} in
     
     -q | query)
         # Se connecter à la base
+        shift 1
 	<?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql $*
 	;;
 
     -d | dump)
+        shift 1
 	<?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump $* 
 	;;
 
