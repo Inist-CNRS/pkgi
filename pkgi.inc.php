@@ -404,6 +404,7 @@ class Pkgi
                 } else if (is_link($t_src)) {
                     // manage symlinks
                     @unlink($t_dst);
+                    @mkdir(dirname($t_dst), 0777, true);
                     symlink(readlink($t_src),$t_dst);
                     @unlink($t_dst_md5);
                     @mkdir(dirname($t_dst_md5), 0777, true);
