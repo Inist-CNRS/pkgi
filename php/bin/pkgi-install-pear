@@ -17,7 +17,7 @@ if ( getenv('http_proxy') !== FALSE || getenv('HTTP_PROXY') !== FALSE)
 {
   $http_proxy = ( getenv('http_proxy') === FALSE ? getenv('HTTP_PROXY') : getenv('http_proxy') );
   $http_proxy = str_replace('http://','',$http_proxy);
-  $ct_params['http'] = array( 'proxy' => 'tcp://'.$http_proxy, 'request_fulluri' => true );
+  $ct_params['http'] = array( 'proxy' => 'tcp://'.$http_proxy, 'request_fulluri' => true, 'timeout' => 5 );
 }
 $ct = stream_context_create($ct_params);
 $gopear = file_get_contents("http://pear.php.net/go-pear", false, $ct);
