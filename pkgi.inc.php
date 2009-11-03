@@ -10,6 +10,7 @@ class Pkgi
     var $tpl_path = null;
     var $dst_path = null;
     var $php_path = null;
+    var $sys_pkg_query = 'dpkg --get-selections %s 2> /dev/null';
 
     function Pkgi($env_path = null, $tpl_path = null, $dst_path = null)
     {
@@ -34,7 +35,10 @@ class Pkgi
             echo "Les modules suivants seront utilises : ".implode(',',$this->MODULES)."\n";
         else
             echo "Le module suivant sera utilise : ".implode(',',$this->MODULES)."\n";
-    
+
+        echo "--- ETAPE X : Vérification des dépendances\n";
+        $this->check_dependencies();
+
         echo "--- ETAPE 3 : Charge les variables d'environnement\n";
         $env = array();
         $this->load_env($env);
@@ -105,6 +109,62 @@ class Pkgi
     
         // ajoute le module core dont tous les autres dependent en tout premier de la liste
         $this->MODULES = array_merge(array('core'), $this->MODULES);
+    }
+
+    function check_dependencies()
+    {
+        $deptree = $this->_build_dependency_tree();
+
+        foreach($deptree as $m => $mdep) {
+
+                if (count($mdep['mandatory-sys-dependency']) > 0 ||
+                    count($mdep['mandatory-pkgi-dependency']) > 0) {
+                echo "- Dépendances obligatoires du module $m\n";
+                // checking system mandatory dependencies
+                foreach($mdep['mandatory-sys-dependency'] as $package) {
+                    $output = trim(shell_exec(sprintf($this->sys_pkg_query, $package)));
+                    if (!empty($output)) {
+                        echo "    * ".$package." est présent au niveau système\n";
+                    } else {
+                        echo "    * ".$package." n'est présent au niveau système, installez le\n";
+                        $error = true;
+                    }
+                }
+                // checking pkgi mandatory dependencies
+                foreach($mdep['mandatory-pkgi-dependency'] as $package) {
+                    if (in_array($package, $this->MODULES)) {
+                        echo "    * ".$package." est dans la liste des modules pkgi utilisés\n";
+                    } else {
+                        echo "    * ".$package." n'est pas dans la liste des modules pkgi utilisés, ajoutez le\n";
+                        $error = true;
+                    }
+                }
+            }
+
+            if (count($mdep['optional-sys-dependency']) > 0 ||
+                count($mdep['optional-pkgi-dependency']) > 0) {
+                echo "- Dépendances optionnelles du module $m\n";
+                // checking system optional dependencies
+                foreach($mdep['optional-sys-dependency'] as $package) {
+                    $output = trim(shell_exec(sprintf($this->sys_pkg_query, $package)));
+                    if (!empty($output)) {
+                        echo "    * ".$package." est présent au niveau système\n";
+                    } else {
+                        echo "    * ".$package." n'est présent au niveau système, vérifiez si vous en avez besoin\n";
+                    }
+                }
+                // checking pkgi mandatory dependencies
+                foreach($mdep['optional-pkgi-dependency'] as $package) {
+                    if (in_array($package, $this->MODULES)) {
+                        echo "    * ".$package." est dans la liste des modules pkgi utilisés\n";
+                    } else {
+                        echo "    * ".$package." n'est pas dans la liste des modules pkgi utilisés, vérifiez si vous en avez besoin\n";
+                    }
+                }
+            }
+
+        }
+        if ($error) die();
     }
 
     function _filter_valide_modules($modules_to_check)
@@ -191,7 +251,6 @@ class Pkgi
             $ini_data = parse_ini_file($ini_path);
             for ($i = 0 ; $i<count($ini_data['env']) ; $i++)
             {
-        
                 $env_to_check[$ini_data['env'][$i]] = array();
                 $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-desc'][$i];
                 $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array();
@@ -199,7 +258,42 @@ class Pkgi
             }
             unlink($ini_path);
         }
+
         return $env_to_check;
+    }
+
+
+    function _build_dependency_tree()
+    {
+        // construit une liste des dépendances entre les différents modules
+        $dep = array();
+        foreach($this->MODULES as $m)
+        {
+            $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+            if (!file_exists($ini_path)) continue;
+
+            // execute les balises php eventuelles contenues dans config.ini
+            $output = shell_exec($this->php_path.' '.$ini_path);
+            $ini_path = dirname(__FILE__).'/config.ini.tmp';
+            file_put_contents($ini_path,$output);
+      
+            $ini_data = parse_ini_file($ini_path);
+            foreach(array('mandatory-sys-dependency',
+                          'optional-sys-dependency',
+                          'mandatory-pkgi-dependency',
+                          'optional-pkgi-dependency') as $field) {
+                $dep[$m][$field] = array();
+                if (isset($ini_data[$field]) && is_array($ini_data[$field])) {
+                    foreach($ini_data[$field] as $v) {
+                        $v = trim($v);
+                        if (!empty($v)) $dep[$m][$field][] = $v;
+                    }
+                }
+            }
+            unlink($ini_path);
+        }
+
+        return $dep;
     }
   
     /**
