@@ -196,12 +196,9 @@ class Pkgi
     {
         // on recherche APPNAME dans l'environement
         // si on le trouve pas alors on cherche dans le fichier XXXX.env
-        if ($s = getenv('APPNAME'))
-        {
+        if ($s = getenv('APPNAME')) {
             $this->APPNAME = $s;
-        }
-        else if (file_exists($this->env_path))
-        {
+        } else if (file_exists($this->env_path)) {
             $data = file_get_contents($this->env_path);
             if (preg_match('/APPNAME=(.+)/i',$data,$res))
                 $this->APPNAME = trim($res[1],'" ');
@@ -352,7 +349,7 @@ class Pkgi
     {
         $filename = $this->env_path;
         echo "Ecriture des variables d'environnement dans ".realpath($filename)."\n";
-        $data = '# Attention : n\'éditez pas ce fichier manuellement car il sera regénéré par pkgi au prochain build'."\n";
+        $data = '';
         foreach($env as $k => $v)
         {
             // ecriture dans le fichier XXX.env

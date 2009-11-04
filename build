@@ -9,6 +9,7 @@ DIR="`dirname "$0"`"
 cd "$DIR"
 
 # chargement des eventuels definitions d'environnements 
+test -f "./pkgi.env" && . "./pkgi.env"
 for i in `ls .` ; do
   test -f "$i/pkgi.env" && . "$i/pkgi.env"
 done
