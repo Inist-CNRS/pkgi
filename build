@@ -31,7 +31,7 @@ ob_implicit_flush(true);
 
 require_once dirname(__FILE__).'/pkgi.inc.php';
 
-$pkgi = new Pkgi( null, realpath(dirname(__FILE__)) );
+$pkgi = new Pkgi(null, realpath(dirname(__FILE__)), null, array_slice($_SERVER['argv'],1));
 $pkgi->run();
 
 ?>

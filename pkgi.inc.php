@@ -11,8 +11,9 @@ class Pkgi
     var $dst_path = null;
     var $php_path = null;
     var $sys_pkg_query = 'dpkg --get-selections %s 2> /dev/null';
+    var $options = array();
 
-    function Pkgi($env_path = null, $tpl_path = null, $dst_path = null)
+    function Pkgi($env_path = null, $tpl_path = null, $dst_path = null, $options = array())
     {
         $current_dir = substr(dirname(__FILE__), strrpos(dirname(__FILE__),'/')+1);
         if (!preg_match('/^[a-z]+$/i',$current_dir)) $current_dir = 'src';
@@ -21,6 +22,7 @@ class Pkgi
         $this->dst_path = $dst_path;
         $this->php_path = getenv('PHP');
         if ($this->php_path === false)  $this->php_path = '/usr/bin/php'; 
+        $this->options = $options;
     }
   
     function run()
@@ -474,7 +476,7 @@ class Pkgi
                 }
             }
 
-        if (count($modified_file) > 0)
+        if (count($modified_file) > 0 && !in_array('--force-overwrite',$this->options))
         {
             do {
                 $prompt = "Les fichiers suivants ont été modifié manuellement depuis le dernier build :\n".
