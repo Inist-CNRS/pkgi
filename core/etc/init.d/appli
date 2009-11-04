@@ -66,6 +66,23 @@ case "$1" in
 	<?php } ?>
 	;;
 
+    reload) 
+    <?php
+    $dreload_list = unserialize(getenv('APPNAME_DRELOAD_LIST'));
+    foreach($dreload_list as $module => $cmd) { ?>
+        # Redemarrage de <?php echo $module; ?> 
+            <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+            <?php foreach( $cmd as $c ) { ?>
+        <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+                RCODE=${?}
+        if [ ${RCODE} -ne 0 ]; then
+            exit ${RCODE}
+        fi
+            <?php } ?>
+        echo "----"
+    <?php } ?>
+    ;;
+
     status)
 	<?php
 	$dstatus_list = unserialize(getenv('APPNAME_DSTATUS_LIST'));
