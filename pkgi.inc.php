@@ -114,28 +114,24 @@ class Pkgi
     function check_dependencies()
     {
         $deptree = $this->_build_dependency_tree();
+        $depresult = array();
 
         foreach($deptree as $m => $mdep) {
 
                 if (count($mdep['mandatory-sys-dependency']) > 0 ||
                     count($mdep['mandatory-pkgi-dependency']) > 0) {
-                echo "- Dépendances obligatoires du module $m\n";
                 // checking system mandatory dependencies
                 foreach($mdep['mandatory-sys-dependency'] as $package) {
                     $output = trim(shell_exec(sprintf($this->sys_pkg_query, $package)));
-                    if (!empty($output)) {
-                        echo "    * ".$package." est présent au niveau système\n";
-                    } else {
-                        echo "    * ".$package." n'est présent au niveau système, installez le\n";
+                    if (empty($output)) {
+                        $depresult['mandatory-sys-dependency'][$package][] = $m;
                         $error = true;
                     }
                 }
                 // checking pkgi mandatory dependencies
                 foreach($mdep['mandatory-pkgi-dependency'] as $package) {
-                    if (in_array($package, $this->MODULES)) {
-                        echo "    * ".$package." est dans la liste des modules pkgi utilisés\n";
-                    } else {
-                        echo "    * ".$package." n'est pas dans la liste des modules pkgi utilisés, ajoutez le\n";
+                    if (!in_array($package, $this->MODULES)) {
+                        $depresult['mandatory-pkgi-dependency'][$package][] = $m;
                         $error = true;
                     }
                 }
@@ -143,27 +139,44 @@ class Pkgi
 
             if (count($mdep['optional-sys-dependency']) > 0 ||
                 count($mdep['optional-pkgi-dependency']) > 0) {
-                echo "- Dépendances optionnelles du module $m\n";
                 // checking system optional dependencies
                 foreach($mdep['optional-sys-dependency'] as $package) {
                     $output = trim(shell_exec(sprintf($this->sys_pkg_query, $package)));
-                    if (!empty($output)) {
-                        echo "    * ".$package." est présent au niveau système\n";
-                    } else {
-                        echo "    * ".$package." n'est présent au niveau système, vérifiez si vous en avez besoin\n";
+                    if (empty($output)) {
+                        $depresult['optional-sys-dependency'][$package][] = $m;
                     }
                 }
                 // checking pkgi mandatory dependencies
                 foreach($mdep['optional-pkgi-dependency'] as $package) {
-                    if (in_array($package, $this->MODULES)) {
-                        echo "    * ".$package." est dans la liste des modules pkgi utilisés\n";
-                    } else {
-                        echo "    * ".$package." n'est pas dans la liste des modules pkgi utilisés, vérifiez si vous en avez besoin\n";
+                    if (!in_array($package, $this->MODULES)) {
+                        $depresult['optional-pkgi-dependency'][$package][] = $m;
                     }
                 }
             }
 
         }
+
+        if (isset($depresult['optional-pkgi-dependency'])) {
+            foreach($depresult['optional-pkgi-dependency'] as $k => $v) {
+                echo "=> Le module pkgi '$k' est optionnel, d'autre modules pkgi (".implode(',',$v).") peuvent l'utiliser.\n";
+            }
+        }
+        if (isset($depresult['optional-sys-dependency'])) {
+            foreach($depresult['optional-sys-dependency'] as $k => $v) {
+                echo "=> Le packet système '$k' est optionnel, les modules pkgi (".implode(',',$v).") peuvent l'utiliser.\n";
+            }
+        }
+        if (isset($depresult['mandatory-pkgi-dependency'])) {
+            foreach($depresult['mandatory-pkgi-dependency'] as $k => $v) {
+                echo "=> Le module pkgi '$k' n'est pas installé, il doit l'être pour pouvoir utiliser les modules pkgi suivants : ".implode(',',$v).".\n";
+            }
+        }
+        if (isset($depresult['mandatory-sys-dependency'])) {
+            foreach($depresult['mandatory-sys-dependency'] as $k => $v) {
+                echo "=> Le packet système '$k' n'est pas installé, il doit l'être pour pouvoir utiliser les modules pkgi suivants : ".implode(',',$v).".\n";
+            }
+        }
+
         if ($error) die();
     }
 
