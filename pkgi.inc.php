@@ -504,6 +504,7 @@ class Pkgi
                 if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src)) {
                     @mkdir(dirname($t_dst), 0777, true);
                     $output = shell_exec($this->php_path.' '.$t_src);
+                    @unlink($t_dst);
                     file_put_contents($t_dst, $output);
                     // setting the rights
                     if (is_executable($t_src) || preg_match('/^bin\//',$t))
@@ -512,6 +513,7 @@ class Pkgi
                         chmod($t_dst,0600);
                     // store the file md5
                     @mkdir(dirname($t_dst_md5), 0777, true);
+                    @unlink($t_dst_md5);
                     file_put_contents($t_dst_md5, md5($output));
                 } else if (is_link($t_src)) {
                     // manage symlinks

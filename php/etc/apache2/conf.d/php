@@ -1,10 +1,35 @@
-#
-# Chargement du module php dans Apache
-#
-Include /etc/apache2/mods-available/php5.load
-Include /etc/apache2/mods-available/php5.conf
+# Load fcgi module
+Include /etc/apache2/mods-available/fcgid.load
+Include /etc/apache2/mods-available/fcgid.conf
 
-#
-# Utilisation du php.ini locale
-#
-PHPIniDir <?php echo getenv('APPNAME_HOME') ?>/etc/php5/php.ini 
+<IfModule mod_fcgid.c>
+    SharememPath <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
+    SocketPath <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
+
+    # Communication timeout: Default value is 20 seconds
+    IPCCommTimeout 60
+
+    # Connection timeout: Default value is 3 seconds
+    #IPCConnectTimeout 3
+
+    # Define a new handler "php-fcgi" for ".php" files, plus the action that must follow
+    AddHandler php-fcgi .php
+    Action php-fcgi /fcgi-bin/php-fcgi-wrapper
+
+    # Define the MIME-Type for ".php" files
+    AddType application/x-httpd-php .php
+
+    # Define alias "/fcgi-bin/". The action above is using this value, which means that
+    # you could run another "php5-cgi" command by just changing this alias
+    Alias /fcgi-bin/ <?php echo getenv('APPNAME_HOME') ?>/usr/lib/fcgi-bin/
+
+    # Turn on the fcgid-script handler for all files within the alias "/fcgi-bin/"
+    <Location /fcgi-bin/>
+        Order Deny,Allow
+        Deny from All
+        Allow from env=REDIRECT_STATUS
+        SetHandler fcgid-script
+        Options +ExecCGI 
+    </Location>
+</IfModule>
+

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PHPRAW="${PHP:=`which php`}"
+PHPRAW="${PHP:=/usr/bin/php}"
 PHP="${PHPRAW} -d short_open_tag=0 "
 export PHP
 
