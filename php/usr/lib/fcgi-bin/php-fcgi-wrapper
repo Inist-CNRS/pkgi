@@ -1,0 +1,7 @@
+#!/bin/sh
+#!/bin/sh
+
+# Load the pkgi profile
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+
+exec /usr/bin/php5-cgi
