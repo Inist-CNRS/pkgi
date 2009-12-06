@@ -10,7 +10,7 @@ class Pkgi
     var $tpl_path = null;
     var $dst_path = null;
     var $php_path = null;
-    var $sys_pkg_query = 'dpkg --get-selections %s 2> /dev/null';
+    var $sys_pkg_query = 'dpkg --get-selections %s 2> /dev/null | grep install';
     var $options = array();
 
     function Pkgi($env_path = null, $tpl_path = null, $dst_path = null, $options = array())
