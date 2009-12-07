@@ -7,39 +7,40 @@ $port      = getenv('APPNAME_APACHE_LISTEN_PORT');
 if (!is_numeric($port)) die();
 ?>
 <VirtualHost <?php echo $interface; ?>:<?php echo $port; ?>>
-	ServerAdmin <?php echo getenv('APPNAME_ADMIN_MAIL') ?> 
-	
-	DocumentRoot <?php echo getenv('APPNAME_HOME') ?>/var/www/
-	<Directory />
-		Options FollowSymLinks
-		AllowOverride None
-	</Directory>
-	<Directory <?php echo getenv('APPNAME_HOME') ?>/var/www/>
-		Options Indexes FollowSymLinks MultiViews
+    ServerAdmin <?php echo getenv('APPNAME_ADMIN_MAIL') ?> 
+    DocumentRoot <?php echo getenv('APPNAME_HOME') ?>/var/www/
+
+    <Directory />
+        Options FollowSymLinks
+        AllowOverride None
+    </Directory>
+    <Directory <?php echo getenv('APPNAME_HOME') ?>/var/www/>
+        Options Indexes FollowSymLinks MultiViews
                 AllowOverride <?php if (in_array('htaccess',$options)) { ?>All<?php } else { ?>None<?php } ?> 
-		Order allow,deny
-		allow from all
-	</Directory>
+        Order allow,deny
+        allow from all
+    </Directory>
 
-	ScriptAlias /cgi-bin/ <?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin/
-	<Directory "<?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin">
-                AllowOverride <?php if (in_array('htaccess',$options)) { ?>All<?php } else { ?>None<?php } ?> 
-		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
-		Order allow,deny
-		Allow from all
-	</Directory>
+    ScriptAlias /cgi-bin/ <?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin/
+    <Directory "<?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin">
 
-        <?php if (in_array('dev',$version) || in_array('access-log',$options)) { ?> 
-        CustomLog <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/access.log combined
-        <?php } ?> 
+        AllowOverride <?php if (in_array('htaccess',$options)) { ?>All<?php } else { ?>None<?php } ?> 
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        Order allow,deny
+        Allow from all
+    </Directory>
 
-        Alias /doc/ "/usr/share/doc/"
-        <Directory "/usr/share/doc/">
-            Options Indexes MultiViews FollowSymLinks
-            AllowOverride None
-            Order deny,allow
-            Deny from all
-            Allow from 127.0.0.0/255.0.0.0 ::1/128
-        </Directory>
+    <?php if (in_array('dev',$version) || in_array('access-log',$options)) { ?> 
+    CustomLog <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/access.log combined
+    <?php } ?> 
+
+    Alias /doc/ "/usr/share/doc/"
+    <Directory "/usr/share/doc/">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.0/255.0.0.0 ::1/128
+    </Directory>
 
 </VirtualHost>
