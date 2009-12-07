@@ -27,21 +27,21 @@ class Pkgi
   
     function run()
     {
-        echo "--- ETAPE 1 : Choisissez un nom d'application\n";
+        echo "--- Choisissez un nom d'application\n";
         $this->choose_appli_name();
-        echo "Le nom d'application suivant sera utilise : ".$this->APPNAME."\n";
-        echo "--- ETAPE 2 : Choisissez les modules a activer\n";
+        echo "Le nom d'application suivant sera utilisé : ".$this->APPNAME."\n";
+        echo "--- Choisissez les modules à activer\n";
         $this->build_module_list();
         $this->choose_modules();
         if (count($this->MODULES) > 1)
-            echo "Les modules suivants seront utilises : ".implode(',',$this->MODULES)."\n";
+            echo "Les modules suivants seront utilisés : ".implode(',',$this->MODULES)."\n";
         else
-            echo "Le module suivant sera utilise : ".implode(',',$this->MODULES)."\n";
+            echo "Le module suivant sera utilisé : ".implode(',',$this->MODULES)."\n";
 
-        echo "--- ETAPE X : Vérification des dépendances\n";
+        echo "--- Vérification des dépendances\n";
         $this->check_dependencies();
 
-        echo "--- ETAPE 3 : Charge les variables d'environnement\n";
+        echo "--- Chargement des variables d'environnement\n";
         $env = array();
         $this->load_env($env);
         $this->check_env($env);
@@ -59,15 +59,14 @@ class Pkgi
                 die("$dst doesn't exist");
         }
     
-        echo "--- ETAPE 4 : Ecrit l'instance des templates\n";
+        echo "--- Instanciation des templates\n";
         $this->write_tpl_instance();
 
-        echo "* Votre application ".$this->APPNAME." est prette.\n";
-        echo "* Elle dispose des modules suivants : ".implode(',',$this->MODULES)."\n";
+        echo "* Votre application ".$this->APPNAME." est prête.\n";
+        echo "* Elle utilise les modules suivants : ".implode(',',$this->MODULES)."\n";
         echo "* Les paramètres ont été sauvegardés dans : ".realpath($this->env_path)."\n";
         echo "* Vous pouvez à tout moment modifier un parametre.\n";
-        echo "* Pensez alors à relancer le build pour regénérer les fichiers de conf et les lanceurs.\n";
-    
+        echo "* Pensez alors à relancer le build pour régénérer les fichiers de conf et les lanceurs.\n";
     }
 
     function build_module_list()
@@ -339,7 +338,7 @@ class Pkgi
                 $env[$e] = $v;
                 putenv("$e=$v");
             }
-            echo "La variable suivante sera utilisee : $e=$v\n";
+            echo "La variable suivante sera utilisée : $e=$v\n";
         }
         return $env;
     }
