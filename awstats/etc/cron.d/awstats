@@ -1,0 +1,1 @@
+0,10,20,30,40,50 * * * * <?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin/awstats.pl -configdir=<?php echo getenv('APPNAME_HOME') ?>/etc/awstats -config=awstats -update >/dev/null

@@ -1,0 +1,25 @@
+<Directory <?php echo getenv('APPNAME_HOME') ?>/var/lib/awstats>
+    Options None
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+</Directory>
+
+Alias /awstats-icon/ /usr/share/awstats/icon/
+<Directory /usr/share/awstats/icon>
+    Options None
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+</Directory>
+
+<Directory <?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin>
+    <Files "awstats.pl">
+        AuthName "awstats authentication"
+        AuthType Basic
+        Require valid-user
+        AuthUserFile <?php echo getenv('APPNAME_HOME') ?>/var/lib/awstats/awstats-password
+    </Files>
+</Directory>
+
+RedirectPermanent /awstats /cgi-bin/awstats.pl
