@@ -453,34 +453,42 @@ class Pkgi
     function write_tpl_instance()
     {
         $tlist = $this->build_templates_list();
-    
+
         // first we check that modified files will not be overwriten
         $modified_file = array();
-        foreach($tlist as $m => $templates)
-            foreach($templates as $t)
-            {
+        foreach($tlist as $m => $templates) {
+            foreach($templates as $t) {
                 if ($t == 'pkgi.env') continue; // special case for this file, do not touch it ! 
 
                 $t_dst     = $this->dst_path.'/'.$t;
                 $t_dst_md5 = $this->dst_path.'/.pkgi/lastmd5/'.$t;
-	        if (is_link($t_dst)) {
-		  // handle symlinks
-		  if (file_exists($t_dst_md5) && readlink($t_dst) != readlink($t_dst_md5)) {
+
+                // traitement permettant de gérer les extensions .pkgi-raw
+                // fichiers ou répertoires à ne pas traiter comme des templates
+                $t_dst     = str_replace('.pkgi-raw','',$t_dst);
+                $t_dst_md5 = str_replace('.pkgi-raw','',$t_dst_md5);
+
+                if (is_link($t_dst)) {
+                    // handle symlinks
+                    if (!is_link($t_dst_md5)) {
                         $modified_file[] = $t_dst;
-		  }
-		} else if (is_dir($t_dst)) {
-		} else if (is_file($t_dst)) {
-  		  // handle files
-                  if (file_exists($t_dst) &&
-                      file_exists($t_dst_md5))
-                  {
-                      $md5_current   = md5(file_get_contents($t_dst));
-                      $md5_lastbuild = file_get_contents($t_dst_md5);
-                      if ($md5_current != $md5_lastbuild)
-                          $modified_file[] = $t_dst;
-	    	  }
+                    } else if (file_exists($t_dst_md5) && readlink($t_dst) != readlink($t_dst_md5)) {
+                        $modified_file[] = $t_dst;
+                    }
+                } else if (is_dir($t_dst)) {
+                } else if (is_file($t_dst)) {
+                    // handle files
+                    if (file_exists($t_dst) &&
+                        file_exists($t_dst_md5)) {
+                        $md5_current   = md5(file_get_contents($t_dst));
+                        $md5_lastbuild = file_get_contents($t_dst_md5);
+                        if ($md5_current != $md5_lastbuild)
+                            $modified_file[] = $t_dst;
+                    }
                 }
+
             }
+        }
 
         if (count($modified_file) > 0 && !in_array('--force-overwrite',$this->options))
         {
@@ -503,10 +511,21 @@ class Pkgi
                 $t_src     = $this->tpl_path.'/'.$m.'/'.$t;
                 $t_dst     = $this->dst_path.'/'.$t;
                 $t_dst_md5 = $this->dst_path.'/.pkgi/lastmd5/'.$t;
+
+                // traitement permettant de gérer les extensions .pkgi-raw
+                // fichiers ou répertoires à ne pas traiter comme des templates
+                $t_src_notpl = (strpos($t_src,'.pkgi-raw') !== false);
+                $t_dst     = str_replace('.pkgi-raw','',$t_dst);
+                $t_dst_md5 = str_replace('.pkgi-raw','',$t_dst_md5);
+
                 echo "Ecriture de ".$t_dst."\n";
                 if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src)) {
                     @mkdir(dirname($t_dst), 0777, true);
-                    $output = shell_exec($this->php_path.' '.$t_src);
+                    if ($t_src_notpl) {
+                        $output = file_get_contents($t_src);
+                    } else {
+                        $output = shell_exec($this->php_path.' '.$t_src);
+                    }
                     @unlink($t_dst);
                     file_put_contents($t_dst, $output);
                     // setting the rights
