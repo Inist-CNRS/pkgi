@@ -38,8 +38,12 @@ class Pkgi
         else
             echo "Le module suivant sera utilisé : ".implode(',',$this->MODULES)."\n";
 
-        echo "--- Vérification des dépendances\n";
-        $this->check_dependencies();
+        echo "--- Vérifications des dépendances\n";
+        if (!in_array('--no-dep',$this->options)) {
+            $this->check_dependencies();
+        } else {
+            echo "Vérifications des dépendances ignorées à la demande de l'utilisateur : option --no-dep\n";
+        }
 
         echo "--- Chargement des variables d'environnement\n";
         $env = array();
