@@ -1,0 +1,8 @@
+Alias <?php echo getenv('APPNAME_DOKUWIKI_BASEURL'); ?> <?php echo getenv('APPNAME_HOME'); ?>/usr/share/dokuwiki/
+
+<Directory <?php echo getenv('APPNAME_HOME'); ?>/usr/share/dokuwiki/>
+	Options +FollowSymLinks
+	AllowOverride All
+	order allow,deny
+	allow from localhost 127.0.0.1
+</Directory>
