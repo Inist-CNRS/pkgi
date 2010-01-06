@@ -128,7 +128,7 @@ if (!defined('DOKU_INC')) die();
 
   </div>
 
-  <?php tpl_license(false);?>
+  <?php @tpl_license(false);?>
 
 </div>
 <?php /*old includehook*/ @include(dirname(__FILE__).'/footer.html')?>
