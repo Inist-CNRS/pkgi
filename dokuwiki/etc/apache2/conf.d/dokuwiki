@@ -4,5 +4,5 @@ Alias <?php echo getenv('APPNAME_DOKUWIKI_BASEURL'); ?> <?php echo getenv('APPNA
 	Options +FollowSymLinks
 	AllowOverride All
 	order allow,deny
-	allow from localhost 127.0.0.1
+	Allow from All
 </Directory>
