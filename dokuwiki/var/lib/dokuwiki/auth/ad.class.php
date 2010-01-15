@@ -1,0 +1,1 @@
+/usr/share/dokuwiki/inc/auth/ad.class.php
