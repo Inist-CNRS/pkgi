@@ -1,0 +1,4 @@
+#!/bin/sh
+#!/bin/sh
+. <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+/usr/bin/php --php-ini <?php echo getenv('APPNAME_HOME') ?>/etc/php5/php.ini $*
