@@ -30,7 +30,7 @@ if (!is_numeric($port)) die();
         Allow from all
     </Directory>
 
-    <?php if (in_array('dev',$version) || in_array('access-log',$options)) { ?> 
+    <?php if (in_array('dev',$version) || in_array('awstats',$options) || in_array('access-log',$options)) { ?> 
     CustomLog <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/access.log combined
     <?php } ?> 
 
