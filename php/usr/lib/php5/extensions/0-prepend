@@ -1,0 +1,12 @@
+<?php
+
+$dir_src  = trim(`php-config --extension-dir`)."/";
+$dir_dst = getenv('APPNAME_HOME').'/usr/lib/php5/extensions/';
+
+var_dump($dir_src, $dir_dst);
+foreach( glob($dir_src.'*') as $f ) {
+    if (file_exists($dir_dst.basename($f)) && is_link($dir_dst.basename($f))) {
+        unlink($dir_dst.basename($f));
+    }
+    symlink($f, $dir_dst.basename($f));
+}

@@ -1,0 +1,14 @@
+#!/bin/sh
+#!/bin/sh
+. <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+
+case "$1" in
+--prefix)
+  echo <?php echo getenv('APPNAME_HOME') ?>/usr;;
+--extension-dir)
+  echo  <?php echo getenv('APPNAME_HOME') ?>/usr/lib/php5/extensions;;
+*)
+  /usr/bin/php-config $*
+esac
+
+exit 0
