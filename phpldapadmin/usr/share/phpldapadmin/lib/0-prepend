@@ -1,0 +1,22 @@
+<?php
+
+$h = getenv('APPNAME_HOME');
+if (!$h) exit;
+chdir($h.'/usr/share/phpldapadmin/lib');
+
+foreach(glob('/usr/share/phpldapadmin/lib/*') as $src) {
+  $dst = basename($src);
+  if ($dst == 'AJAXTree.php') continue;
+  echo $src."\n";
+  echo $dst."\n";
+  @unlink($dst);
+  symlink($src,$dst);
+}
+
+// ceci est un patch pour corriger un bug de phpldapadmin !
+@unlink('AJAXTree.php');
+$fdata = file_get_contents('/usr/share/phpldapadmin/lib/AJAXTree.php');
+$fdata = str_replace('protected function draw_dn($dn,$level=0,',
+                     'protected function draw_dn($dn,$level,',
+                     $fdata);
+file_put_contents($h.'/usr/share/phpldapadmin/lib/AJAXTree.php', $fdata);
