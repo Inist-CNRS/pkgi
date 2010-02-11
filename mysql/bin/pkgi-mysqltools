@@ -35,7 +35,7 @@ USE mysql;
 REPLACE INTO user SET host='localhost', user='debian-sys-maint', password=password('$pass'), Select_priv='Y', Insert_priv='Y', Update_priv='Y', Delete_priv='Y', Create_priv='Y', Drop_priv='Y', Reload_priv='Y', Shutdown_priv='Y', Process_priv='Y',  File_priv='Y', Grant_priv='Y', References_priv='Y', Index_priv='Y', Alter_priv='Y', Show_db_priv='Y', Super_priv='Y', Create_tmp_table_priv='Y', Lock_tables_priv='Y', Execute_priv='Y', Repl_slave_priv='Y', Repl_client_priv='Y';
 EOF
 	MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
-	$MYSQL_BOOTSTRAP <$tfile
+        $MYSQL_BOOTSTRAP <$tfile
         if [ "$?" != "0" ]; then
           echo "Error: debian-sys-maint cannot be created."
           rm -f $tfile
@@ -48,9 +48,8 @@ EOF
 
 
     -rp | rootpassword)
-	# initialisation du mot de passe root
-	if [[ ${#} -lt 2 ]]
-        then
+        # initialisation du mot de passe root
+        if [ ${#} -lt 2 ]; then
             echo "Error: missing parameter (root password)."
             echo "Example: bin/pkgi-mysqltools rootpassword a13fz22"
             exit 1
@@ -84,8 +83,7 @@ EOF
 	;;
 
     -mr | makeroot)
-	if [[ ${#} -lt 2 ]]
-        then
+        if [ ${#} -lt 2 ] ; then
             echo "Error: missing parameter (hostname)."
             echo "Example: bin/mysqltools -mr gully.ads.intra.inist.fr"
             exit 1
@@ -99,25 +97,21 @@ EOF
 
     -t | copyto )
         # Copie des bases sur un autre serveur
-        if [[ ${#} -lt 2 ]]
-        then
+        if [ ${#} -lt 2 ]; then
             exit 1
         fi
-	if [[ ${#} -eq 3 ]]
-        then
-	    BASES="--databases ${3}"
-	else
-	    BASES="--all-databases"
+        if [ ${#} -eq 3 ] ; then
+            BASES="--databases ${3}"
+        else
+            BASES="--all-databases"
         fi
         REMOTE_HOST=`echo "${2}" | cut -d":" -f 1 `
         REMOTE_PORT=`echo "${2}"  | cut -d":" -f 2 `
-        if [[ "${REMOTE_PORT}" = "${REMOTE_HOST}" ]]
-        then
+        if [ "${REMOTE_PORT}" = "${REMOTE_HOST}" ] ; then
             REMOTE_PORT="3306"
         fi
         <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} -e "exit" 
-        if [[ ${?} -ne 0 ]]
-        then
+        if [ ${?} -ne 0 ] ; then
             exit 1
         else
             <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT}
@@ -125,26 +119,22 @@ EOF
         ;;
     
     -f | copyfrom)
-        # R�cup�ration des bases d'un autre serveur
-	if [[ ${#} -lt 2 ]]
-        then
+        # Récupération des bases d'un autre serveur
+        if [ ${#} -lt 2 ] ; then
             exit ${RC_ERR_PARAM}
         fi
-	if [[ ${#} -eq 3 ]]
-        then
-	    BASES="--databases ${3}"
-	else
-	    BASES="--all-databases"
+        if [ ${#} -eq 3 ] ; then
+            BASES="--databases ${3}"
+        else
+            BASES="--all-databases"
         fi
         REMOTE_HOST=`echo "${2}" | cut -d":" -f 1 `
         REMOTE_PORT=`echo "${2}"  | cut -d":" -f 2 `
-        if [[ "${REMOTE_PORT}" = "${REMOTE_HOST}" ]]
-        then
+        if [ "${REMOTE_PORT}" = "${REMOTE_HOST}" ] ; then
             REMOTE_PORT="3306"
         fi
         <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} -e "exit" 
-        if [[ ${?} -ne 0 ]]
-        then
+        if [ ${?} -ne 0 ] ; then
             exit 1
         else
             <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
