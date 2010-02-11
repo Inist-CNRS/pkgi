@@ -563,6 +563,6 @@ $queries[$q]['filter'] = '(&(objectClass=sambaAccount)(uid=*$))';
 $queries[$q]['attributes'] = 'uid, homeDirectory';
 
 $f_include = dirname(__FILE__).'/config.local.php';
-if (file_exists()) {
+if (file_exists($f_include)) {
   include $f_include;
 }
