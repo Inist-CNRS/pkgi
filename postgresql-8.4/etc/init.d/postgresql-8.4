@@ -20,7 +20,7 @@
 
 . <?php echo getenv('APPNAME_HOME') ?>/usr/share/postgresql-common/init.d-functions
 
-VERSION=8.4
+VERSION=${PGVERSION}
 
 case "$1" in
     start)
