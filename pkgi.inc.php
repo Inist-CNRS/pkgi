@@ -234,26 +234,29 @@ class Pkgi
         $data = file_exists($this->env_path) ? file_get_contents($this->env_path) : '';
         foreach($env_to_check as $e => $e_option)
         {
+            $e_unnamed = 'APPNAME_'.$e;
             $e = $this->APPNAME.'_'.$e;
-            if (getenv($e) === FALSE)
-            {
-                if (preg_match('/export\s+'.$e.'=(.*)/',$data,$res))
-                {
+            if (getenv($e) === FALSE) {
+                if (preg_match('/export\s+'.$e.'=(.*)/',$data,$res)) {
                     $env[$e] = trim($res[1],'" ');
-                    putenv('$e="'.$env[$e].'"');
+                    putenv($e.'='.$env[$e]);
                 }
-            }
-            else
+            } else {
                 $env[$e] = getenv($e);
+        }
+            putenv($e_unnamed.'='.$env[$e]);
         }
     }
 
-    function _build_env_to_check()
+    function _build_env_to_check($modules = null)
     {
         // construit une liste des variables d'env a tester
         // en fonction des modules choisis
         $env_to_check = array();
-        foreach($this->MODULES as $m)
+        if ($modules === NULL) {
+            $modules = $this->MODULES;
+        }
+        foreach($modules as $m)
         {
             $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
             if (!file_exists($ini_path)) continue;
@@ -320,29 +323,33 @@ class Pkgi
         echo "Verification de la presence des variables d'environnement ...\n";
     
         // construit une liste des variables d'env a tester
-        $env_to_check = $this->_build_env_to_check();
-        foreach($env_to_check as $e => $e_option)
-        {
-            $e = $this->APPNAME.'_'.$e;
-            $v = isset($env[$e]) ? $env[$e] : NULL;
-            if ($v == NULL || $v == '')
+        foreach($this->MODULES as $m) {
+            $env_to_check = $this->_build_env_to_check(array($m));
+            foreach($env_to_check as $e => $e_option)
             {
-                $v = getenv($e);
-                if ($v === FALSE || $v == '') 
+                $e_unnamed = 'APPNAME_'.$e;
+                $e         = $this->APPNAME.'_'.$e;
+                $v = isset($env[$e]) ? $env[$e] : NULL;
+                if ($v == NULL || $v == '')
                 {
-                    echo "\n";
-                    echo "Signification de $e : ".$e_option[0]."\n";
-                    if (count($e_option[1]) > 0)
-                        echo "Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n";
-                    $v_default = $e_option[2] != '' ? "[defaut=".$e_option[2]."] " : '';
-                    $prompt = "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
-                    $v = readline($prompt);
-                    if ($v == '') $v = $e_option[2]; // si on a rien repondu, on prend la valeur par defaut
+                    $v = getenv($e);
+                    if ($v === FALSE || $v == '') 
+                    {
+                        echo "\n";
+                        echo "Signification de $e : ".$e_option[0]."\n";
+                        if (count($e_option[1]) > 0)
+                            echo "Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n";
+                        $v_default = $e_option[2] != '' ? "[defaut=".$e_option[2]."] " : '';
+                        $prompt = "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
+                        $v = readline($prompt);
+                        if ($v == '') $v = $e_option[2]; // si on a rien repondu, on prend la valeur par defaut
+                    }
+                    $env[$e] = $v;
+                    putenv("$e=$v");
+                    putenv("$e_unnamed=$v");
                 }
-                $env[$e] = $v;
-                putenv("$e=$v");
+                echo "La variable suivante sera utilisée : $e=$v\n";
             }
-            echo "La variable suivante sera utilisée : $e=$v\n";
         }
         return $env;
     }
