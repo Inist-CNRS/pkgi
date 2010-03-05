@@ -120,6 +120,7 @@ class Pkgi
     {
         $deptree = $this->_build_dependency_tree();
         $depresult = array();
+        $error = false;
 
         foreach($deptree as $m => $mdep) {
 
