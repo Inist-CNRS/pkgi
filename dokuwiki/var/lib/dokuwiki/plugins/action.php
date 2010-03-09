@@ -1,1 +1,0 @@
-/usr/share/dokuwiki/lib/plugins/action.php
