@@ -244,8 +244,10 @@ class Pkgi
                 }
             } else {
                 $env[$e] = getenv($e);
-        }
-            putenv($e_unnamed.'='.$env[$e]);
+            }
+            if (isset($env[$e])) {
+                putenv($e_unnamed.'='.$env[$e]);
+            }
         }
     }
 
@@ -266,14 +268,16 @@ class Pkgi
             $output = shell_exec($this->php_path.' '.$ini_path);
             $ini_path = dirname(__FILE__).'/config.ini.tmp';
             file_put_contents($ini_path,$output);
-      
+
             $ini_data = parse_ini_file($ini_path);
-            for ($i = 0 ; $i<count($ini_data['env']) ; $i++)
-            {
-                $env_to_check[$ini_data['env'][$i]] = array();
-                $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-desc'][$i];
-                $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array();
-                $env_to_check[$ini_data['env'][$i]][] = isset($ini_data['env-default'][$i]) ? $ini_data['env-default'][$i] : '';
+            if (isset($ini_data['env'])) {
+                for ($i = 0 ; $i<count($ini_data['env']) ; $i++)
+                {
+                    $env_to_check[$ini_data['env'][$i]] = array();
+                    $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-desc'][$i];
+                    $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array();
+                    $env_to_check[$ini_data['env'][$i]][] = isset($ini_data['env-default'][$i]) ? $ini_data['env-default'][$i] : '';
+                }
             }
             unlink($ini_path);
         }
