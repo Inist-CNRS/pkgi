@@ -1,6 +1,3 @@
-#!/bin/sh
-#!/bin/sh
-<?php
-$version = explode(',',getenv('APPNAME_VERSION'));
-?>
+<?php echo '#!/bin/bash'; ?>
+
 /usr/sbin/apache2ctl -f <?php echo getenv('APPNAME_HOME') ?>/etc/apache2/apache2.conf $*
