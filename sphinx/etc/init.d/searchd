@@ -91,6 +91,29 @@ check_for_no_start() {
 	fi
 }
 
+# get the pid of searchd
+pidof_searchd_noexit() {
+    # if pidof is null for some reasons the script exits automagically
+    # classified as good/unknown feature
+    PIDS=`pidof searchd` || true
+
+    [ -e $SEARCHD_PIDFILE ] && PIDS2=`cat $SEARCHD_PIDFILE`
+    
+    # if there is a pid we need to verify that belongs to searchd
+    # for real
+    for i in $PIDS; do
+    	if [ "$i" = "$PIDS2" ]; then
+            # in this case the pid stored in the
+            # pidfile matches one of the pidof apache
+            # so a simple kill will make it
+            echo $i
+            return 0
+        fi
+    done
+    return 0
+}
+
+
 # Tell the user that something went wrong and give some hints for
 # resolving the problem.
 report_failure() {
@@ -132,17 +155,18 @@ stop_searchd() {
 		--exec $SEARCHD 2>&1`"
 }
 
+
 # Start the sphinx daemons
 start_sphinx() {
 	echo -n "Starting Sphinx:"
 	trap 'report_failure' 0
 	start_searchd
 	trap "-" 0
-        echo " (listening on <?php echo getenv('APPNAME_SPHINX_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_SPHINX_PORT'); ?>)"
+        echo " (listening on <?php echo getenv('APPNAME_SPHINX_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_SPHINX_LISTEN_PORT'); ?>)"
 }
 
 # Stop the sphinx daemons
-stop_ldap() {
+stop_sphinx() {
 	echo -n "Stopping Sphinx:"
 	trap 'report_failure' 0
 	stop_searchd
@@ -151,20 +175,15 @@ stop_ldap() {
 }
 
 # Check if sphinx is running
-status() {
-	if [ ! -f ${SEARCHD_PIDFILE} ]
-	then
-        echo "Sphinx not started"
+status_sphinx() {
+	PID=$(pidof_searchd_noexit)
+	if [ -n "$PID" ]; then
+		echo "Sphinx is running (pid $PID, listening on <?php echo getenv('APPNAME_SPHINX_LISTEN_INTERFACE')?>:<?php echo getenv('APPNAME_SPHINX_LISTEN_PORT')?>)."
+		exit 0
+	else
+		echo "Sphinx is not running."
 		exit 1
 	fi
-	pid=`cat ${SEARCHD_PIDFILE}`
-    ps -ef | cut -c 10-14,48- | grep "${pid}" | grep "<?php echo getenv('APPNAME_SPHINX_PORT'); ?>" > /dev/null
-	if [ ${?} -ne 0 ]
-	then
-		echo "Sphinx process not found"
-		exit 1
-	fi  
-	echo "Sphinx is listening on <?php echo getenv('APPNAME_SPHINX_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_SPHINX_PORT'); ?> with pid ${pid}"
 }
 
 case "$1" in
@@ -179,7 +198,7 @@ case "$1" in
 	start_sphinx
 	;;
   status)
-  	status ;;
+  	status_sphinx ;;
   *)
   	echo "Usage: $0 {start|stop|restart|status}"
 	exit 1
