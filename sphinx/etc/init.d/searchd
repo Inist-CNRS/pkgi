@@ -1,0 +1,187 @@
+#!/bin/sh
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          searchd
+# Required-Start:    $remote_fs $network $syslog
+# Required-Stop:     $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Sphinx Search Engine Server 
+### END INIT INFO
+
+# Specify path variable
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+# Kill me on all errors
+set -e
+
+# Set the paths to searchd as a variable so that someone who really
+# wants to can override the path in /etc/default/searchd.
+SEARCHD=<?php echo getenv('APPNAME_SPHINX_HOME') ?>/bin/searchd
+
+# Stop processing if searchd is not there
+[ -x $SEARCHD ] || exit 0
+
+# debconf may have this file descriptor open and it makes things work a bit
+# more reliably if we redirect it as a matter of course.  db_stop will take
+# care of this, but this won't hurt.
+exec 3>/dev/null
+
+# Source the init script configuration
+if [ -f "<?php echo getenv('APPNAME_HOME') ?>/etc/default/searchd" ]; then
+	. <?php echo getenv('APPNAME_HOME') ?>/etc/default/searchd
+fi
+
+# Load the pkgi profile
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+
+# Load the default location of the searchd config file
+if [ -z "$SEARCHD_CONF" ]; then
+	SEARCHD_CONF="<?php echo getenv('APPNAME_HOME') ?>/etc/sphinx/sphinx.conf"
+fi
+
+# Stop processing if the config file is not there
+if [ ! -r "$SEARCHD_CONF" ]; then
+  cat <<EOF >&2
+No configuration file was found for searchd at $SEARCHD_CONF.
+If you have moved the searchd configuration file please modify
+/etc/default/searchd to reflect this.  If you chose to not
+configure searchd during installation then you need to do so
+prior to attempting to start searchd.
+EOF
+  exit 0 # Should this be 1?
+fi
+
+# Find out the name of searchd's pid file
+if [ -z "$SEARCHD_PIDFILE" ]; then
+	if [ -f "$SEARCHD_CONF" ] ; then
+		SEARCHD_PIDFILE=`sed -ne 's/[[:space:]]\+pid_file[[:space:]]\+=[[:space:]]\+\(.\+\)/\1/p' \
+			"$SEARCHD_CONF"`
+		SEARCHD_OPTIONS="-c $SEARCHD_CONF $SEARCHD_OPTIONS"
+	fi
+fi
+
+# XXX: Breaks upgrading if there is no pidfile (invoke-rc.d stop will fail)
+# -- Torsten
+if [ -z "$SEARCHD_PIDFILE" ]; then
+	cat <<EOF >&2
+The pidfile for searchd is neither specified in "$SEARCHD_CONF".
+Consequently, searchd will not be started.
+EOF
+	exit 1
+fi
+
+# Make sure the pidfile directory exists with correct permissions
+piddir=`dirname "$SEARCHD_PIDFILE"`
+if [ ! -d "$piddir" ]; then
+	mkdir -p "$piddir"
+	[ -z "$SEARCHD_USER" ] || chown -R "$SEARCHD_USER" "$piddir"
+	[ -z "$SEARCHD_GROUP" ] || chgrp -R "$SEARCHD_GROUP" "$piddir"
+fi
+
+# Check whether we were configured to not start the services.
+check_for_no_start() {
+	if [ -n "$SEARCHD_NO_START" ]; then
+		echo 'Not starting searchd: SEARCHD_NO_START set in <?php echo getenv('APPNAME_HOME') ?>/etc/default/searchd' >&2
+		exit 0
+	fi
+	if [ -n "$SEARCHD_SENTINEL_FILE" ] && [ -e "$SEARCHD_SENTINEL_FILE" ]; then
+		echo "Not starting searchd: $SEARCHD_SENTINEL_FILE exists" >&2
+		exit 0
+	fi
+}
+
+# Tell the user that something went wrong and give some hints for
+# resolving the problem.
+report_failure() {
+	if [ -n "$reason" ]; then
+		echo " - failed: "
+		echo "$reason"
+	else
+		echo " - failed."
+		cat <<EOF
+The operation failed but no output was produced. For hints on what went
+wrong please refer to the system's logfiles (e.g. /var/log/syslog).
+EOF
+
+		if [ -n "$SEARCHD_OPTIONS" ]; then
+			cat <<EOF
+
+Below, you can find the command line options used by this script to 
+run searchd. Do not forget to specify those options if you
+want to look to debugging output:
+  searchd $SEARCHD_OPTIONS
+EOF
+		fi
+	fi
+}
+
+# Start the searchd daemon and capture the error message if any to 
+# $reason.
+start_searchd() {
+	echo -n " searchd"
+	$SEARCHD $SEARCHD_OPTIONS >> $SEARCHD_LOG 2>&1 &
+}
+
+# Stop the searchd daemon and capture the error message (if any) to
+# $reason.
+stop_searchd() {
+	echo -n " searchd"
+	reason="`start-stop-daemon --stop --quiet --oknodo --retry TERM/10 \
+		--pidfile "$SEARCHD_PIDFILE" \
+		--exec $SEARCHD 2>&1`"
+}
+
+# Start the sphinx daemons
+start_sphinx() {
+	echo -n "Starting Sphinx:"
+	trap 'report_failure' 0
+	start_searchd
+	trap "-" 0
+        echo " (listening on <?php echo getenv('APPNAME_SPHINX_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_SPHINX_PORT'); ?>)"
+}
+
+# Stop the sphinx daemons
+stop_ldap() {
+	echo -n "Stopping Sphinx:"
+	trap 'report_failure' 0
+	stop_searchd
+	trap "-" 0
+	echo .
+}
+
+# Check if sphinx is running
+status() {
+	if [ ! -f ${SEARCHD_PIDFILE} ]
+	then
+        echo "Sphinx not started"
+		exit 1
+	fi
+	pid=`cat ${SEARCHD_PIDFILE}`
+    ps -ef | cut -c 10-14,48- | grep "${pid}" | grep "<?php echo getenv('APPNAME_SPHINX_PORT'); ?>" > /dev/null
+	if [ ${?} -ne 0 ]
+	then
+		echo "Sphinx process not found"
+		exit 1
+	fi  
+	echo "Sphinx is listening on <?php echo getenv('APPNAME_SPHINX_LISTEN_INTERFACE'); ?>:<?php echo getenv('APPNAME_SPHINX_PORT'); ?> with pid ${pid}"
+}
+
+case "$1" in
+  start)
+	check_for_no_start
+  	start_sphinx ;;
+  stop)
+  	stop_sphinx ;;
+  restart|force-reload)
+	check_for_no_start
+  	stop_sphinx
+	start_sphinx
+	;;
+  status)
+  	status ;;
+  *)
+  	echo "Usage: $0 {start|stop|restart|status}"
+	exit 1
+	;;
+esac
