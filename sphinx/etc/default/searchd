@@ -1,30 +1,13 @@
-# Default location of the sphinx.conf file.
-SEARCHD_CONF=
+# Defaults for searchd initscript
+
+# Additional options that are passed to the Daemon.
+DAEMON_OPTS="-c <?php echo getenv('APPNAME_HOME') ?>/etc/sphinx/sphinx.conf"
 
 # System account to run the searchd server under. 
-SEARCHD_USER="<?php echo getenv('APPNAME_USER'); ?>"
+#DAEMONUSER="<?php echo getenv('APPNAME_USER'); ?>"
 
-# System group to run the searchd server under. 
-SEARCHD_GROUP="<?php echo getenv('APPNAME_GROUP'); ?>"
+# Server log file
+#LOGFILE=
 
-# Path to the pid file of the searchd server.
-SEARCHD_PIDFILE=
-
-# If SEARCHD_NO_START is set, the init script will not start or restart
-# searchd (but stop will still work).  Uncomment this if you are
-# starting searchd via some other means or if you don't want searchd normally
-# started at boot.
-#SEARCHD_NO_START=1
-
-# If SEARCHD_SENTINEL_FILE is set to path to a file and that file exists,
-# the init script will not start or restart searchd (but stop will still
-# work).  Use this for temporarily disabling startup of searchd (when doing
-# maintenance, for example, or through a configuration management system)
-# when you don't want to edit a configuration file.
-SEARCHD_SENTINEL_FILE=<?php echo getenv('APPNAME_HOME') ?>/etc/ldap/nosearchd
-
-# Additional options to pass to searchd
-SEARCHD_OPTIONS=""
-
-# For loggin in a file
-SEARCHD_LOG=<?php echo getenv('APPNAME_HOME'); ?>/var/log/sphinx/sphinx.log
+# Start the demon
+RUN=yes
