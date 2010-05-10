@@ -36,7 +36,7 @@ class Pkgi
             echo "  --no-dep\n";
             echo "    Ne fait pas les vérifications avec les dépendances systèmes.\n";
             echo "  --force-overwrite\n";
-            echo "    Ne pose pas de question si une instance d'un fichier à été modifié localement.\n";
+            echo "    Ne pose pas de question si une instance d'un fichier a été modifiée localement.\n";
             echo "  --version\n";
             echo "    Affiche le numéro de version de pkgi.\n";
             echo "  --help\n";
