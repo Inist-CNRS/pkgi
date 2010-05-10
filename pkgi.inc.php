@@ -10,6 +10,7 @@ class Pkgi
     var $tpl_path = null;
     var $dst_path = null;
     var $php_path = null;
+    var $version  = null;
     var $sys_pkg_query = 'dpkg --get-selections %s 2> /dev/null | grep -E "install|hold"';
     var $options = array();
 
@@ -21,12 +22,33 @@ class Pkgi
         $this->tpl_path = ($tpl_path == null) ? realpath(dirname(__FILE__)) : $tpl_path;
         $this->dst_path = $dst_path;
         $this->php_path = getenv('PHP');
+        $this->version  = trim(file_get_contents(dirname(__FILE__).'/version'));
         if ($this->php_path === false)  $this->php_path = '/usr/bin/php'; 
         $this->options = $options;
     }
   
     function run()
     {
+        if (in_array('--help',$this->options) || in_array('-h',$this->options)) {
+            echo "Options de pkgi-".$this->version." :\n";
+            echo "  --modules=[[m1,m2,...]]\n";
+            echo "    Force le chargement des modules passés en argument.\n";
+            echo "  --no-dep\n";
+            echo "    Ne fait pas les vérifications avec les dépendances systèmes.\n";
+            echo "  --force-overwrite\n";
+            echo "    Ne pose pas de question si une instance d'un fichier à été modifié localement.\n";
+            echo "  --version\n";
+            echo "    Affiche le numéro de version de pkgi.\n";
+            echo "  --help\n";
+            echo "    Affiche cette page.\n";
+            die();
+        }
+
+        if (in_array('--version',$this->options)) {
+            echo $this->version."\n";
+            die();
+        }
+    
         echo "--- Choisissez un nom d'application\n";
         $this->choose_appli_name();
         echo "Le nom d'application suivant sera utilisé : ".$this->APPNAME."\n";
@@ -92,22 +114,28 @@ class Pkgi
   
     function choose_modules()
     {
-        // on recherche MODULES dans l'environement
-        // si on le trouve pas alors on pose la question
-        if ($s = getenv($this->APPNAME.'_MODULES'))
-        {
-            $this->MODULES = $this->_filter_valide_modules(explode(',',$s));
+        // on commence par chercher si on a indiqué explicitement
+        // quels modules utiliser dans la ligne de commande
+        foreach($this->options as $o) {
+            if (preg_match('/^--modules=(.*)/',$o,$matched)) {
+                $this->MODULES = $this->_filter_valide_modules(explode(',',$matched[1]));
+            }
         }
-        else if (file_exists($this->env_path))
-        {
-            $data = file_get_contents($this->env_path);
-            if (preg_match('/'.$this->APPNAME.'_MODULES=(.+)/i',$data,$res))
-                $this->MODULES = $this->_filter_valide_modules(explode(',',trim($res[1],'" ')));
+
+        if (count($this->MODULES) == 0) {
+            // on recherche ensuite les modules dans les variables d'environement
+            if ($s = getenv($this->APPNAME.'_MODULES')) {
+                $this->MODULES = $this->_filter_valide_modules(explode(',',$s));
+            } else if (file_exists($this->env_path)) {
+                // si rien n'a été trouvé alors on cherche dans le fichier pkgi.en
+                $data = file_get_contents($this->env_path);
+                if (preg_match('/'.$this->APPNAME.'_MODULES=(.+)/i',$data,$res))
+                    $this->MODULES = $this->_filter_valide_modules(explode(',',trim($res[1],'" ')));
+            }
         }
     
         // si rien n'a ete trouve alors on demande a l'utilisateur d'entrer des modules au clavier
-        while (count($this->MODULES) == 0)
-        {
+        while (count($this->MODULES) == 0) {
             $prompt = "Entrez le nom des modules separes par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
             $this->MODULES = $this->_filter_valide_modules(explode(',',readline($prompt)));
         }
