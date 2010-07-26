@@ -1,7 +1,1 @@
 export PHPRC="<?php echo getenv('APPNAME_HOME') ?>/etc/php5/php.ini"
-
-# Number of PHP childs that will be launched. Leave undefined to let PHP decide.
-#export PHP_FCGI_CHILDREN=3
-
-# Maximum requests before a process is stopped and a new one is launched
-export PHP_FCGI_MAX_REQUESTS=10000  

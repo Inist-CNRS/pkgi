@@ -6,12 +6,26 @@ Include /etc/apache2/mods-available/fcgid.conf
     SharememPath <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
     SocketPath <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
 
-    # Communication timeout: Default value is 20 seconds
+    # Maximum requests before a process is stopped and a new one is launched
+    FcgidInitialEnv PHP_FCGI_MAX_REQUESTS 5000
+    DefaultInitEnv  PHP_FCGI_MAX_REQUESTS 5000
+    
+    # Number of PHP childs that will be launched. Leave undefined to let PHP decide.
+    #FcgidInitialEnv PHP_FCGI_CHILDREN 5
+    #DefaultInitEnv  PHP_FCGI_CHILDREN 5
+
+    # Disable fcgid output buffering
+    FcgidOutputBufferSize 0
+    OutputBufferSize 0
+
+    # Communication timeout: Default value is 40 seconds
+    FcgidIOTimeout 60
     IPCCommTimeout 60
-
+    
     # Connection timeout: Default value is 3 seconds
-    #IPCConnectTimeout 3
-
+    #FcgidConnectTimeout 3
+    #IPCConnectTimeout   3
+    
     # Define a new handler "php-fcgi" for ".php" files, plus the action that must follow
     AddHandler php-fcgi .php
     Action php-fcgi /fcgi-bin/php-fcgi-wrapper
