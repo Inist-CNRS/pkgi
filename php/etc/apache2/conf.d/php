@@ -4,38 +4,38 @@ Include /etc/apache2/mods-available/fcgid.conf
 
 <IfModule mod_fcgid.c>
     SharememPath          <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
-    FcgidProcessTableFile <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
+#    FcgidProcessTableFile <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
     SocketPath  <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
-    FcgidIPCDir <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
+#    FcgidIPCDir <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
 
     # We run a single PHP FastCGI server which will launch as many children as necessary.
     # Useful for APC optimizations
     # 18 and 2 are a good choice for APC extension
     DefaultMaxClassProcessCount 16
-    FcgidMaxProcessesPerClass   16
+#    FcgidMaxProcessesPerClass   16
     DefaultMinClassProcessCount 2
-    FcgidMinProcessesPerClass   2
+#    FcgidMinProcessesPerClass   2
 
     # Maximum requests before a process is stopped and a new one is launched
-    FcgidInitialEnv PHP_FCGI_MAX_REQUESTS 5000
+#    FcgidInitialEnv PHP_FCGI_MAX_REQUESTS 5000
     DefaultInitEnv  PHP_FCGI_MAX_REQUESTS 5000
     
     # Number of PHP childs that will be launched. Leave undefined to let PHP decide.
     # 0 is a good choice for APC extension
-    FcgidInitialEnv PHP_FCGI_CHILDREN 0
+#    FcgidInitialEnv PHP_FCGI_CHILDREN 0
     DefaultInitEnv  PHP_FCGI_CHILDREN 0
 
     # If the size of the request body exceeds this amount, the request will fail with 500 Server Error.
     # 1Go by default
-    FcgidMaxRequestLen 1073741824
+#    FcgidMaxRequestLen 1073741824
     MaxRequestLen      1073741824
 
     # Disable fcgid output buffering
-    FcgidOutputBufferSize 0
+#    FcgidOutputBufferSize 0
     OutputBufferSize      0
 
     # Communication timeout: Default value is 40 seconds
-    FcgidIOTimeout 60
+#    FcgidIOTimeout 60
     IPCCommTimeout 60
     
     # Connection timeout: Default value is 3 seconds
