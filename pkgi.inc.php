@@ -558,6 +558,12 @@ class Pkgi
                 $t_dst     = str_replace('.pkgi-raw','',$t_dst);
                 $t_dst_md5 = str_replace('.pkgi-raw','',$t_dst_md5);
 
+                // Vérifie si on doit ignorer le fichier ou le répertoire
+                $t_src_ignore = (strpos($t_src,'.pkgi-ignore') !== false);
+                if ($t_src_ignore) {
+                    continue;
+                }
+
                 echo "Ecriture de ".$t_dst."\n";
                 if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src)) {
                     @mkdir(dirname($t_dst), 0777, true);
@@ -569,10 +575,11 @@ class Pkgi
                     @unlink($t_dst);
                     file_put_contents($t_dst, $output);
                     // setting the rights
-                    if (is_executable($t_src) || preg_match('/^bin\//',$t))
+                    if (is_executable($t_src) || preg_match('/^bin\//',$t)) {
                         chmod($t_dst,0700);
-                    else
+                    } else {
                         chmod($t_dst,0600);
+                    }
                     // store the file md5
                     @mkdir(dirname($t_dst_md5), 0777, true);
                     @unlink($t_dst_md5);
