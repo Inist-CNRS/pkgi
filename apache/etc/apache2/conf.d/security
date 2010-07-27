@@ -66,3 +66,21 @@ TraceEnable On
 TraceEnable Off
 <?php } ?> 
 
+
+# réglages des drotis aux répertoires web et cgi
+<Directory />
+    Options FollowSymLinks
+    AllowOverride None
+</Directory>
+<Directory <?php echo getenv('APPNAME_HOME') ?>/var/www/>
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride <?php if (in_array('htaccess',$options)) { ?>All<?php } else { ?>None<?php } ?> 
+    Order allow,deny
+    allow from all
+</Directory>
+<Directory "<?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin">
+    AllowOverride <?php if (in_array('htaccess',$options)) { ?>All<?php } else { ?>None<?php } ?> 
+    Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+    Order allow,deny
+    Allow from all
+</Directory>
