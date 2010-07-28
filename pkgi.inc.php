@@ -255,6 +255,7 @@ class Pkgi
     {
         $env['APPNAME'] = $this->APPNAME;
         putenv('APPNAME='.$this->APPNAME);
+        putenv('PKGI_MODULES_LIST='.implode(',',$this->MODULES_LIST));
         $env[$this->APPNAME.'_MODULES'] = implode(',',$this->MODULES);
 
         // construit une liste des variables d'env a tester
