@@ -24,7 +24,7 @@ foreach($optim as $o) {
 
 // charge les optimisations choisies pour le module courant
 foreach($optim_by_module[$whoami] as $o) {
-    $f = dirname(__FILE__).'/optim-'.$o.'.pkgi-ignore';
+    $f = dirname(__FILE__).'/'.basename(__FILE__).'-'.$o.'.pkgi-ignore';
     if (file_exists($f)) {
         include $f;
     }
