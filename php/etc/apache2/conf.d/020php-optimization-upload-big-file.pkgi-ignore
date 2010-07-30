@@ -1,0 +1,24 @@
+<?php
+
+// on commence par désactiver fcgid qui n'est pas utile
+@unlink(getenv('APPNAME_HOME').'/etc/apache2/conf.d/010php-fcgid');
+
+?>
+
+# Passe les exécutions des scripts PHP en mode CGI
+# fcgid n'est pas utilisé car il est très instable avec les gros fichiers uploadés
+# des fuites mémoires sont flagrantes et rendent le serveur apache inutilisable
+<?php $mods = explode(',',getenv('APPNAME_APACHE_MODS')); ?>
+<?php if (!in_array('cgi', $mods)) { ?> 
+Include /etc/apache2/mods-available/cgi.load
+<?php } ?>
+RemoveHandler                      .php
+AddType application/x-httpd-php    .php
+Action  php-fcgi                   /cgi-bin/php-cgi
+Action  application/x-httpd-php    /cgi-bin/php-cgi
+
+# Limite d'upload d'apache à 2Go et réglage du timeout a 10 minutes
+# On ne laisse pas la limite à 0 (infini) car en cas de dépassement des limites du php.ini de php
+# le navigateur ne va pas interpréter l'erreur et le script PHP va continuer à vivre.
+LimitRequestBody 214748364800
+Timeout 600
