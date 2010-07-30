@@ -1,6 +1,8 @@
+; Le choix 2047 plutôt que 2048 est volontaire car les php5 32bit sur debian lenny ne supportent pas plus haut
+; paramètres à revoir lorsque debian squeeze sera stable.
 file_uploads = On
-memory_limit = <?php echo 2048+16; ?>M
-upload_max_filesize = 2048M
-post_max_size = 2048M
+memory_limit = <?php echo 2047+16; ?>M
+upload_max_filesize = 2047M
+post_max_size = 2047M
 max_input_time = 600
 session.gc_maxlifetime = 600

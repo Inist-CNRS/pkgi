@@ -7,7 +7,6 @@
 
 # prefork MPM
 <IfModule mpm_prefork_module>
-# TODO : a tester
     ServerLimit           25
     StartServers           1
     MinSpareServers        1
