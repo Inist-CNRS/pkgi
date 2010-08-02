@@ -31,6 +31,8 @@ class Pkgi
     {
         if (in_array('--help',$this->options) || in_array('-h',$this->options)) {
             echo "Options de pkgi-".$this->version." :\n";
+            echo "  --reset\n";
+            echo "    Détruit les instance des fichiers et répertoires générés par pkgi.\n";
             echo "  --modules=[[m1,m2,...]]\n";
             echo "    Force le chargement des modules passés en argument.\n";
             echo "  --no-dep\n";
@@ -85,14 +87,20 @@ class Pkgi
                 die("$dst doesn't exist");
         }
     
-        echo "--- Instanciation des templates\n";
-        $this->write_tpl_instance();
+    
+        if (in_array('--reset',$this->options)) {
+        echo "--- Nettoyage des instances des fichiers et des répertoires générées\n";
+            $this->reset_tpl_instance();
+        } else {
+            echo "--- Instanciation des templates\n";
+            $this->write_tpl_instance();
 
-        echo "* Votre application ".$this->APPNAME." est prête.\n";
-        echo "* Elle utilise les modules suivants : ".implode(',',$this->MODULES)."\n";
-        echo "* Les paramètres ont été sauvegardés dans : ".realpath($this->env_path)."\n";
-        echo "* Vous pouvez à tout moment modifier un parametre.\n";
-        echo "* Pensez alors à relancer le build pour régénérer les fichiers de conf et les lanceurs.\n";
+            echo "* Votre application ".$this->APPNAME." est prête.\n";
+            echo "* Elle utilise les modules suivants : ".implode(',',$this->MODULES)."\n";
+            echo "* Les paramètres ont été sauvegardés dans : ".realpath($this->env_path)."\n";
+            echo "* Vous pouvez à tout moment modifier un parametre.\n";
+            echo "* Pensez alors à relancer le build pour régénérer les fichiers de conf et les lanceurs.\n";
+        }
     }
 
     function build_module_list()
@@ -468,7 +476,7 @@ class Pkgi
         $ret = array();
         foreach($this->MODULES as $m)
         {
-            $list[$m] = array_values(ls($this->tpl_path.'/'.$m,"//i"));
+            $list[$m] = array_values(pkgi_ls($this->tpl_path.'/'.$m,"//i"));
             $n = 0;
             foreach( $list[$m] as $l)
             {
@@ -601,14 +609,104 @@ class Pkgi
             }
     }
 
+    // Détruit les instances des fichiers et répertoires générés par pkgi
+    function reset_tpl_instance()
+    {
+        // on commence par traiter tous les fichiers
+        $root_instance = $this->dst_path;
+        $root_pkgi     = $this->dst_path.'/.pkgi/lastmd5';
+        $dir_list = array();
+        foreach(pkgi_ls($root_pkgi, '/.*/') as $f) {
+            $f          = str_replace($root_pkgi, '', $f);
+            $f_instance = $root_instance.$f;
+            $f_pkgi     = $root_pkgi.$f;
+
+            // on récupère la hiérarchie des répertoires
+            $d = explode('/',trim(is_dir($f_pkgi) ? $f : dirname($f),'/'));
+            while(count($d)) {
+                $dir_list[] = '/'.implode('/', $d).'/';
+                array_pop($d);
+            }
+            
+            // on ne traite pas les répertoires tout de suite
+            if (is_dir($f_pkgi)) {
+                continue;
+            }
+//                 var_dump($dir_list);
+//             die();
+
+            $md5_instance = file_exists($f_instance) ? md5(file_get_contents($f_instance)) : '';
+            if (!is_link($f_instance) && !empty($md5_instance) && $md5_instance != file_get_contents($f_pkgi)) {
+                do {
+                    $prompt = "Le fichier $f_instance a été modifié manuellement depuis le dernier build.\n".
+                        "Voulez vous le supprimer (o/n) ? :\n";
+                    $answer = readline($prompt);
+                } while (!preg_match('/^[on]+/i',$answer));
+                if (preg_match('/^o/i',$answer)) {
+                    echo "Suppression de ".$f_instance."\n";
+                    @unlink($f_instance);
+                    @unlink($f_pkgi);
+                }
+            } else {
+                echo "Suppression de ".$f_instance."\n";
+                @unlink($f_instance);
+                @unlink($f_pkgi);
+            }
+        }
+
+        // on dédoublonne
+        $dir_list = array_unique($dir_list);
+        
+        // traitement des répertoires
+        // on supprime les répertoires qui sont vides
+        foreach($dir_list as $d) {
+            if (file_exists($root_instance.$d) && pkgi_is_dir_empty($root_instance.$d)) {
+                echo "Suppression de ".$root_instance.$d."\n";
+                pkgi_rmdir($root_instance.$d, true);
+                pkgi_rmdir($root_pkgi.$d, true);
+            }
+        }
+    }
+
+}
+
+function pkgi_rmdir($dir, $recursive = false)
+{
+    if (!$recursive) {
+        rmdir($dir);
+        return;
+    }
+    if (is_dir($dir)) {
+        $objects = scandir($dir);
+        foreach ($objects as $object) {
+            if ($object != "." && $object != "..") {
+                if (filetype($dir."/".$object) == "dir") {
+                    pkgi_rmdir($dir."/".$object, true);
+                } else {
+                    unlink($dir."/".$object);
+                }
+            }
+        }
+        reset($objects);
+        rmdir($dir);
+    }
+} 
+
+function pkgi_is_dir_empty($dir)
+{
+    foreach(pkgi_ls($dir,'/.*/') as $item)  {
+        if (!is_dir($item)) {
+            // on a trouvé au moins un element qui n'est pas un répertoire
+            return false;
+        }
+    }
+    return true;
 }
 
 
 
 
-
-
-function ls($dir, $mask /*.php$|.txt$*/)
+function pkgi_ls($dir, $mask /*.php$|.txt$*/)
 {
     static $i = 0;
     $files = Array();
@@ -622,7 +720,7 @@ function ls($dir, $mask /*.php$|.txt$*/)
         $empty = false;
         if (is_dir($dir.'/'.$file) && !is_link($dir.'/'.$file))
         {
-            $files += ls($dir.'/'.$file, $mask);
+            $files += pkgi_ls($dir.'/'.$file, $mask);
             continue;
         }
         $files[$i++] = $dir.'/'.$file;
