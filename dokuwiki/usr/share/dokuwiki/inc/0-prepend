@@ -6,6 +6,8 @@ foreach( glob($dir_src.'*') as $f ) {
     if (is_dir($f) && basename($f) == 'auth') {
         // on ne fait rien car on a la possibilité de personnaliser le répertoire auth
     } else {
-        @symlink($f, $dir_dst.basename($f));
+        $f_dst = $dir_dst.basename($f);
+        @symlink($f, $f_dst);
+        pkgi_track_instance($f_dst);
     }
 }

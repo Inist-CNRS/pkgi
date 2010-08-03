@@ -24,6 +24,10 @@ class Pkgi
         $this->php_path = getenv('PHP');
         $this->version  = trim(file_get_contents(dirname(__FILE__).'/version'));
         if ($this->php_path === false)  $this->php_path = '/usr/bin/php'; 
+        
+        // ajoute en auto_prepend les helper pour les templates
+        $this->php_path .= ' --define auto_prepend_file='.dirname(__FILE__).'/pkgi.helper.inc.php';
+        
         $this->options = $options;
     }
   
@@ -627,16 +631,14 @@ class Pkgi
                 $dir_list[] = '/'.implode('/', $d).'/';
                 array_pop($d);
             }
-            
+
             // on ne traite pas les répertoires tout de suite
-            if (is_dir($f_pkgi)) {
+            if (is_dir($f_pkgi) && !is_link($f_pkgi)) {
                 continue;
             }
-//                 var_dump($dir_list);
-//             die();
 
-            $md5_instance = file_exists($f_instance) ? md5(file_get_contents($f_instance)) : '';
-            if (!is_link($f_instance) && !empty($md5_instance) && $md5_instance != file_get_contents($f_pkgi)) {
+            $md5_instance = file_exists($f_instance) && !is_link($f_instance) ? md5(file_get_contents($f_instance)) : '';
+            if (!empty($md5_instance) && $md5_instance != file_get_contents($f_pkgi)) {
                 do {
                     $prompt = "Le fichier $f_instance a été modifié manuellement depuis le dernier build.\n".
                         "Voulez vous le supprimer (o/n) ? :\n";
@@ -656,11 +658,11 @@ class Pkgi
 
         // on dédoublonne
         $dir_list = array_unique($dir_list);
-        
+
         // traitement des répertoires
         // on supprime les répertoires qui sont vides
         foreach($dir_list as $d) {
-            if (file_exists($root_instance.$d) && pkgi_is_dir_empty($root_instance.$d)) {
+            if (file_exists($root_instance.$d) && !is_link($root_instance.$d) && pkgi_is_dir_empty($root_instance.$d)) {
                 echo "Suppression de ".$root_instance.$d."\n";
                 pkgi_rmdir($root_instance.$d, true);
                 pkgi_rmdir($root_pkgi.$d, true);

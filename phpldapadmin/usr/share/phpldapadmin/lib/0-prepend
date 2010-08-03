@@ -2,7 +2,8 @@
 
 $h = getenv('APPNAME_HOME');
 if (!$h) exit;
-chdir($h.'/usr/share/phpldapadmin/lib');
+$dst_root = $h.'/usr/share/phpldapadmin/lib';
+chdir($dst_root);
 
 foreach(glob('/usr/share/phpldapadmin/lib/*') as $src) {
   $dst = basename($src);
@@ -13,6 +14,7 @@ foreach(glob('/usr/share/phpldapadmin/lib/*') as $src) {
   echo $dst."\n";
   @unlink($dst);
   symlink($src,$dst);
+  pkgi_track_instance($dst_root.'/'.$dst);
 }
 
 // ceci est un patch pour corriger un bug de phpldapadmin !
@@ -21,7 +23,8 @@ $fdata = file_get_contents('/usr/share/phpldapadmin/lib/AJAXTree.php');
 $fdata = str_replace('protected function draw_dn($dn,$level=0,',
                      'protected function draw_dn($dn,$level,',
                      $fdata);
-file_put_contents($h.'/usr/share/phpldapadmin/lib/AJAXTree.php', $fdata);
+file_put_contents($dst_root.'/AJAXTree.php', $fdata);
+pkgi_track_instance($dst_root.'/AJAXTree.php');
 
 // ceci est un patch pour corriger un autre bug de phpldapadmin !
 @unlink('common.php');
@@ -29,7 +32,8 @@ $fdata = file_get_contents('/usr/share/phpldapadmin/lib/common.php');
 $fdata = str_replace('error_reporting(E_ALL);',
                      'error_reporting(E_ALL & ~E_DEPRECATED);',
                      $fdata);
-file_put_contents($h.'/usr/share/phpldapadmin/lib/common.php', $fdata);
+file_put_contents($dst_root.'/common.php', $fdata);
+pkgi_track_instance($dst_root.'/common.php');
 
 // ceci est un patch pour corriger un autre bug de phpldapadmin !
 @unlink('server_functions.php');
@@ -38,4 +42,5 @@ $fdata = str_replace('ldap_first_attribute($resource,$entry_id,$attrs)',
                      'ldap_first_attribute($resource,$entry_id)', $fdata);
 $fdata = str_replace('ldap_next_attribute($resource,$entry_id,$attrs)',
                      'ldap_next_attribute($resource,$entry_id)', $fdata);
-file_put_contents($h.'/usr/share/phpldapadmin/lib/server_functions.php', $fdata);
+file_put_contents($dst_root.'/server_functions.php', $fdata);
+pkgi_track_instance($dst_root.'/server_functions.php');

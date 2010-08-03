@@ -2,7 +2,8 @@
 
 $h = getenv('APPNAME_HOME');
 if (!$h) exit;
-chdir($h.'/usr/share/phpldapadmin/htdocs');
+$dst_root = $h.'/usr/share/phpldapadmin/htdocs';
+chdir($dst_root);
 
 foreach(glob('/usr/share/phpldapadmin/htdocs/*') as $src) {
   $dst = basename($src);
@@ -11,10 +12,12 @@ foreach(glob('/usr/share/phpldapadmin/htdocs/*') as $src) {
   echo $dst."\n";
   @unlink($dst);
   symlink($src,$dst);
+  pkgi_track_instance($dst_root.'/'.$dst);
 }
 
 // mise en place de la config locale
 @unlink('index.php');
 $fdata = file_get_contents('/usr/share/phpldapadmin/htdocs/index.php');
 $fdata = str_replace("define('LIBDIR'", "if(!defined('LIBDIR')) define('LIBDIR'", $fdata);
-file_put_contents($h.'/usr/share/phpldapadmin/htdocs/index.php', $fdata);
+file_put_contents($dst_root.'/index.php', $fdata);
+pkgi_track_instance($dst_root.'/index.php');

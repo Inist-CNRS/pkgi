@@ -2,7 +2,9 @@
 
 $h = getenv('APPNAME_HOME');
 if (!$h) exit;
-chdir($h.'/usr/share/phpmyadmin/');
+$dst_root = $h.'/usr/share/phpmyadmin/';
+chdir($dst_root);
+
 
 foreach(glob('/usr/share/phpmyadmin/*') as $src) {
   $dst = basename($src);
@@ -11,8 +13,10 @@ foreach(glob('/usr/share/phpmyadmin/*') as $src) {
   echo $dst."\n";
   @unlink($dst);
   symlink($src,$dst);
+  pkgi_track_instance($dst_root.'/'.$dst);
 }
 
 // mise en place de la config locale
 @unlink('config.inc.php');
 symlink($h.'/etc/phpmyadmin/config.inc.php', 'config.inc.php');
+pkgi_track_instance($dst_root.'/config.inc.php');
