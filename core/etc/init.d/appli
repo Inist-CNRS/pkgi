@@ -11,6 +11,7 @@ $applink = trim(getenv('APPNAME_HOME').'/etc/init.d/'.strtolower(getenv('APPNAME
   getenv('APPNAME_HOME').'/etc/init.d/appli',
   $applink
 );
+pkgi_track_instance($applink);
 
 ?>
 

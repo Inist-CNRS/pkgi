@@ -605,7 +605,8 @@ class Pkgi
                     @unlink($t_dst_md5);
                     @mkdir(dirname($t_dst_md5), 0777, true);
                     symlink(readlink($t_src),$t_dst_md5);
-                } else if (substr($t_src,-1) == '/') {
+                } else if (is_dir($t_src)) {
+                    @mkdir($t_dst_md5, 0777, true);
                     @mkdir($t_dst, 0777, true);
                 } else {
                     trigger_error($t_src." cannot be found",E_USER_ERROR);

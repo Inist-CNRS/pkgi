@@ -9,4 +9,5 @@ foreach( glob($dir_src.'*') as $f ) {
         unlink($dir_dst.basename($f));
     }
     symlink($f, $dir_dst.basename($f));
+    pkgi_track_instance($dir_dst.basename($f));
 }
