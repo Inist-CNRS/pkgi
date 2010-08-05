@@ -41,7 +41,11 @@ Include /etc/apache2/mods-available/fcgid.conf
     # Connection timeout: Default value is 3 seconds
     #FcgidConnectTimeout 3
     #IPCConnectTimeout   3
-    
+   
+
+	Passheader Authorization
+
+ 
     # Define a new handler "php-fcgi" for ".php" files, plus the action that must follow
     AddHandler php-fcgi .php
     Action php-fcgi /fcgi-bin/php-fcgi-wrapper
