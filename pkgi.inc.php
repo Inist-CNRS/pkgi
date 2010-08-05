@@ -55,25 +55,25 @@ class Pkgi
             die();
         }
     
-        echo "--- Choisissez un nom d'application\n";
+        $this->pkgi_log("--- Choisissez un nom d'application\n");
         $this->choose_appli_name();
-        echo "Le nom d'application suivant sera utilisé : ".$this->APPNAME."\n";
-        echo "--- Choisissez les modules à activer\n";
+        $this->pkgi_log("Le nom d'application suivant sera utilisé : ".$this->APPNAME."\n");
+        $this->pkgi_log("--- Choisissez les modules à activer\n");
         $this->build_module_list();
         $this->choose_modules();
         if (count($this->MODULES) > 1)
-            echo "Les modules suivants seront utilisés : ".implode(',',$this->MODULES)."\n";
+            $this->pkgi_log("Les modules suivants seront utilisés : ".implode(',',$this->MODULES)."\n");
         else
-            echo "Le module suivant sera utilisé : ".implode(',',$this->MODULES)."\n";
+            $this->pkgi_log("Le module suivant sera utilisé : ".implode(',',$this->MODULES)."\n");
 
-        echo "--- Vérifications des dépendances\n";
+        $this->pkgi_log("--- Vérifications des dépendances\n");
         if (!in_array('--no-dep',$this->options)) {
             $this->check_dependencies();
         } else {
-            echo "Vérifications des dépendances ignorées à la demande de l'utilisateur : option --no-dep\n";
+            $this->pkgi_log("Vérifications des dépendances ignorées à la demande de l'utilisateur : option --no-dep\n");
         }
 
-        echo "--- Chargement des variables d'environnement\n";
+        $this->pkgi_log("--- Chargement des variables d'environnement\n");
         $env = array();
         $this->load_env($env);
         $this->check_env($env);
@@ -93,17 +93,20 @@ class Pkgi
     
     
         if (in_array('--reset',$this->options)) {
-        echo "--- Nettoyage des instances des fichiers et des répertoires générées\n";
+        $this->pkgi_log("--- Nettoyage des instances des fichiers et des répertoires générées\n");
             $this->reset_tpl_instance();
         } else {
-            echo "--- Instanciation des templates\n";
+            $this->pkgi_log("--- Instanciation des templates\n");
             $this->write_tpl_instance();
+            
+            $this->pkgi_log("--- Exécution des scripts de post-build\n");
+            $this->hook_post_build();
 
-            echo "* Votre application ".$this->APPNAME." est prête.\n";
-            echo "* Elle utilise les modules suivants : ".implode(',',$this->MODULES)."\n";
-            echo "* Les paramètres ont été sauvegardés dans : ".realpath($this->env_path)."\n";
-            echo "* Vous pouvez à tout moment modifier un parametre.\n";
-            echo "* Pensez alors à relancer le build pour régénérer les fichiers de conf et les lanceurs.\n";
+            $this->pkgi_log("* Votre application ".$this->APPNAME." est prête.\n");
+            $this->pkgi_log("* Elle utilise les modules suivants : ".implode(',',$this->MODULES)."\n");
+            $this->pkgi_log("* Les paramètres ont été sauvegardés dans : ".realpath($this->env_path)."\n");
+            $this->pkgi_log("* Vous pouvez à tout moment modifier un parametre.\n");
+            $this->pkgi_log("* Pensez alors à relancer le build pour régénérer les fichiers de conf et les lanceurs.\n");
         }
     }
 
@@ -156,6 +159,60 @@ class Pkgi
         $this->MODULES = array_merge(array('core'), $this->MODULES);
     }
 
+    function hook_post_build()
+    {
+        // construit une liste des scripts de post build a exécuter
+        $postbuild = array();
+        foreach($this->MODULES as $m)
+        {
+            $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+            if (!file_exists($ini_path)) continue;
+
+            // execute les balises php eventuelles contenues dans config.ini
+            $output = shell_exec($this->php_path.' '.$ini_path);
+            $ini_path = dirname(__FILE__).'/config.ini.tmp';
+            file_put_contents($ini_path,$output);
+      
+            $ini_data = parse_ini_file($ini_path);
+            foreach(array('post-build') as $field) {
+                //$postbuild[$m][$field] = array();
+                if (isset($ini_data[$field]) && is_array($ini_data[$field])) {
+                    foreach($ini_data[$field] as $v) {
+                        $v = trim($v);
+                        if (!empty($v) && !isset($postbuild[$v])) {
+                            $postbuild[$v] = $m;
+                        }
+                    }
+                }
+            }
+            unlink($ini_path);
+        }
+        
+        // exécution des scripts de post build
+        foreach($postbuild as $script => $module) {
+            $this->pkgi_log("[$module] => $script");
+            $script = explode(' ',$script);
+            if ($script[0][0] != '/' && file_exists($this->dst_path.'/'.$script[0])) {
+                exec($this->dst_path.'/'.implode(' ',$script), $output, $error);
+            } else {
+                exec(implode(' ',$script), $output, $error);
+            }
+            $this->pkgi_log($error == 0 ? " => OK\n" : " => KO(".$error.")\n", true, false);
+            $this->pkgi_log(implode("\n",$output)."\n", false);
+        }
+    }
+    
+    function pkgi_log($log, $display = true, $withprefix = true)
+    {
+        // permet d'enregistrer les actions en les datant dans le fichier var/log/pkgi.log
+        if ($this->dst_path && is_dir($this->dst_path.'/var/log') && is_writable($this->dst_path.'/var/log')) {
+            file_put_contents($this->dst_path.'/var/log/pkgi.log', ($withprefix ? date('c').' - '.trim(`whoami`).' - ' : '').$log, FILE_APPEND | LOCK_EX);
+        }
+        if ($display) {
+            echo $log;
+        }
+    }
+    
     function check_dependencies()
     {
         $deptree = $this->_build_dependency_tree();
@@ -204,22 +261,22 @@ class Pkgi
 
         if (isset($depresult['optional-pkgi-dependency'])) {
             foreach($depresult['optional-pkgi-dependency'] as $k => $v) {
-                echo "=> Le module pkgi '$k' est optionnel, d'autre modules pkgi (".implode(',',$v).") peuvent l'utiliser.\n";
+                $this->pkgi_log("=> Le module pkgi '$k' est optionnel, d'autre modules pkgi (".implode(',',$v).") peuvent l'utiliser.\n");
             }
         }
         if (isset($depresult['optional-sys-dependency'])) {
             foreach($depresult['optional-sys-dependency'] as $k => $v) {
-                echo "=> Le packet système '$k' est optionnel, les modules pkgi (".implode(',',$v).") peuvent l'utiliser.\n";
+                $this->pkgi_log("=> Le packet système '$k' est optionnel, les modules pkgi (".implode(',',$v).") peuvent l'utiliser.\n");
             }
         }
         if (isset($depresult['mandatory-pkgi-dependency'])) {
             foreach($depresult['mandatory-pkgi-dependency'] as $k => $v) {
-                echo "=> Le module pkgi '$k' n'est pas installé, il doit l'être pour pouvoir utiliser les modules pkgi suivants : ".implode(',',$v).".\n";
+                $this->pkgi_log("=> Le module pkgi '$k' n'est pas installé, il doit l'être pour pouvoir utiliser les modules pkgi suivants : ".implode(',',$v).".\n");
             }
         }
         if (isset($depresult['mandatory-sys-dependency'])) {
             foreach($depresult['mandatory-sys-dependency'] as $k => $v) {
-                echo "=> Le packet système '$k' n'est pas installé, il doit l'être pour pouvoir utiliser les modules pkgi suivants : ".implode(',',$v).".\n";
+                $this->pkgi_log("=> Le packet système '$k' n'est pas installé, il doit l'être pour pouvoir utiliser les modules pkgi suivants : ".implode(',',$v).".\n");
             }
         }
 
@@ -366,7 +423,7 @@ class Pkgi
      */
     function &check_env(&$env)
     {
-        echo "Verification de la presence des variables d'environnement ...\n";
+        $this->pkgi_log("Verification de la presence des variables d'environnement ...\n");
     
         // construit une liste des variables d'env a tester
         foreach($this->MODULES as $m) {
@@ -381,10 +438,10 @@ class Pkgi
                     $v = getenv($e);
                     if ($v === FALSE || $v == '') 
                     {
-                        echo "\n";
-                        echo "Signification de $e : ".$e_option[0]."\n";
+                        $this->pkgi_log("\n");
+                        $this->pkgi_log("Signification de $e : ".$e_option[0]."\n");
                         if (count($e_option[1]) > 0)
-                            echo "Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n";
+                            $this->pkgi_log("Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n");
                         $v_default = $e_option[2] != '' ? "[defaut=".$e_option[2]."] " : '';
                         $prompt = "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
                         $v = readline($prompt);
@@ -394,7 +451,7 @@ class Pkgi
                     putenv("$e=$v");
                     putenv("$e_unnamed=$v");
                 }
-                echo "La variable suivante sera utilisée : $e=$v\n";
+                $this->pkgi_log("La variable suivante sera utilisée : $e=$v\n");
             }
         }
         return $env;
@@ -404,7 +461,7 @@ class Pkgi
     function write_env($env)
     {
         $filename = $this->env_path;
-        echo "Ecriture des variables d'environnement dans ".realpath($filename)."\n";
+        $this->pkgi_log("Écriture des variables d'environnement dans ".realpath($filename)."\n");
         $data = '';
         foreach($env as $k => $v)
         {
@@ -577,7 +634,7 @@ class Pkgi
                     continue;
                 }
 
-                echo "Ecriture de ".$t_dst."\n";
+                $this->pkgi_log("Écriture de ".$t_dst."\n");
                 if (file_exists($t_src) && !is_dir($t_src) && !is_link($t_src)) {
                     @mkdir(dirname($t_dst), 0777, true);
                     if ($t_src_notpl) {
@@ -646,12 +703,12 @@ class Pkgi
                     $answer = readline($prompt);
                 } while (!preg_match('/^[on]+/i',$answer));
                 if (preg_match('/^o/i',$answer)) {
-                    echo "Suppression de ".$f_instance."\n";
+                    $this->pkgi_log("Suppression de ".$f_instance."\n");
                     @unlink($f_instance);
                     @unlink($f_pkgi);
                 }
             } else {
-                echo "Suppression de ".$f_instance."\n";
+                $this->pkgi_log("Suppression de ".$f_instance."\n");
                 @unlink($f_instance);
                 @unlink($f_pkgi);
             }
@@ -664,7 +721,7 @@ class Pkgi
         // on supprime les répertoires qui sont vides
         foreach($dir_list as $d) {
             if (file_exists($root_instance.$d) && !is_link($root_instance.$d) && pkgi_is_dir_empty($root_instance.$d)) {
-                echo "Suppression de ".$root_instance.$d."\n";
+                $this->pkgi_log("Suppression de ".$root_instance.$d."\n");
                 pkgi_rmdir($root_instance.$d, true);
                 pkgi_rmdir($root_pkgi.$d, true);
             }
