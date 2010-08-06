@@ -1,7 +1,3 @@
-# Load fcgi module
-Include /etc/apache2/mods-available/fcgid.load
-Include /etc/apache2/mods-available/fcgid.conf
-
 <IfModule mod_fcgid.c>
     SharememPath          <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
 #    FcgidProcessTableFile <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
@@ -42,9 +38,8 @@ Include /etc/apache2/mods-available/fcgid.conf
     #FcgidConnectTimeout 3
     #IPCConnectTimeout   3
    
-
-	Passheader Authorization
-
+    # Allows HTTP auth data to be forwarded to PHP scripts
+    Passheader Authorization
  
     # Define a new handler "php-fcgi" for ".php" files, plus the action that must follow
     AddHandler php-fcgi .php

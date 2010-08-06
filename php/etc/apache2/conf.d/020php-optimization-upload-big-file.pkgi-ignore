@@ -1,7 +1,8 @@
 <?php
 
-// on commence par désactiver fcgid qui n'est pas utile
-@unlink(getenv('APPNAME_HOME').'/etc/apache2/conf.d/010php-fcgid');
+// on commence par désactiver mod_fcgid et mod_php5 qui ne sont pas utiles
+@unlink(getenv('APPNAME_HOME').'/etc/apache2/conf.d/010php-mod_fcgid');
+@unlink(getenv('APPNAME_HOME').'/etc/apache2/conf.d/010php-mod_php5');
 
 ?>
 
@@ -11,11 +12,8 @@
 <?php $mods = explode(',',getenv('APPNAME_APACHE_MODS')); ?>
 <?php if (!in_array('cgi', $mods)) { ?> 
 Include /etc/apache2/mods-available/cgi.load
+Include <?php echo getenv('APPNAME_HOME'); ?>/etc/apache2/conf.d/010php-mod_cgi
 <?php } ?>
-RemoveHandler                      .php
-AddType application/x-httpd-php    .php
-Action  php-fcgi                   /cgi-bin/php-cgi
-Action  application/x-httpd-php    /cgi-bin/php-cgi
 
 # Limite d'upload d'apache à 2Go et réglage du timeout a 10 minutes
 # On ne laisse pas la limite à 0 (infini) car en cas de dépassement des limites du php.ini de php

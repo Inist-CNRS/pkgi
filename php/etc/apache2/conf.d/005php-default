@@ -1,0 +1,7 @@
+<?php $mods = explode(',',getenv('APPNAME_APACHE_MODS')); ?>
+<?php if (!in_array('cgi', $mods) && !in_array('fcgid', $mods) && !in_array('php5', $mods)) { ?> 
+# If any PHP compatible module is loaded in apache, fcgid module is loaded
+Include /etc/apache2/mods-available/fcgid.load
+Include /etc/apache2/mods-available/fcgid.conf
+<?php } ?>
+
