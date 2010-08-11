@@ -22,7 +22,7 @@ case ${1} in
     ;;
 
     --install|*)
-        NOT_INSTALLED=`grep "<?php echo getenv('APPNAME_ADMIN_MAIL') ?>" $FILE_FORWARD`
+        NOT_INSTALLED=`grep "<?php echo getenv('APPNAME_ADMIN_MAIL') ?>" $FILE_FORWARD 2&>/dev/null`
         if [ "$NOT_INSTALLED" == "" ]; then
             echo "<?php echo getenv('APPNAME_ADMIN_MAIL') ?>" >> $FILE_FORWARD
             echo "<?php echo getenv('APPNAME_ADMIN_MAIL') ?> added to $FILE_FORWARD"
