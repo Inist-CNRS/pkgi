@@ -12,7 +12,7 @@ case ${1} in
                 echo "<?php echo getenv('APPNAME_ADMIN_MAIL') ?> removed from $FILE_FORWARD"
             else
                 echo "<?php echo getenv('APPNAME_ADMIN_MAIL') ?> not found in $FILE_FORWARD"
-                exit 1
+                exit 0
             fi
             rm -f $TMP_FILE
         else
@@ -28,7 +28,7 @@ case ${1} in
             echo "<?php echo getenv('APPNAME_ADMIN_MAIL') ?> added to $FILE_FORWARD"
         else
             echo "<?php echo getenv('APPNAME_ADMIN_MAIL') ?> already in $FILE_FORWARD"
-            exit 1
+            exit 0
         fi
     ;;
 esac
