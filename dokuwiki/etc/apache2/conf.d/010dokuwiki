@@ -1,4 +1,6 @@
+<?php if (getenv('APPNAME_DOKUWIKI_BASEURL') != '/') { ?>
 Alias <?php echo getenv('APPNAME_DOKUWIKI_BASEURL'); ?> <?php echo getenv('APPNAME_HOME'); ?>/usr/share/dokuwiki/
+<?php } ?>
 
 <Directory <?php echo getenv('APPNAME_HOME'); ?>/usr/share/dokuwiki/>
 	Options +FollowSymLinks

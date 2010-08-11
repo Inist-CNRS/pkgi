@@ -1,0 +1,20 @@
+<?php
+
+// Récupération de la configuration par défaut d'apache2
+// et remplace le DocumentRoot par celui de dokuwiki uniquement si 
+// on souhaite placer dokuwiki à la racine du virtualhost
+
+// Dans le cas où dokuwiki n'est pas placé à la racine du virtualhost
+// la directive Alias est utilisée dans le fichier conf.d/010dokuwiki
+
+ob_start();
+include dirname(__FILE__).'/../../../../apache/etc/apache2/sites-enabled/000-default';
+$content = ob_get_contents();
+ob_end_clean();
+
+if (getenv('APPNAME_DOKUWIKI_BASEURL') == '/') {
+    $DocumentRoot = getenv('APPNAME_HOME').'/usr/share/dokuwiki';
+    echo preg_replace('/DocumentRoot .*/', 'DocumentRoot '.$DocumentRoot, $content);
+} else {
+    echo $content;
+}
