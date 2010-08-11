@@ -10,6 +10,11 @@ if [ -w tags/$1 ] ; then
   exit 2
 fi
 
+# divers nettoyages avant de commencer
+rm -rf /tmp/pkgi/
+rm -rf /tmp/tags/
+cd /tmp/
+
 # recuperation des tags
 svn co --quiet --depth=immediates https://subversion.cru.fr/pkgi/tags
 
@@ -30,8 +35,8 @@ svn export --quiet tags/$1 pkgi
 tar czf pkgi-$1.tar.gz pkgi/
 
 # divers nettoyages
-rm -rf pkgi/
-rm -rf tags/
+rm -rf /tmp/pkgi/
+rm -rf /tmp/tags/
 
 echo "Release $1 generee"
 echo "- le tag $1 a ete cree"
