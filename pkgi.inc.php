@@ -37,6 +37,8 @@ class Pkgi
             echo "Options de pkgi-".$this->version." :\n";
             echo "  --reset\n";
             echo "    Détruit les instances des fichiers et répertoires générés par pkgi.\n";
+            echo "  --autoremove\n";
+            echo "    Supprime les modules inutilisés des sources de pkgi.\n";
             echo "  --modules=[[m1,m2,...]]\n";
             echo "    Force le chargement des modules passés en argument.\n";
             echo "  --no-dep\n";
@@ -91,9 +93,11 @@ class Pkgi
                 die("$dst doesn't exist");
         }
     
-    
-        if (in_array('--reset',$this->options)) {
-        $this->pkgi_log("--- Nettoyage des instances des fichiers et des répertoires générées\n");
+        if (in_array('--autoremove',$this->options)) {
+            $this->pkgi_log("--- Suppression des sources des modules inutilisés\n");
+            $this->autoremove_unused_tpl();
+        } else if (in_array('--reset',$this->options)) {
+            $this->pkgi_log("--- Nettoyage des instances des fichiers et des répertoires générées\n");
             $this->reset_tpl_instance();
         } else {
             $this->pkgi_log("--- Instanciation des templates\n");
@@ -687,6 +691,18 @@ class Pkgi
                     trigger_error($t_src." cannot be found",E_USER_ERROR);
                 }
             }
+    }
+
+    function autoremove_unused_tpl()
+    {
+        $modules_to_remove = array_diff($this->MODULES_LIST, $this->MODULES);
+        foreach($modules_to_remove as $m) {
+            if (is_dir($this->tpl_path.'/'.$m)) {
+                $dir = $this->tpl_path.'/'.$m;
+                $this->pkgi_log("Suppression de ".$dir."\n");
+                pkgi_rmdir($dir, true);
+            }
+        }
     }
 
     // Détruit les instances des fichiers et répertoires générés par pkgi
