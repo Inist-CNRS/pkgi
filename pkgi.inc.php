@@ -13,7 +13,7 @@ class Pkgi
     var $version  = null;
     var $sys_pkg_query = 'dpkg --get-selections %s 2> /dev/null | grep -E "install|hold"';
     var $options = array();
-
+    
     function Pkgi($env_path = null, $tpl_path = null, $dst_path = null, $options = array())
     {
         $current_dir = substr(dirname(__FILE__), strrpos(dirname(__FILE__),'/')+1);
@@ -36,7 +36,7 @@ class Pkgi
         if (in_array('--help',$this->options) || in_array('-h',$this->options)) {
             echo "Options de pkgi-".$this->version." :\n";
             echo "  --reset\n";
-            echo "    Détruit les instance des fichiers et répertoires générés par pkgi.\n";
+            echo "    Détruit les instances des fichiers et répertoires générés par pkgi.\n";
             echo "  --modules=[[m1,m2,...]]\n";
             echo "    Force le chargement des modules passés en argument.\n";
             echo "  --no-dep\n";
@@ -55,12 +55,13 @@ class Pkgi
             die();
         }
     
+        $env = array();
         $this->pkgi_log("--- Choisissez un nom d'application\n");
-        $this->choose_appli_name();
+        $this->choose_appli_name($env);
         $this->pkgi_log("Le nom d'application suivant sera utilisé : ".$this->APPNAME."\n");
         $this->pkgi_log("--- Choisissez les modules à activer\n");
         $this->build_module_list();
-        $this->choose_modules();
+        $this->choose_modules($env);
         if (count($this->MODULES) > 1)
             $this->pkgi_log("Les modules suivants seront utilisés : ".implode(',',$this->MODULES)."\n");
         else
@@ -74,7 +75,6 @@ class Pkgi
         }
 
         $this->pkgi_log("--- Chargement des variables d'environnement\n");
-        $env = array();
         $this->load_env($env);
         $this->check_env($env);
         $this->write_env($env);
@@ -102,11 +102,10 @@ class Pkgi
             $this->pkgi_log("--- Exécution des scripts de post-build\n");
             $this->hook_post_build();
 
-            $this->pkgi_log("* Votre application ".$this->APPNAME." est prête.\n");
-            $this->pkgi_log("* Elle utilise les modules suivants : ".implode(',',$this->MODULES)."\n");
+            $this->pkgi_log("* Votre application ".$this->APPNAME." est prête avec les modules : ".implode(',',$this->MODULES)."\n");
             $this->pkgi_log("* Les paramètres ont été sauvegardés dans : ".realpath($this->env_path)."\n");
-            $this->pkgi_log("* Vous pouvez à tout moment modifier un parametre.\n");
-            $this->pkgi_log("* Pensez alors à relancer le build pour régénérer les fichiers de conf et les lanceurs.\n");
+            $this->pkgi_log("* Vous pouvez à tout moment modifier un parametre en éditant ce fichier.\n");
+            $this->pkgi_log("* Pensez alors à relancer pkgi/build pour régénérer les fichiers de conf et les lanceurs.\n");
         }
     }
 
@@ -127,7 +126,7 @@ class Pkgi
         closedir($d);
     }
   
-    function choose_modules()
+    function choose_modules(&$env)
     {
         // on commence par chercher si on a indiqué explicitement
         // quels modules utiliser dans la ligne de commande
@@ -150,13 +149,24 @@ class Pkgi
         }
     
         // si rien n'a ete trouve alors on demande a l'utilisateur d'entrer des modules au clavier
+        $ask = false;
         while (count($this->MODULES) == 0) {
-            $prompt = "Entrez le nom des modules separes par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
+            $prompt = "Entrez le nom des modules séparés par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
             $this->MODULES = $this->_filter_valide_modules(explode(',',readline($prompt)));
+            $ask = true;
         }
     
         // ajoute le module core dont tous les autres dependent en tout premier de la liste
         $this->MODULES = array_merge(array('core'), $this->MODULES);
+        
+        // écriture de la réponse dans les variables d'environnements
+        putenv('PKGI_MODULES_LIST='.implode(',',$this->MODULES_LIST));
+        $env[$this->APPNAME.'_MODULES'] = implode(',',$this->MODULES);
+        
+        // écriture de la réponse dans le fichier d'env
+        if ($ask) {
+            $this->write_env($env);
+        }
     }
 
     function hook_post_build()
@@ -293,7 +303,7 @@ class Pkgi
         return $mod_ok;
     }
   
-    function choose_appli_name()
+    function choose_appli_name(&$env)
     {
         // on recherche APPNAME dans l'environement
         // si on le trouve pas alors on cherche dans le fichier XXXX.env
@@ -306,12 +316,23 @@ class Pkgi
         }
 
         // rien n'a ete trouve alors on demande a l'utilisateur de l'entrer au clavier
+        $ask = false;
         if ($this->APPNAME == '')
         {
+            $ask = true;
             do {
                 $prompt = "Entrez le nom de votre application (en lettres majuscules): ";
                 $this->APPNAME = readline($prompt);
             } while (!preg_match('/[A-Z]+/',$this->APPNAME));
+        }
+
+        // sauvegarde dans l'environnement
+        $env['APPNAME'] = $this->APPNAME;
+        putenv('APPNAME='.$this->APPNAME);
+        
+        // écriture de la réponse dans le fichier d'env
+        if ($ask) {
+            $this->write_env($env);
         }
     }
 
@@ -322,11 +343,6 @@ class Pkgi
      */
     function load_env(&$env)
     {
-        $env['APPNAME'] = $this->APPNAME;
-        putenv('APPNAME='.$this->APPNAME);
-        putenv('PKGI_MODULES_LIST='.implode(',',$this->MODULES_LIST));
-        $env[$this->APPNAME.'_MODULES'] = implode(',',$this->MODULES);
-
         // construit une liste des variables d'env a tester
         $env_to_check = $this->_build_env_to_check();
     
@@ -436,8 +452,8 @@ class Pkgi
                 if ($v == NULL || $v == '')
                 {
                     $v = getenv($e);
-                    if ($v === FALSE || $v == '') 
-                    {
+                    $ask = ($v === FALSE || $v == '');
+                    if ($ask) {
                         $this->pkgi_log("\n");
                         $this->pkgi_log("Signification de $e : ".$e_option[0]."\n");
                         if (count($e_option[1]) > 0)
@@ -450,6 +466,9 @@ class Pkgi
                     $env[$e] = $v;
                     putenv("$e=$v");
                     putenv("$e_unnamed=$v");
+                    if ($ask) {
+                        $this->write_env($env);
+                    }
                 }
                 $this->pkgi_log("La variable suivante sera utilisée : $e=$v\n");
             }
@@ -461,7 +480,6 @@ class Pkgi
     function write_env($env)
     {
         $filename = $this->env_path;
-        $this->pkgi_log("Écriture des variables d'environnement dans ".realpath($filename)."\n");
         $data = '';
         foreach($env as $k => $v)
         {
