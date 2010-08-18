@@ -13,10 +13,4 @@ if (!is_numeric($port)) die();
     CustomLog <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/access.log combined
 <?php } ?>
     ErrorLog <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/error.log
-
-    # pour les cgi
-    ScriptAlias /cgi-bin/ <?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin/
-<?php if (in_array('dev',$version)) { ?>
-    ScriptLog   <?php echo getenv('APPNAME_HOME') ?>/var/log/cgi.error.log
-<?php } ?>
 </VirtualHost>
