@@ -472,3 +472,4 @@ interactive-timeout
 # sure you have set the global system limit high enough! The high value
 # is required for a large number of opened tables
 open-files-limit = 8192
+
