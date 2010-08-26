@@ -155,7 +155,7 @@ class Pkgi
         // si rien n'a ete trouve alors on demande a l'utilisateur d'entrer des modules au clavier
         $ask = false;
         while (count($this->MODULES) == 0) {
-            $prompt = "Entrez le nom des modules séparés par des virgules que vous voulez activer dans votre application\nparmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
+            $prompt = "Entrez le nom des modules séparés par des virgules que vous voulez activer dans votre application parmis les modules suivants ".implode(',',$this->MODULES_LIST)." : ";
             $this->MODULES = $this->_filter_valide_modules(explode(',',readline($prompt)));
             $ask = true;
         }
