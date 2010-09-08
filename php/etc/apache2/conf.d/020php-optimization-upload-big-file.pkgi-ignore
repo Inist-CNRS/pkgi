@@ -19,4 +19,4 @@ Include <?php echo getenv('APPNAME_HOME'); ?>/etc/apache2/conf.d/010php-mod_cgi
 # On ne laisse pas la limite à 0 (infini) car en cas de dépassement des limites du php.ini de php
 # le navigateur ne va pas interpréter l'erreur et le script PHP va continuer à vivre.
 LimitRequestBody 214748364800
-Timeout 600
+Timeout 1200

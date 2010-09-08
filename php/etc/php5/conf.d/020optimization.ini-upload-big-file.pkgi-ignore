@@ -6,3 +6,4 @@ upload_max_filesize = 2047M
 post_max_size = 2047M
 max_input_time = 600
 session.gc_maxlifetime = 600
+max_execution_time = 1200
