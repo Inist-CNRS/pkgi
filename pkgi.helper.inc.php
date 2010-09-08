@@ -28,3 +28,27 @@ function pkgi_track_instance($path)
         file_put_contents($t_dst_md5, $f_md5);
     }
 }
+
+function pkgi_optimization_profils()
+{
+    // parse la listes des optimisations dans $optim_by_module
+    $modules = explode(',',getenv('PKGI_MODULES_LIST'));
+    $optim   = explode(',',getenv('APPNAME_OPTIMIZATION'));
+    $optim_by_module = array();
+    foreach($optim as $o) {
+        $for_one_module = false;
+        foreach($modules as $m) {
+            if (preg_match('/^'.$m.'-(.*)$/', $o, $matches)) {
+                $optim_by_module[$m][] = $matches[1];
+                $for_one_module = true;
+                break;
+            }
+        }
+        if (!$for_one_module) {
+            foreach($modules as $m) {
+                $optim_by_module[$m][] = $o;
+            }
+        }
+    }
+    return $optim_by_module;
+}

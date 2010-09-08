@@ -1,25 +1,42 @@
+<?php
+$optim = pkgi_optimization_profils();
+?>
 <IfModule mod_fcgid.c>
     SharememPath          <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
 #    FcgidProcessTableFile <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
     SocketPath  <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
 #    FcgidIPCDir <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
 
-    # We run a single PHP FastCGI server which will launch as many children as necessary.
-    # Useful for APC optimizations
-    # 18 and 2 are a good choice for APC extension
-    DefaultMaxClassProcessCount 16
-#    FcgidMaxProcessesPerClass   16
-    DefaultMinClassProcessCount 2
-#    FcgidMinProcessesPerClass   2
+    # Limit max and min PHP FastCGI processes
+    # max = 20 means that you will not be able to handle more than 20 simultaneous connections
+#    FcgidMinProcessesPerClass   3
+    DefaultMinClassProcessCount 3
+<?php if (in_array('huge', $optim['apache'])) { ?>
+    # 128*7 = 896 php processes (896 simultaneous connections)
+    DefaultMaxClassProcessCount 128
+#    FcgidMaxProcessesPerClass   128
+    # Number of PHP thread parents
+#    FcgidInitialEnv PHP_FCGI_CHILDREN 7
+    DefaultInitEnv  PHP_FCGI_CHILDREN  7
+<?php } else if (in_array('big', $optim['apache'])) { ?>
+    # 4*30 = 120 php processes (120 simultaneous connections)
+    DefaultMaxClassProcessCount  30
+#    FcgidMaxProcessesPerClass   30
+    # Number of PHP thread parents
+#    FcgidInitialEnv PHP_FCGI_CHILDREN 4
+    DefaultInitEnv  PHP_FCGI_CHILDREN  4
+<?php } else { ?>
+    # 20 php processes (20 simultaneous connections)
+    DefaultMaxClassProcessCount 20
+#    FcgidMaxProcessesPerClass  20
+    # Number of PHP thread parents
+#    FcgidInitialEnv PHP_FCGI_CHILDREN 0
+    DefaultInitEnv  PHP_FCGI_CHILDREN  0
+<?php } ?>
 
     # Maximum requests before a process is stopped and a new one is launched
 #    FcgidInitialEnv PHP_FCGI_MAX_REQUESTS 5000
     DefaultInitEnv  PHP_FCGI_MAX_REQUESTS 5000
-    
-    # Number of PHP childs that will be launched. Leave undefined to let PHP decide.
-    # 0 is a good choice for APC extension
-#    FcgidInitialEnv PHP_FCGI_CHILDREN 0
-    DefaultInitEnv  PHP_FCGI_CHILDREN 0
 
     # If the size of the request body exceeds this amount, the request will fail with 500 Server Error.
     # 1Go by default
