@@ -18,6 +18,7 @@ read_buffer_size = 256K
 read_rnd_buffer_size = 256K
 net_buffer_length = 2K
 thread_stack = 128K
+max_connections = 25
 
 [isamchk]
 key_buffer = 8M

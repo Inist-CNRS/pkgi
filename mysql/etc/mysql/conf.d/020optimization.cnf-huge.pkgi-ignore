@@ -20,6 +20,7 @@ thread_cache_size = 8
 query_cache_size = 32M
 # Try number of CPU's*2 for thread_concurrency
 thread_concurrency = 8
+max_connections = 1024
 
 [isamchk]
 key_buffer = 256M
