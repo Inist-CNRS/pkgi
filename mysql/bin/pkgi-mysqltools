@@ -1,50 +1,56 @@
-#!/bin/sh
-#!/bin/sh
+<?php echo '#!/bin/bash'; ?> 
 
 case ${1} in
-    
+
     -q | query)
-        # Se connecter à la base
+    # Se connecter à la base
         shift 1
-	<?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql $*
-	;;
+        <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql $*
+    ;;
 
     -d | dump)
         shift 1
-	<?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump $* 
-	;;
+        <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump $* 
+    ;;
 
     -i | init)
-	# initialisation de la base avec 
+        # initialisation de la base avec 
         # creation et reglage de l'utilisateur de maintenance: debian-sys-maint
         <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql stop > /dev/null
         if [ "$?" != "0" ]; then
-          echo "Database cannot be initialized because mysql server cannot be stopped..."
-          exit 1
+            echo "Database cannot be initialized because mysql server cannot be stopped..."
+            exit 1
         fi
-	<?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql_install_db > /dev/null
+        <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql_install_db > /dev/null
 
         # reglage du mot de passe debian-sys-maint
-	pass="`sed -n 's/^[ 	]*password *= *// p'  <?php echo getenv('APPNAME_HOME') ?>/etc/mysql/debian.cnf | sed 's/\s// p' | head -n 1`"
-	tfile=`mktemp`
-	if [ ! -f "$tfile" ]; then
-	    return 1
-	fi
-	cat << EOF > $tfile
+        pass="`sed -n 's/^[ 	]*password *= *// p'  <?php echo getenv('APPNAME_HOME') ?>/etc/mysql/debian.cnf | sed 's/\s// p' | head -n 1`"
+        tfile=`mktemp`
+        if [ ! -f "$tfile" ]; then
+            return 1
+        fi
+        cat << EOF > $tfile
 USE mysql;
 REPLACE INTO user SET host='localhost', user='debian-sys-maint', password=password('$pass'), Select_priv='Y', Insert_priv='Y', Update_priv='Y', Delete_priv='Y', Create_priv='Y', Drop_priv='Y', Reload_priv='Y', Shutdown_priv='Y', Process_priv='Y',  File_priv='Y', Grant_priv='Y', References_priv='Y', Index_priv='Y', Alter_priv='Y', Show_db_priv='Y', Super_priv='Y', Create_tmp_table_priv='Y', Lock_tables_priv='Y', Execute_priv='Y', Repl_slave_priv='Y', Repl_client_priv='Y';
 EOF
-	MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
+        MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
         $MYSQL_BOOTSTRAP <$tfile
         if [ "$?" != "0" ]; then
-          echo "Error: debian-sys-maint cannot be created."
-          rm -f $tfile
-          exit 1
+            echo "Error: debian-sys-maint cannot be created."
+            rm -f $tfile
+            exit 1
         else
-          echo "Database has been initialized"
-          rm -f $tfile
+            echo "Database has been initialized"
+            rm -f $tfile
         fi
-	;;
+    ;;
+
+    postinst-init)
+        # initialisation juste après l'installation du module
+        if [ ! -d <?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql/mysql ]; then
+            <?php echo getenv('APPNAME_HOME') ?>/bin/<?php echo basename(__FILE__); ?> init  2>&1
+        fi
+    ;;
 
 
     -rp | rootpassword)
@@ -56,31 +62,31 @@ EOF
         fi
         <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql stop > /dev/null
         if [ "$?" != "0" ]; then
-          echo "Root password cannot be changed because mysql server cannot be stopped..."
-          exit 1
+            echo "Root password cannot be changed because mysql server cannot be stopped..."
+            exit 1
         fi
         ROOT_PASSWORD=$2
-	MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
-	tfile=`mktemp`
-	if [ ! -f "$tfile" ]; then
-	    return 1
-	fi
-	cat << EOF > $tfile
+        MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
+        tfile=`mktemp`
+        if [ ! -f "$tfile" ]; then
+            return 1
+        fi
+        cat << EOF > $tfile
 USE mysql;
 UPDATE user SET password=PASSWORD("$ROOT_PASSWORD") WHERE user='root';
 FLUSH PRIVILEGES;
 EOF
-	$MYSQL_BOOTSTRAP <$tfile
+        $MYSQL_BOOTSTRAP <$tfile
         if [ "$?" != "0" ]; then
-          echo "Root password cannot be changed because mysql database has not been initialized."
-          echo "Please firstly initialize the mysql database: bin/pkgi-mysqltools init"
-          rm -f $tfile
-          exit 1
+            echo "Root password cannot be changed because mysql database has not been initialized."
+            echo "Please firstly initialize the mysql database: bin/pkgi-mysqltools init"
+            rm -f $tfile
+            exit 1
         else
-          echo "Root password has been initialized to $ROOT_PASSWORD"
-          rm -f $tfile
+            echo "Root password has been initialized to $ROOT_PASSWORD"
+            rm -f $tfile
         fi
-	;;
+    ;;
 
     -mr | makeroot)
         if [ ${#} -lt 2 ] ; then
@@ -93,7 +99,7 @@ EOF
         echo "Now ${MRHOST} should be allowed to connect as root to the database (using phpmyadmin for example)"
         echo "Query was :"
         cat <?php echo getenv('APPNAME_HOME') ?>/etc/mysql/mysql-makeroot.sql | sed s/{HOST}/${MRHOST}/g
-        ;;
+    ;;
 
     -t | copyto )
         # Copie des bases sur un autre serveur
@@ -116,8 +122,8 @@ EOF
         else
             <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT}
         fi
-        ;;
-    
+    ;;
+
     -f | copyfrom)
         # Récupération des bases d'un autre serveur
         if [ ${#} -lt 2 ] ; then
@@ -139,13 +145,12 @@ EOF
         else
             <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
         fi
-        ;;
+    ;;
 
     *)
-	# parametre invalide
-	
-	echo "usage: $0 ( query | dump | init | makeroot | copyto | copyfrom )"
-	cat <<EOF
+        # parametre invalide
+        echo "usage: $0 ( query | dump | init | makeroot | copyto | copyfrom )"
+    cat <<EOF
 
    -q  | query        - Permet de lancer la commande mysql (placez vos paramètres à la suite)
    -i  | init         - Initialisation de la base
@@ -156,9 +161,8 @@ EOF
    -f  | copyfrom     - Récupération d'une ou de toutes les bases venant d'un autre serveur
 
 EOF
-
-	exit 1
-	;;
+        exit 1
+    ;;
 esac
 
 exit 0
