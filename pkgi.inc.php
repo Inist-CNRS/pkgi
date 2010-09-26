@@ -212,7 +212,9 @@ class Pkgi
                 exec(implode(' ',$script), $output, $error);
             }
             $this->pkgi_log($error == 0 ? " => OK\n" : " => KO(".$error.")\n", true, false);
-            $this->pkgi_log(implode("\n",$output)."\n", false);
+            foreach($output as $ol) {
+                $this->pkgi_log($ol."\n", false);
+            }
         }
     }
     

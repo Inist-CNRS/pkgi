@@ -1,4 +1,5 @@
-#!/bin/sh
-#!/bin/sh
+<?php echo '#!/bin/bash'; ?> 
 
-<?php echo getenv('APPNAME_HOME'); ?>/usr/sbin/slapadd -l <?php echo getenv('APPNAME_HOME'); ?>/etc/ldap/example.ldif
+if [ ! -f <?php echo getenv('APPNAME_HOME') ?>/var/lib/ldap/DB_CONFIG ]; then
+    <?php echo getenv('APPNAME_HOME'); ?>/usr/sbin/slapadd -l <?php echo getenv('APPNAME_HOME'); ?>/etc/ldap/example.ldif 2>&1
+fi
