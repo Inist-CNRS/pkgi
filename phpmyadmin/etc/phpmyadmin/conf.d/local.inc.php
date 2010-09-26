@@ -24,3 +24,5 @@ $cfg['Servers'][$i]['extension'] = 'mysql';
 // $cfg['Servers'][$i]['history'] = 'pma_history';
 // $cfg['Servers'][$i]['designer_coords'] = 'pma_designer_coords';
 
+$cfg['Servers'][$i]['AllowNoPassword'] = TRUE;
+$cfg['Servers'][$i]['AllowNoPasswordRoot'] = TRUE;
