@@ -68,7 +68,7 @@ stop)
     ;;
 status)
     PID=`cat $PIDFILE 2> /dev/null`
-    PID_EXISTS=`ps -e | grep -E "^\s+${PID}"`
+    PID_EXISTS=`ps -e | grep -E "^\s*${PID}"`
     if [ "$PID_EXISTS" != "" ] && [ "$PID" != "" ]
     then
         echo "Checking $DESC status: $NAME is running."
