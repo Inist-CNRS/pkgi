@@ -5,7 +5,7 @@
 defaults
   sendtime = 20
   resendtime = 50
-  maxlines = 7
+  maxlines = 25
   template = <?php echo getenv('APPNAME_HOME') ?>/etc/log2mail/mail
   fromaddr = <?php echo getenv('APPNAME_USER'); ?> 
   sendmail = /usr/lib/sendmail -oi -t
