@@ -23,12 +23,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/ircd-ratbox
 NAME=ircd-ratbox
 DESC="ratbox IRC Server"
-PARAMS="-dlinefile <?php echo getenv('APPNAME_HOME') ?>/etc/ircd-ratbox/dline.conf \
--configfile <?php echo getenv('APPNAME_HOME') ?>/etc/ircd-ratbox/ircd.conf \
--klinefile <?php echo getenv('APPNAME_HOME') ?>/etc/ircd-ratbox/kline.conf \
--resvfile <?php echo getenv('APPNAME_HOME') ?>/etc/ircd-ratbox/resv.conf \
--xlinefile <?php echo getenv('APPNAME_HOME') ?>/etc/ircd-ratbox/xline.conf \
--logfile <?php echo getenv('APPNAME_HOME') ?>/var/log/ircd-ratbox/ircd.log"
+PARAMS="-basedir <?php echo getenv('APPNAME_HOME') ?> -configfile <?php echo getenv('APPNAME_HOME') ?>/etc/ircd-ratbox/ircd.conf -logfile <?php echo getenv('APPNAME_HOME') ?>/var/log/ircd-ratbox/ircd.log"
 
 test -f $DAEMON || exit 0
 
