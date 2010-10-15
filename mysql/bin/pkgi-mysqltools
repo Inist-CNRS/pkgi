@@ -120,7 +120,10 @@ EOF
         if [ ${?} -ne 0 ] ; then
             exit 1
         else
-            <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT}
+			TMPFILE=`TMPDIR=<?php echo getenv('APPNAME_HOME') ?>/tmp && mktemp`
+            <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --opt ${BASES} > ${TMPFILE}
+			<?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} < ${TMPFILE}
+			rm -f ${TMPFILE}
         fi
     ;;
 
@@ -143,7 +146,7 @@ EOF
         if [ ${?} -ne 0 ] ; then
             exit 1
         else
-            <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} --opt ${BASES} | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+            <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqldump --user=root --password= --host=${REMOTE_HOST} --port=${REMOTE_PORT} --opt ${BASES} | cat | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
         fi
     ;;
 
