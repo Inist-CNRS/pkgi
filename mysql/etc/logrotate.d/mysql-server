@@ -10,18 +10,8 @@
 	compress
 	sharedscripts
 	postrotate
-		test -x /usr/bin/mysqladmin || exit 0
-
-		# If this fails, check debian.conf! 
-		MYADMIN="/usr/bin/mysqladmin --defaults-file=<?php echo getenv('APPNAME_HOME') ?>/etc/mysql/debian.cnf"
-		if [ -z "`$MYADMIN ping 2>/dev/null`" ]; then
-		  # Really no mysqld or rather a missing debian-sys-maint user?
-		  # If this occurs and is not a error please report a bug.
-		  if ps cax | grep -q mysqld; then
- 		    exit 1
-		  fi 
-		else
-		  $MYADMIN flush-logs
-		fi
+		test -x <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqladmin || exit 0
+		MYADMIN="<?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysqladmin"
+		$MYADMIN flush-logs
 	endscript
 }
