@@ -3,11 +3,18 @@
 $password = md5(uniqid(rand(), true));
 
 // recuperation de l'eventuel mot de passe si il existait deja
+$password_found = false;
 $debian_cnf_file = getenv('APPNAME_HOME').'/etc/mysql/debian.cnf';
 if (file_exists($debian_cnf_file)) {
-   if (preg_match('/password\s*\=\s*([a-zA-Z0-9]+)\s*/', file_get_contents($debian_cnf_file), $matches)) {
-     $password = $matches[1];
-   }
+    if (preg_match('/password\s*\=\s*([a-zA-Z0-9]+)\s*/', file_get_contents($debian_cnf_file), $matches)) {
+        $password = $matches[1];
+        $password_found = true;
+    }
+}
+if (!$password_found) {
+    // aucun mdp n'existait avant, on doit donc initialiser la base
+    // on positionne pour cela un fichier témoinsqui sera testé par le script postinst du module mysql
+    touch(getenv('APPNAME_HOME').'/tmp/mysql-init-flag');
 }
 
 ?>

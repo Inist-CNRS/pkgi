@@ -102,18 +102,13 @@ EOF
 
     -postinst-init | postinst-init)
         # Cette option est appelée par le build de pkgi lorsque le build est terminé (postinst)
-        #
-        # Le if est commenté car si on fait un "build --reset" le mdp debian-sys-maint est supprimé
-        # mais bien entendu pas le fichier var/lib/mysql/mysql donc au prochain build un nouveau mdp
-        # est généré pour debian-sys-maint qui ne correspond pas au mdp stoqué dans la base de données.
-        # Pour optimiser cette oppération et éviter d'initialiser la bdd a chaque build, il faudrait disposer
-        # d'un script de preinst dans pkgi permettant de mémoriser si oui ou non un mdp debian-sys-maint existe 
-        # ou non et agir en conséquence lors de cette oppération par le script de postinst.
-        #if [ ! -d <?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql/mysql ]; then
+        # son but est d'initialiser la base de donnée uniquement si c'est necessaire
+        # le fichier tmp/mysql-init-flag est positionné par l'instanciation du fichier etc/mysql/debian.cnf
+        if [ -f <?php echo getenv('APPNAME_HOME') ?>/tmp/mysql-init-flag ]; then
             <?php echo getenv('APPNAME_HOME') ?>/bin/<?php echo basename(__FILE__); ?> init  2>&1
-        #fi
+            rm -f <?php echo getenv('APPNAME_HOME') ?>/tmp/mysql-init-flag
+        fi
     ;;
-
 
     -rp | -rootpassword | rootpassword)
         # initialisation du mot de passe root
