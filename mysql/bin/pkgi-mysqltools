@@ -57,8 +57,14 @@ case ${1} in
     ;;    
 
     -i | -init | init)
-        # initialisation de la base avec 
-        # creation et reglage de l'utilisateur de maintenance: debian-sys-maint
+        # Initialisation de la base avec creation et reglage de l'utilisateur de maintenance: debian-sys-maint
+
+        # On vérifie si le démon tourne ou pas pour éventuellement le relancer après la phase d'initialisation
+        # qui va obligatoirement l'éteindre
+        <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql status
+        MYSQL_WAS_STARTED=$?
+        
+        # Le serveur doit être éteint pour l'oppération
         <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql stop > /dev/null
         if [ "$?" != "0" ]; then
             echo "Database cannot be initialized because mysql server cannot be stopped..." >&2
@@ -86,6 +92,11 @@ EOF
         else
             echo "Database has been initialized"
             rm -f $tfile
+            
+            # On démarre le démon si il l'était avant l'exécution de ce script
+            if [ "$MYSQL_WAS_STARTED" == 0 ]; then
+                <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql start
+            fi
         fi
     ;;
 
