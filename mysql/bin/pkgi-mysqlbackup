@@ -1,0 +1,4 @@
+<?php echo '#!/bin/bash'; ?> 
+
+APP_HOME=<?php echo getenv('APPNAME_HOME') ?> 
+$APP_HOME/bin/pkgi-mysqltools backup | gzip > $APP_HOME/dump-`/bin/date +%A`.sql.gz
