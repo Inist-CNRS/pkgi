@@ -92,7 +92,7 @@ class Pkgi
             else
                 die("$dst doesn't exist");
         }
-    
+
         if (in_array('--autoremove',$this->options)) {
             $this->pkgi_log("--- Suppression des sources des modules inutilisés\n");
             $this->autoremove_unused_tpl();
@@ -100,6 +100,9 @@ class Pkgi
             $this->pkgi_log("--- Nettoyage des instances des fichiers et des répertoires générées\n");
             $this->reset_tpl_instance();
         } else {
+            $this->pkgi_log("--- Exécution des scripts preinst\n");
+            $this->hook_preinst();
+            
             $this->pkgi_log("--- Instanciation des templates\n");
             $this->write_tpl_instance();
             
@@ -175,8 +178,17 @@ class Pkgi
 
     function hook_postinst()
     {
-        // construit une liste des scripts de post build a exécuter
-        $postbuild = array();
+        $this->hook_generic('postinst');
+    }
+    function hook_preinst()
+    {
+        $this->hook_generic('preinst');
+    }
+
+    private function hook_generic($name)
+    {
+        // construit une liste des scripts de hook a exécuter ensuite
+        $scripts = array();
         foreach($this->MODULES as $m)
         {
             $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
@@ -188,13 +200,13 @@ class Pkgi
             file_put_contents($ini_path,$output);
       
             $ini_data = parse_ini_file($ini_path);
-            foreach(array('postinst') as $field) {
-                //$postbuild[$m][$field] = array();
+            foreach(array('preinst') as $field) {
+                //$scripts[$m][$field] = array();
                 if (isset($ini_data[$field]) && is_array($ini_data[$field])) {
                     foreach($ini_data[$field] as $v) {
                         $v = trim($v);
-                        if (!empty($v) && !isset($postbuild[$v])) {
-                            $postbuild[$v] = $m;
+                        if (!empty($v) && !isset($scripts[$v])) {
+                            $scripts[$v] = $m;
                         }
                     }
                 }
@@ -202,8 +214,8 @@ class Pkgi
             unlink($ini_path);
         }
         
-        // exécution des scripts de post build
-        foreach($postbuild as $script => $module) {
+        // exécution des scripts de hook
+        foreach($scripts as $script => $module) {
             $this->pkgi_log("[$module] => $script");
             $script = explode(' ',$script);
             if ($script[0][0] != '/' && file_exists($this->dst_path.'/'.$script[0])) {
@@ -217,7 +229,7 @@ class Pkgi
             }
         }
     }
-    
+
     function pkgi_log($log, $display = true, $withprefix = true)
     {
         // permet d'enregistrer les actions en les datant dans le fichier var/log/pkgi.log
