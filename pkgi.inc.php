@@ -200,7 +200,7 @@ class Pkgi
             file_put_contents($ini_path,$output);
       
             $ini_data = parse_ini_file($ini_path);
-            foreach(array('preinst') as $field) {
+            foreach(array($name) as $field) {
                 //$scripts[$m][$field] = array();
                 if (isset($ini_data[$field]) && is_array($ini_data[$field])) {
                     foreach($ini_data[$field] as $v) {
@@ -213,7 +213,7 @@ class Pkgi
             }
             unlink($ini_path);
         }
-        
+
         // exécution des scripts de hook
         foreach($scripts as $script => $module) {
             $this->pkgi_log("[$module] => $script");
