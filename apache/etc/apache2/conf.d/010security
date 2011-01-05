@@ -84,3 +84,6 @@ TraceEnable Off
     Order allow,deny
     Allow from all
 </Directory>
+
+# on n'autorise pas l'accès aux répertoires ".svn"
+RedirectMatch 404 /\\.svn(/.*|$)
