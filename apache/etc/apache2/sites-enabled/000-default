@@ -7,6 +7,8 @@ $port      = getenv('APPNAME_APACHE_LISTEN_PORT');
 if (!is_numeric($port)) die();
 ?>
 <VirtualHost <?php echo $interface; ?>:<?php echo $port; ?>>
+    UseCanonicalName On
+    ServerName <?php echo getenv('APPNAME_APACHE_URL_ROOT'); ?> 
     ServerAdmin <?php echo getenv('APPNAME_ADMIN_MAIL') ?> 
     DocumentRoot <?php echo getenv('APPNAME_HOME') ?>/var/www
 <?php if (in_array('dev',$version) || in_array('awstats',$options) || in_array('access-log',$options)) { ?> 
