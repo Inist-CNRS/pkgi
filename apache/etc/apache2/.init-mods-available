@@ -2,6 +2,7 @@
 
 $dir_src = '/etc/apache2/mods-available/';
 $dir_dst = getenv('APPNAME_HOME').'/etc/apache2/mods-available/';
+@mkdir($dir_dst);
 foreach( glob($dir_src.'*') as $f ) {
     $f_dst = $dir_dst.basename($f);
     @symlink($f, $f_dst);
