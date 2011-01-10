@@ -52,3 +52,15 @@ function pkgi_optimization_profils()
     }
     return $optim_by_module;
 }
+
+
+function pkgi_return_free_port($default = null)
+{
+    if ($default && trim(getenv('APPNAME_USER')) == 'root') {
+        return (integer)$default;
+    }
+    do {
+        $port = rand(1024,65535);
+    } while(@fsockopen('localhost', $port, $errno, $errstr, 1) !== FALSE);
+    return $port;
+}
