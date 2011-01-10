@@ -1,0 +1,7 @@
+<?php
+echo "#!/bin/bash\n";
+
+echo getenv('APPNAME_HOME').'/usr/sbin/a2ensite default'."\n";
+
+// TODO ? activer le site ssl seulement si on a le mod_ssl de chargé
+// $mods = explode(',', getenv('APPNAME_APACHE_MODS'));
