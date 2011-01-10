@@ -1,0 +1,7 @@
+<?php
+echo "#!/bin/bash\n";
+
+$mods = explode(',', getenv('APPNAME_APACHE_MODS'));
+$mods = implode(' ', $mods);
+
+echo getenv('APPNAME_HOME').'/usr/sbin/a2enmod '.$mods."\n";
