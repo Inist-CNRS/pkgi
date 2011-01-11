@@ -1,8 +1,19 @@
 <?php
 echo "#!/bin/bash\n";
 
+
+
+
 // on commence par réinitialiser les modules utilisés
-echo getenv('APPNAME_HOME').'/usr/sbin/a2dismod *'."\n";
+$mods = array();
+foreach(glob(getenv('APPNAME_HOME').'/etc/apache2/mods-enabled/*') as $mod) {
+    $mod = basename($mod);
+    $mod = preg_replace('/\..*$/','',$mod);
+    if (!in_array($mod, $mods)) {
+        $mods[] = $mod;
+    }
+}
+echo getenv('APPNAME_HOME').'/usr/sbin/a2dismod '.implode(' ', $mods)."\n";
 
 // on active tous les modules apache choisis par défaut
 $mods = explode(',', getenv('APPNAME_APACHE_MODS'));
