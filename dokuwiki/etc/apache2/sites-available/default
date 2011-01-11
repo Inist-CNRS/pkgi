@@ -8,7 +8,7 @@
 // la directive Alias est utilisée dans le fichier conf.d/010dokuwiki
 
 ob_start();
-include dirname(__FILE__).'/../../../../apache/etc/apache2/sites-enabled/000-default';
+include dirname(__FILE__).'/../../../../apache/etc/apache2/sites-available/default';
 $content = ob_get_contents();
 ob_end_clean();
 
