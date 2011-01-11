@@ -75,9 +75,8 @@
     points into to this section.
     -->
     <ApplicationDefaults id="default" policyId="default"
-        entityID="https://sp.example.org/shibboleth"
-        homeURL="https://sp.example.org/index.html"
-        REMOTE_USER="eppn persistent-id targeted-id"
+        entityID="<?php echo getenv('APPNAME_SHIBSP_ENTITYID'); ?>"
+        REMOTE_USER="mail eppn persistent-id targeted-id"
         signing="false" encryption="false"
         >
 
@@ -102,7 +101,7 @@
             -->
 
             <!-- Default example directs to a specific IdP's SSO service (favoring SAML 2 over Shib 1). -->
-            <SessionInitiator type="Chaining" Location="/Login" isDefault="true" id="Intranet"
+            <SessionInitiator type="Chaining" Location="/Login" isDefault="false" id="Intranet"
                     relayState="cookie" entityID="https://idp.example.org/shibboleth">
                 <SessionInitiator type="SAML2" defaultACSIndex="1" template="bindingTemplate.html"/>
                 <SessionInitiator type="Shib1" defaultACSIndex="5"/>
@@ -112,14 +111,14 @@
             <SessionInitiator type="Chaining" Location="/WAYF" id="WAYF" relayState="cookie">
                 <SessionInitiator type="SAML2" defaultACSIndex="1" template="bindingTemplate.html"/>
                 <SessionInitiator type="Shib1" defaultACSIndex="5"/>
-                <SessionInitiator type="WAYF" defaultACSIndex="5" URL="https://wayf.example.org/WAYF"/>
+                <SessionInitiator type="WAYF" defaultACSIndex="5" URL="<?php echo getenv('APPNAME_SHIBSP_WAYF_URL'); ?>"/>
             </SessionInitiator>
 
             <!-- An example supporting the new-style of discovery service. -->
-            <SessionInitiator type="Chaining" Location="/DS" id="DS" relayState="cookie">
+            <SessionInitiator type="Chaining" Location="/DS" isDefault="true" id="DS" relayState="cookie" acsByIndex="false">
                 <SessionInitiator type="SAML2" defaultACSIndex="1" template="bindingTemplate.html"/>
                 <SessionInitiator type="Shib1" defaultACSIndex="5"/>
-                <SessionInitiator type="SAMLDS" URL="https://ds.example.org/DS"/>
+                <SessionInitiator type="SAMLDS" URL="<?php echo getenv('APPNAME_SHIBSP_WAYF_URL'); ?>"/>
             </SessionInitiator>
             
             <!--
@@ -128,7 +127,7 @@
             are used when sessions are initiated to determine how to tell the IdP where and
             how to return the response.
             -->
-            <md:AssertionConsumerService Location="/SAML2/POST" index="1"
+            <md:AssertionConsumerService Location="/SAML2/POST" index="5"
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"/>
             <md:AssertionConsumerService Location="/SAML2/POST-SimpleSign" index="2"
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign"/>
@@ -207,12 +206,12 @@
         <!-- Chains together all your metadata sources. -->
         <MetadataProvider type="Chaining">
             <!-- Example of remotely supplied batch of signed metadata. -->
-            <!--
-            <MetadataProvider type="XML" uri="http://federation.org/federation-metadata.xml"
+            <MetadataProvider type="XML" uri="<?php echo getenv('APPNAME_SHIBSP_METADATA_URL') ?>"
                  backingFilePath="<?php echo getenv('APPNAME_HOME') ?>/etc/shibboleth/federation-metadata.xml" reloadInterval="7200">
+            <!--
                <SignatureMetadataFilter certificate="<?php echo getenv('APPNAME_HOME') ?>/etc/shibboleth/fedsigner.pem"/>
-            </MetadataProvider>
             -->
+            </MetadataProvider>
 
             <!-- Example of locally maintained metadata. -->
             <!--

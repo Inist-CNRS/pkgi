@@ -1,5 +1,9 @@
+<?php
+$version = explode(',',getenv('APPNAME_VERSION'));
+?>
+
 # set overall behavior
-log4j.rootCategory=INFO, shibd_log
+log4j.rootCategory=<?php echo in_array('dev', $version) ? 'DEBUG' : 'INFO'; ?>, shibd_log
 
 # fairly verbose for DEBUG, so generally leave at INFO
 log4j.category.XMLTooling.XMLObject=INFO

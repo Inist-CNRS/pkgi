@@ -1,0 +1,44 @@
+<?php
+// preparation des tableaux d'options
+$version = explode(',',getenv('APPNAME_VERSION'));
+$options = explode(',',getenv('APPNAME_APACHE_OPTIONS'));
+$interface = getenv('APPNAME_APACHE_LISTEN_INTERFACE');
+$port      = getenv('APPNAME_APACHE_LISTEN_PORT');
+if (!is_numeric($port)) die();
+?>
+<VirtualHost <?php echo $interface; ?>:<?php echo $port; ?>>
+    UseCanonicalName On
+    ServerName <?php echo getenv('APPNAME_APACHE_URL_ROOT'); ?> 
+    ServerAdmin <?php echo getenv('APPNAME_ADMIN_MAIL') ?> 
+    DocumentRoot <?php echo getenv('APPNAME_HOME') ?>/var/www
+<?php if (in_array('dev',$version) || in_array('awstats',$options) || in_array('access-log',$options)) { ?> 
+    CustomLog <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/access.log combined
+<?php } ?>
+    ErrorLog <?php echo getenv('APPNAME_HOME') ?>/var/log/apache2/error.log
+
+    # on termine par la configuration spécifique à shibboleth
+    ShibConfig <?php echo getenv('APPNAME_HOME') ?>/etc/shibboleth/shibboleth2.xml
+    <Location <?php echo getenv('APPNAME_SHIBSP_PATH_TO_PROTECT'); ?>>
+        <?php if (getenv('APPNAME_SHIBSP_LAZY_SESSION') == 'yes') { ?>
+        # configuration lazy session
+        AuthType shibboleth
+        ShibRequestSetting requireSession 0
+        ShibRequestSetting applicationId default
+        Require shibboleth
+        <?php } else { // !LAZY_SESSION ?>
+        # configuration normale (potection systématique de l'URL)
+        AuthType shibboleth
+        ShibRequestSetting requireSession 1
+        ShibRequestSetting applicationId default
+        Require valid-user
+        <?php } // !LAZY_SESSION  ?>
+    </Location>
+    Alias /shibboleth-sp/ /usr/share/shibboleth/
+    <Directory /usr/share/shibboleth/>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride None
+        Order allow,deny
+        allow from all
+    </Directory>
+
+</VirtualHost>

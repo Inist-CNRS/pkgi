@@ -1,0 +1,4 @@
+<?php echo '#!/bin/bash'; ?> 
+
+# chargement du module apache shib2 obligatoire pour faire fonctionner le fournisseur de serveur shibboleth
+<?php echo getenv('APPNAME_HOME'); ?>/usr/sbin/a2enmod shib2

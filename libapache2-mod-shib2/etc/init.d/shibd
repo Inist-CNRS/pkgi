@@ -48,6 +48,9 @@ DAEMON_OPTS="$DAEMON_OPTS -p $PIDFILE"
 # Get the setting of VERBOSE and other rcS variables.
 [ -f /etc/default/rcS ] && . /etc/default/rcS
 
+# Load the pkgi profile
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+
 case "$1" in
 start)
     # Don't start shibd if NO_START is set.
