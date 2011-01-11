@@ -1,9 +1,12 @@
 <?php
 echo "#!/bin/bash\n";
 
+// on commence par réinitialiser les modules utilisés
+echo getenv('APPNAME_HOME').'/usr/sbin/a2dismod *'."\n";
+
+// on active tous les modules apache choisis par défaut
 $mods = explode(',', getenv('APPNAME_APACHE_MODS'));
 $mods = implode(' ', $mods);
-
 echo getenv('APPNAME_HOME').'/usr/sbin/a2enmod '.$mods."\n";
 
 // en dev on rajoute quelques modules
