@@ -13,7 +13,9 @@ foreach(glob(getenv('APPNAME_HOME').'/etc/apache2/mods-enabled/*') as $mod) {
         $mods[] = $mod;
     }
 }
-echo getenv('APPNAME_HOME').'/usr/sbin/a2dismod '.implode(' ', $mods)."\n";
+if (count($mods) > 0) {
+    echo getenv('APPNAME_HOME').'/usr/sbin/a2dismod '.implode(' ', $mods)."\n";
+}
 
 // on active tous les modules apache choisis par défaut
 $mods = explode(',', getenv('APPNAME_APACHE_MODS'));
