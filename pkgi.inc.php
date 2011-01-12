@@ -461,9 +461,15 @@ class Pkgi
     
         // construit une liste des variables d'env a tester
         foreach($this->MODULES as $m) {
+            // this first _build_env_to_check is used to get env variable names 
             $env_to_check = $this->_build_env_to_check(array($m));
-            foreach($env_to_check as $e => $e_option)
+            foreach(array_keys($env_to_check) as $e)
             {
+                // parse again the config.ini in order to interpret php code with
+                // latest environement variables values
+                $env_to_check = $this->_build_env_to_check(array($m));
+                $e_option = $env_to_check[$e];
+
                 $e_unnamed = 'APPNAME_'.$e;
                 $e         = $this->APPNAME.'_'.$e;
                 $v = isset($env[$e]) ? $env[$e] : NULL;
