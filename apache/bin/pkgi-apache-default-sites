@@ -1,18 +1,6 @@
 <?php
 echo "#!/bin/bash\n";
 
-// on commence par désactiver les sites activés
-$sites = array();
-foreach(glob(getenv('APPNAME_HOME').'/etc/apache2/sites-enabled/*') as $site) {
-    $site = basename($site);
-    if (!in_array($site, $sites)) {
-        $sites[] = $site;
-    }
-}
-if (count($sites) > 0) {
-    echo getenv('APPNAME_HOME').'/usr/sbin/a2dissite '.implode(' ', $sites)."\n";
-}
-
 // active le site par défaut
 echo getenv('APPNAME_HOME').'/usr/sbin/a2ensite default'."\n";
 
