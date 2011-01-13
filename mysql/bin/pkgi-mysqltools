@@ -47,14 +47,12 @@ case ${1} in
                 exit 1
             else
                 rm -f <?php echo getenv('APPNAME_HOME') ?>/etc/cron.d/mysql-backup
-                <?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-install-crontab
             fi
         else
             echo "<?php echo rand(0,59); ?> 3 * * * <?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-mysqlbackup" > <?php echo getenv('APPNAME_HOME') ?>/etc/cron.d/mysql-backup
             <?php pkgi_track_instance(getenv('APPNAME_HOME').'/etc/cron.d/mysql-backup'); ?> 
-            <?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-install-crontab
         fi
-    ;;    
+    ;;
 
     -i | -init | init)
         # Initialisation de la base avec creation et reglage de l'utilisateur de maintenance: debian-sys-maint
