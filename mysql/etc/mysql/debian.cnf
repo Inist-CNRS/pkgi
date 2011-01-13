@@ -13,7 +13,8 @@ if (file_exists($debian_cnf_file)) {
 }
 if (!$password_found) {
     // aucun mdp n'existait avant, on doit donc initialiser la base
-    // on positionne pour cela un fichier témoinsqui sera testé par le script postinst du module mysql
+    // on positionne pour cela un fichier témoin qui sera testé par le script postinst du module mysql
+    @mkdir(getenv('APPNAME_HOME').'/tmp');
     touch(getenv('APPNAME_HOME').'/tmp/mysql-init-flag');
 }
 
