@@ -196,7 +196,7 @@
             ssl="<?php echo getenv('APPNAME_HOME') ?>/etc/shibboleth/sslError.html"
             localLogout="<?php echo getenv('APPNAME_HOME') ?>/etc/shibboleth/localLogout.html"
             globalLogout="<?php echo getenv('APPNAME_HOME') ?>/etc/shibboleth/globalLogout.html"
-            supportContact="root@localhost"
+            supportContact="<?php echo getenv('APPNAME_ADMIN_MAIL') ?>"
             logoLocation="/shibboleth-sp/logo.jpg"
             styleSheet="/shibboleth-sp/main.css"/>
         
