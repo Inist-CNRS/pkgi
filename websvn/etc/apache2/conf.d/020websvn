@@ -1,0 +1,26 @@
+<?php if (getenv('APPNAME_WEBSVN_PATH') != '/') { ?>
+Alias <?php echo getenv('APPNAME_WEBSVN_PATH'); ?> /usr/share/websvn
+<?php } ?>
+
+<Directory /usr/share/websvn>
+    DirectoryIndex index.php
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    <IfModule mod_php4.c>
+        php_flag magic_quotes_gpc Off
+        php_flag track_vars On
+    </IfModule>
+</Directory>
+
+<Directory /usr/share/websvn>
+    # exemple d'authentification LDAP
+    #AuthType Basic
+    #AuthName "Authentification subversion"
+    #AuthBasicProvider ldap
+    #AuthLDAPBindDN cn=manager,dc=localhost 
+    #AuthLDAPBindPassword secret 
+    #AuthLDAPURL ldap://localhost:41415/dc=localhost?mail
+    #AuthzLDAPAuthoritative off
+    #Require valid-user
+</Directory>

@@ -1,0 +1,9 @@
+<?php
+
+$home = getenv(getenv('APPNAME').'_HOME');
+
+// réglage de l'include_path pour permettre la surcharge du fichier de conf
+$delim = PATH_SEPARATOR;
+$classpath = $home.'/usr/share/websvn'.$delim;
+$classpath .= ini_get('include_path');
+ini_set('include_path',$classpath);

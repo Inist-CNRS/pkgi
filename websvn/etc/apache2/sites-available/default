@@ -1,0 +1,20 @@
+<?php
+
+// Récupération de la configuration par défaut d'apache2
+// et remplace le DocumentRoot par celui de websvn uniquement si 
+// on souhaite placer websvn à la racine du virtualhost
+
+// Dans le cas où websvn n'est pas placé à la racine du virtualhost
+// la directive Alias est utilisée dans le fichier conf.d/020websvn
+
+ob_start();
+include dirname(__FILE__).'/../../../../apache/etc/apache2/sites-available/default';
+$content = ob_get_contents();
+ob_end_clean();
+
+if (getenv('APPNAME_WEBSVN_PATH') == '/') {
+    $DocumentRoot = '/usr/share/websvn';
+    echo preg_replace('/DocumentRoot .*/', 'DocumentRoot '.$DocumentRoot, $content);
+} else {
+    echo $content;
+}
