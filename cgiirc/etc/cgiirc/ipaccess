@@ -1,0 +1,8 @@
+# CGI:IRC ipaccess file. (For CGI:IRC versions from 0.5.3).
+#
+# Check /usr/share/doc/cgiirc/examples/ipaccess.example
+# for more details.
+#
+# Safe default configuration: Access only for localnet.
+#127.0.0.0/8
+*

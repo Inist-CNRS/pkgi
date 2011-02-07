@@ -1,0 +1,1 @@
+../../../../etc/phpldapadmin/config.php

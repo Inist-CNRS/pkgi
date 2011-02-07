@@ -1,0 +1,11 @@
+<?php
+// preparation des tableaux d'options
+$version = explode(',',getenv('APPNAME_VERSION'));
+$options = explode(',',getenv('APPNAME_APACHE_OPTIONS'));
+?>
+<IfModule mod_cgi.c>
+    ScriptAlias /cgi-bin/ <?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin/
+<?php if (in_array('dev',$version)) { ?>
+    ScriptLog   <?php echo getenv('APPNAME_HOME') ?>/var/log/cgi.error.log
+<?php } ?>
+</IfModule>

@@ -1,0 +1,26 @@
+#
+# Cette configuration autorise 1024 connexions simultanées
+#
+# Concretement cette configuration est capable de supporter le trafic généré par cette commande
+# siege http://xxx/phpinfo.php -t10s -c 1024 -b
+#
+
+# prefork MPM
+<IfModule mpm_prefork_module>
+    ServerLimit         1024
+    MinSpareServers        5
+    MaxSpareServers       10
+    MaxClients          1024
+    MaxRequestsPerChild 1000
+</IfModule>
+
+# worker MPM
+<IfModule mpm_worker_module>
+    ServerLimit           16
+    MinSpareThreads       25
+    MaxSpareThreads       75
+    ThreadsPerChild       64
+    MaxClients          1024
+    MaxRequestsPerChild 1000
+</IfModule>
+

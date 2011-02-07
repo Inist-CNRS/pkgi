@@ -1,0 +1,26 @@
+<?php
+
+// on commence par remplir la liste des modules disponible au niveau système
+$dir_src = '/etc/apache2/mods-available/';
+$dir_dst = getenv('APPNAME_HOME').'/etc/apache2/mods-available/';
+@mkdir($dir_dst);
+foreach( glob($dir_src.'*') as $f ) {
+    $f_dst = $dir_dst.basename($f);
+    @symlink($f, $f_dst);
+    pkgi_track_instance($f_dst);
+}
+
+// on termine en enregistrant dans pkgi les éventuels modules et sites activés
+// utile lorsque l'on fait un pkgi/build --reset pour ne rien oublier
+// remarque : il n'est pas très intelligent de traiter les sites ici car ce 
+//            fichier est sensé de s'occuper uniquement des modules apaches
+$dir_dst = getenv('APPNAME_HOME').'/etc/apache2/mods-enabled/';
+@mkdir($dir_dst);
+foreach( glob($dir_dst.'*') as $f ) {
+    pkgi_track_instance($f);
+}
+$dir_dst = getenv('APPNAME_HOME').'/etc/apache2/sites-enabled/';
+@mkdir($dir_dst);
+foreach( glob($dir_dst.'*') as $f ) {
+    pkgi_track_instance($f);
+}

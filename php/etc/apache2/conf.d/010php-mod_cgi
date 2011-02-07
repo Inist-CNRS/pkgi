@@ -1,0 +1,4 @@
+<IfModule mod_cgi.c>
+    AddType application/x-httpd-php    .php
+    Action  application/x-httpd-php    /cgi-bin/php-cgi
+</IfModule>

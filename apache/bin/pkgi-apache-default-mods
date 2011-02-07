@@ -1,0 +1,13 @@
+<?php
+echo "#!/bin/bash\n";
+
+// on active tous les modules apache choisis par défaut
+$mods = explode(',', getenv('APPNAME_APACHE_MODS'));
+$mods = implode(' ', $mods);
+echo getenv('APPNAME_HOME').'/usr/sbin/a2enmod '.$mods."\n";
+
+// en dev on rajoute quelques modules
+$versions = explode(',', getenv('APPNAME_VERSION'));
+if (in_array('dev', $versions)) {
+    echo getenv('APPNAME_HOME').'/usr/sbin/a2enmod status info'."\n";
+}

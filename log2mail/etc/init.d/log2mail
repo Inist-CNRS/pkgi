@@ -1,0 +1,113 @@
+#! /bin/sh
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          log2mail
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
+#
+# $Id: init.d,v 1.3 2001/02/09 15:13:54 pape Exp $
+
+PATH=/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/log2mail
+NAME=log2mail
+DESC=log2mail
+PIDFILE=<?php echo getenv('APPNAME_HOME') ?>/var/run/$NAME.pid
+
+test -f $DAEMON || exit 1
+
+set -e
+
+. /lib/lsb/init-functions
+
+pidof_log2mail_noexit() {
+    # if pidof is null for some reasons the script exits automagically
+    # classified as good/unknown feature
+    PIDS=`pidof $NAME` || true
+
+    [ -e $PIDFILE ] && PIDS2=`cat $PIDFILE`
+    
+    # if there is a pid we need to verify that belongs to apache2
+    # for real
+    for i in $PIDS; do
+        if [ "$i" = "$PIDS2" ]; then
+            # in this case the pid stored in the
+            # pidfile matches one of the pidof apache
+            # so a simple kill will make it
+            echo $i
+            return 0
+        fi
+    done
+    return 0
+}
+
+case "$1" in
+  start)
+        PID=$(pidof_log2mail_noexit)
+        if [ -n "$PID" ]; then
+            log_success_msg "$NAME is already running (pid $PID)"
+            exit 1
+        else
+            echo -n "Starting $DESC: "
+            start-stop-daemon --start --quiet \
+                --chuid <?php echo getenv('APPNAME_USER') ?>:<?php echo getenv('APPNAME_GROUP') ?> \
+                --exec $DAEMON -- -f <?php echo getenv('APPNAME_HOME') ?>/etc/log2mail/config
+            
+            # calculate the daemon PID
+            PID=`ps -ef | grep $DAEMON | grep -v grep | grep <?php echo getenv('APPNAME_HOME'); ?>/etc/log2mail | awk '{print $2}' | head -n1`
+            echo $PID > $PIDFILE
+            
+            echo "$NAME."
+        fi
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --stop --quiet --oknodo \
+		--exec $DAEMON
+	echo "$NAME."
+	;;
+  status)
+        PID=$(pidof_log2mail_noexit)
+        if [ -n "$PID" ]; then
+            log_success_msg "$NAME is running (pid $PID)"
+            exit 0
+        else
+            log_failure_msg "$NAME is not running"
+            exit 1
+        fi
+    ;;
+  #reload)
+	#
+	#	If the daemon can reload its config files on the fly
+	#	for example by sending it SIGHUP, do it here.
+	#
+	#	If the daemon responds to changes in its config file
+	#	directly anyway, make this a do-nothing entry.
+	#
+	# echo "Reloading $DESC configuration files."
+	# start-stop-daemon --stop --signal 1 --quiet --pidfile \
+	#	/var/run/$NAME.pid --exec $DAEMON
+  #;;
+  restart|reload|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: "
+	echo ""
+	$0 stop
+	$0 start
+	echo "done."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $N {start|stop|status|restart|reload|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

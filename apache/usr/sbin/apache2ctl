@@ -1,0 +1,3 @@
+<?php echo '#!/bin/bash'; ?>
+
+/usr/sbin/apache2ctl -f <?php echo getenv('APPNAME_HOME') ?>/etc/apache2/apache2.conf $*

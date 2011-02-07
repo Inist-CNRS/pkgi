@@ -1,0 +1,10 @@
+<?php echo '#!/bin/bash'; ?> 
+
+# chargement du module apache shib2 obligatoire pour faire fonctionner le fournisseur de serveur shibboleth
+<?php echo getenv('APPNAME_HOME'); ?>/usr/sbin/a2enmod shib2
+OK=$?
+
+# génération du certificat et de la clé si ce n'est déjà fait
+<?php echo getenv('APPNAME_HOME'); ?>/usr/sbin/shib-keygen 2>&1
+
+exit $OK

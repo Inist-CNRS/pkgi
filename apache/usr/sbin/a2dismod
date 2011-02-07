@@ -1,0 +1,5 @@
+<?php echo '#!/bin/bash'; ?>
+
+. <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+export APACHE_CONFDIR=<?php echo getenv('APPNAME_HOME') ?>/etc/apache2
+/usr/sbin/a2dismod $*

@@ -1,0 +1,81 @@
+<?php
+$optim = pkgi_optimization_profils();
+?>
+<IfModule mod_fcgid.c>
+    SharememPath          <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
+#    FcgidProcessTableFile <?php echo getenv('APPNAME_HOME') ?>/var/run/fcgid_shm
+    SocketPath  <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
+#    FcgidIPCDir <?php echo getenv('APPNAME_HOME') ?>/var/lib/apache2/fcgid/
+
+    # Limit max and min PHP FastCGI processes
+    # max = 20 means that you will not be able to handle more than 20 simultaneous connections
+#    FcgidMinProcessesPerClass   3
+    DefaultMinClassProcessCount 3
+<?php if (in_array('huge', $optim['apache'])) { ?>
+    # 128*7 = 896 php processes (896 simultaneous connections)
+    DefaultMaxClassProcessCount 128
+#    FcgidMaxProcessesPerClass   128
+    # Number of PHP thread parents
+#    FcgidInitialEnv PHP_FCGI_CHILDREN 7
+    DefaultInitEnv  PHP_FCGI_CHILDREN  7
+<?php } else if (in_array('big', $optim['apache'])) { ?>
+    # 4*30 = 120 php processes (120 simultaneous connections)
+    DefaultMaxClassProcessCount  30
+#    FcgidMaxProcessesPerClass   30
+    # Number of PHP thread parents
+#    FcgidInitialEnv PHP_FCGI_CHILDREN 4
+    DefaultInitEnv  PHP_FCGI_CHILDREN  4
+<?php } else { ?>
+    # 20 php processes (20 simultaneous connections)
+    DefaultMaxClassProcessCount 20
+#    FcgidMaxProcessesPerClass  20
+    # Number of PHP thread parents
+#    FcgidInitialEnv PHP_FCGI_CHILDREN 0
+    DefaultInitEnv  PHP_FCGI_CHILDREN  0
+<?php } ?>
+
+    # Maximum requests before a process is stopped and a new one is launched
+#    FcgidInitialEnv PHP_FCGI_MAX_REQUESTS 5000
+    DefaultInitEnv  PHP_FCGI_MAX_REQUESTS 5000
+
+    # If the size of the request body exceeds this amount, the request will fail with 500 Server Error.
+    # 1Go by default
+#    FcgidMaxRequestLen 1073741824
+    MaxRequestLen      1073741824
+
+    # Disable fcgid output buffering
+#    FcgidOutputBufferSize 0
+    OutputBufferSize      0
+
+    # Communication timeout: Default value is 40 seconds
+#    FcgidIOTimeout 60
+    IPCCommTimeout 60
+    
+    # Connection timeout: Default value is 3 seconds
+    #FcgidConnectTimeout 3
+    #IPCConnectTimeout   3
+   
+    # Allows HTTP auth data to be forwarded to PHP scripts
+    Passheader Authorization
+ 
+    # Define a new handler "php-fcgi" for ".php" files, plus the action that must follow
+    AddHandler php-fcgi .php
+    Action php-fcgi /fcgi-bin/php-fcgi-wrapper
+
+    # Define the MIME-Type for ".php" files
+    AddType application/x-httpd-php .php
+
+    # Define alias "/fcgi-bin/". The action above is using this value, which means that
+    # you could run another "php5-cgi" command by just changing this alias
+    Alias /fcgi-bin/ <?php echo getenv('APPNAME_HOME') ?>/usr/lib/fcgi-bin/
+
+    # Turn on the fcgid-script handler for all files within the alias "/fcgi-bin/"
+    <Location /fcgi-bin/>
+        Order Deny,Allow
+        Deny from All
+        Allow from env=REDIRECT_STATUS
+        SetHandler fcgid-script
+        Options +ExecCGI 
+    </Location>
+</IfModule>
+

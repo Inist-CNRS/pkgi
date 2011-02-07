@@ -1,0 +1,11 @@
+# /etc/default/shibd -- Defaults for the shibd init script.  -*- sh -*-
+#
+# This file is sourced by /etc/init.d/shibd and is used to configure the
+# behavior of the init script.  This file must follow standard POSIX shell
+# syntax.
+
+# To not start shibd at boot, uncomment this line.
+#NO_START=1
+
+# Replace options passed to shibd by the init script.
+#DAEMON_OPTS=""

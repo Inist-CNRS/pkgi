@@ -1,0 +1,7 @@
+# les images /usr/share/images sont utilisées par cgiirc
+<Directory "/usr/share/images">
+    Options -MultiViews +SymLinksIfOwnerMatch
+    Order allow,deny
+    Allow from all
+</Directory>
+Alias /images /usr/share/images

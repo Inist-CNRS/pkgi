@@ -1,0 +1,1 @@
+export PHPRC="<?php echo getenv('APPNAME_HOME') ?>/etc/php5/php.ini"
