@@ -1,8 +1,0 @@
-export PGVERSION=8.4 
-export PGDATA=<?php echo getenv('APPNAME_HOME') ?>/var/lib/postgresql/${PGVERSION}/main
-export PGPORT=<?php echo getenv('APPNAME_PG_LISTEN_PORT'); ?> 
-export PGHOST=<?php echo getenv('APPNAME_HOME') ?>/var/run/postgresql
-export PGDATABASE=<?php echo strtolower(getenv('APPNAME')); ?>
-
-export PG_CLUSTER_CONF_ROOT=<?php echo getenv('APPNAME_HOME') ?>/etc/postgresql
-export PGSYSCONFDIR=/etc/postgresql-common
