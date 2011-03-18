@@ -53,6 +53,11 @@ $gopear = str_replace('$alter_phpini = !stristr(fgets($tty, 1024), "n");','$alte
 $gopear = str_replace('if ($registry->packageExists($pkg) || $registry->packageExists($pkg_basename)) {',
                       '$options[\'force\'] = true; if (0) {', $gopear);
 
+// Corrige un bug de dépendance empêchant d'utiliser pkgi-install-pear sur debian lenny ou squeeze.
+// Le numéro 5.9 est  volontairement un numéro d'une version très lointaine de php permettant ainsi
+// d'utiliser ce script encore quelques temps sur les distributions dérivées de debian (ubuntu surtout)
+// Remarque : le numéro 5.3.3 aurait été suffisant pour une comptabilité uniquement avec debian squeeze.
+$gopear = str_replace('5.1.6', '5.9', $gopear);
 
 $gopear = '#/bin/sh
 export PHP="/usr/bin/php -d short_open_tag=0 "
