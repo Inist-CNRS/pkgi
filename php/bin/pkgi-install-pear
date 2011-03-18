@@ -1,0 +1,92 @@
+<?php
+// 
+// Ce script se charge de :
+// - telecharger le script go-pear sur http://pear.php.net/go-pear
+// - le modifier pour regler les bon chemins en fonction des variables d'environnement de l'applicatif
+// - retirer les questions inutiles
+// - rajouter du code pour transformer ce script en script sh 
+//   de facon a permettre le reglage du cache_dir car il semble impossible de le regler en amont
+// - afficher le resultat
+// Remarque : Ce script étant un tdemplate, lorsqu''il sera instancié, le code php généré sera
+//            en faite un script sh executable par l'utilisateur s''il desire installer pear
+//            dans son application
+//
+
+$ct_params = array();
+if ( getenv('http_proxy') !== FALSE || getenv('HTTP_PROXY') !== FALSE)
+{
+    $http_proxy = ( getenv('http_proxy') === FALSE ? getenv('HTTP_PROXY') : getenv('http_proxy') );
+    $http_proxy = str_replace('http://','',$http_proxy);
+    if (empty($http_proxy)) {
+        $ct_params['http'] = array( 'request_fulluri' => true, 'timeout' => 5 );
+    } else {
+        $ct_params['http'] = array( 'proxy' => 'tcp://'.$http_proxy, 'request_fulluri' => true, 'timeout' => 5 );
+    }
+}
+$ct = stream_context_create($ct_params);
+$gopear = file_get_contents("http://pear.php.net/go-pear", false, $ct);
+
+// reglages des chemins
+$gopear = str_replace('detect_install_dirs();','detect_install_dirs();
+$prefix       = "'.getenv('APPNAME_HOME').'/usr";
+$temp_dir     = "'.getenv('APPNAME_HOME').'/tmp/pear/temp";
+$php_dir      = "'.getenv('APPNAME_HOME').'/usr/share/php/pear";
+$cache_dir    = "'.getenv('APPNAME_HOME').'/tmp/pear/cache";
+$test_dir     = "'.getenv('APPNAME_HOME').'/usr/share/php/pear/tests";
+$doc_dir      = "'.getenv('APPNAME_HOME').'/usr/share/php/pear/docs";
+$download_dir = "'.getenv('APPNAME_HOME').'/tmp/pear/download";
+$data_dir     = "'.getenv('APPNAME_HOME').'/usr/share/php/pear/data";
+
+',$gopear);
+$gopear = str_replace('PEAR_Config::singleton()',
+                      'PEAR_Config::singleton(\''.getenv('APPNAME_HOME').'/usr/etc/pear.conf'.'\')',
+                      $gopear);
+
+// repond automatiquement aux questions et retire les "press Enter to continue"
+$gopear = str_replace('fgets($tty, 1024);','',$gopear);
+$gopear = str_replace('trim(fgets($tty, 1024));','"";',$gopear);
+$gopear = str_replace('$install_pfc = !stristr(fgets($tty, 1024), "n");','$install_pfc = !stristr("Y", "n");',$gopear);
+$gopear = str_replace('$alter_phpini = !stristr(fgets($tty, 1024), "n");','$alter_phpini = !stristr("n", "n");',$gopear);
+
+// force l'installation des packages de pear 
+// (ceci permet de remettre d'aplomb un pear bancale sans provoquer d'erreur)
+$gopear = str_replace('if ($registry->packageExists($pkg) || $registry->packageExists($pkg_basename)) {',
+                      '$options[\'force\'] = true; if (0) {', $gopear);
+
+// Corrige un bug de dépendance empêchant d'utiliser pkgi-install-pear sur debian lenny ou squeeze.
+// Le numéro 5.9 est  volontairement un numéro d'une version très lointaine de php permettant ainsi
+// d'utiliser ce script encore quelques temps sur les distributions dérivées de debian (ubuntu surtout)
+// Remarque : le numéro 5.3.3 aurait été suffisant pour une comptabilité uniquement avec debian squeeze.
+$gopear = str_replace('5.1.6', '5.9', $gopear);
+
+$gopear = '#/bin/sh
+export PHP="/usr/bin/php -d short_open_tag=0 "
+export PHPRC='.getenv('APPNAME_HOME').'/etc/php5
+FILE=`basename "$0"`
+DIR=`dirname "$0"`
+cd "$DIR"
+$PHP -C -q -d output_buffering=1 "$FILE" $@
+mkdir -p '.getenv('APPNAME_HOME').'/tmp/pear/cache
+$PHP -r \'$f="'.getenv('APPNAME_HOME').'/usr/bin/pear"; file_put_contents($f,str_replace("pearcmd.php \\"$@\\"","pearcmd.php -c '.getenv('APPNAME_HOME').'/usr/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
+$PHP -r \'$f="'.getenv('APPNAME_HOME').'/usr/bin/peardev"; file_put_contents($f,str_replace("pearcmd.php \\"$@\\"","pearcmd.php -c '.getenv('APPNAME_HOME').'/usr/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
+$PHP -r \'$f="'.getenv('APPNAME_HOME').'/usr/bin/pecl"; file_put_contents($f,str_replace("peclcmd.php \\"$@\\"","peclcmd.php -c '.getenv('APPNAME_HOME').'/usr/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
+$PHP -r \'$f="'.getenv('APPNAME_HOME').'/usr/bin/pecl"; $a=file($f); $last=$a[count($a)-1]; unset($a[count($a)-1]); $a[]="'.getenv('APPNAME_HOME').'/usr/bin/pear config-set php_ini \\"\\"\\n"; $a[]=$last; $a[]="'.getenv('APPNAME_HOME').'/usr/bin/pear config-set php_ini '.getenv('APPNAME_HOME').'/etc/php5/php.ini\\n"; file_put_contents($f,implode("",$a));\'
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-set cache_dir '.getenv('APPNAME_HOME').'/tmp/pear/cache
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-set cfg_dir '.getenv('APPNAME_HOME').'/usr/share/php/pear/cfg
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-set ext_dir '.getenv('APPNAME_HOME').'/usr/lib/php5/extensions
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-set php_prefix '.getenv('APPNAME_HOME').'/usr/bin/
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-set php_ini '.getenv('APPNAME_HOME').'/etc/php5/php.ini
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-set www_dir '.getenv('APPNAME_HOME').'/var/www
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-set auto_discover 1
+'.getenv('APPNAME_HOME').'/usr/bin/pear channel-discover pear.pxxo.net
+'.getenv('APPNAME_HOME').'/usr/bin/pear config-show
+exit
+<?php
+ob_end_clean();
+set_time_limit(0);
+ob_implicit_flush(true);
+?>'.$gopear;
+
+echo $gopear;
+
+?>
