@@ -2,3 +2,7 @@
     AddType application/x-httpd-php    .php
     Action  application/x-httpd-php    /cgi-bin/php-cgi
 </IfModule>
+<IfModule mod_cgid.c>
+    AddType application/x-httpd-php    .php
+    Action  application/x-httpd-php    /cgi-bin/php-cgi
+</IfModule>

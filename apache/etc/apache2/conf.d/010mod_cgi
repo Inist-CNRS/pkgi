@@ -9,3 +9,10 @@ $options = explode(',',getenv('APPNAME_APACHE_OPTIONS'));
     ScriptLog   <?php echo getenv('APPNAME_HOME') ?>/var/log/cgi.error.log
 <?php } ?>
 </IfModule>
+
+<IfModule mod_cgid.c>
+    ScriptAlias /cgi-bin/ <?php echo getenv('APPNAME_HOME') ?>/usr/lib/cgi-bin/
+<?php if (in_array('dev',$version)) { ?>
+    ScriptLog   <?php echo getenv('APPNAME_HOME') ?>/var/log/cgi.error.log
+<?php } ?>
+</IfModule>

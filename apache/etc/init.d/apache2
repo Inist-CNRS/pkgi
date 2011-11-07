@@ -17,7 +17,36 @@ $version = explode(',',getenv('APPNAME_VERSION'));
 $options = explode(',',getenv('APPNAME_APACHE_OPTIONS'));
 ?>
 
+set -e
+
+SCRIPTNAME="${0##*/}"
+SCRIPTNAME="${SCRIPTNAME##[KS][0-9][0-9]}"
+if [ -n "$APACHE_CONFDIR" ] ; then
+        if [ "${APACHE_CONFDIR##<?php echo getenv('APPNAME_HOME') ?>/etc/apache2-}" != "${APACHE_CONFDIR}" ] ; then
+                DIR_SUFFIX="${APACHE_CONFDIR##<?php echo getenv('APPNAME_HOME') ?>/etc/apache2-}"
+        else
+                DIR_SUFFIX=
+        fi
+elif [ "${SCRIPTNAME##apache2-}" != "$SCRIPTNAME" ] ; then
+        DIR_SUFFIX="-${SCRIPTNAME##apache2-}"
+        APACHE_CONFDIR=<?php echo getenv('APPNAME_HOME') ?>/etc/apache2$DIR_SUFFIX
+else
+        DIR_SUFFIX=
+        APACHE_CONFDIR=<?php echo getenv('APPNAME_HOME') ?>/etc/apache2
+fi
+if [ -z "$APACHE_ENVVARS" ] ; then
+        APACHE_ENVVARS=$APACHE_CONFDIR/envvars
+fi
+export APACHE_CONFDIR APACHE_ENVVARS
+
 ENV="env -i LANG=C PATH=/usr/local/bin:/usr/bin:/bin"
+if [ "$APACHE_CONFDIR" != <?php echo getenv('APPNAME_HOME') ?>/etc/apache2 ] ; then
+        ENV="$ENV APACHE_CONFDIR=$APACHE_CONFDIR"
+fi
+if [ "$APACHE_ENVVARS" != "$APACHE_CONFDIR/envvars" ] ; then
+        ENV="$ENV APACHE_ENVVARS=$APACHE_ENVVARS"
+fi
+
 
 #[ `ls -1 /etc/apache2/sites-enabled/ | wc -l | sed -e 's/ *//;'` -eq 0 ] && \
 #echo "You haven't enabled any sites yet, so I'm not starting apache2." && \
@@ -31,7 +60,6 @@ HTCACHECLEAN_DAEMON_INTERVAL=120
 HTCACHECLEAN_PATH=<?php echo getenv('APPNAME_HOME') ?>/var/cache/apache2/mod_disk_cache
 HTCACHECLEAN_OPTIONS=""
 
-set -e
 if [ -x /usr/sbin/apache2 ] ; then
 	HAVE_APACHE2=1
 else
@@ -46,6 +74,8 @@ test -f <?php echo getenv('APPNAME_HOME') ?>/etc/default/apache2 && . <?php echo
 
 # Load the pkgi profile
 test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+
+. $APACHE_ENVVARS
 
 APACHE2CTL="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/apache2ctl"
 HTCACHECLEAN="/usr/sbin/htcacheclean"
