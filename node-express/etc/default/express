@@ -1,0 +1,11 @@
+<?php
+// preparation des tableaux d'options
+$version = explode(',',getenv('APPNAME_VERSION'));
+?>
+
+## to determine some behaviors related to caching 
+<?php if (in_array('dev',$version)) { ?> 
+NODE_ENV=development
+<?php } else { ?>  
+NODE_ENV=production
+<?php } ?> 
