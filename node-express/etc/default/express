@@ -9,3 +9,5 @@ NODE_ENV=development
 <?php } else { ?>  
 NODE_ENV=production
 <?php } ?> 
+export NODE_ENV
+
