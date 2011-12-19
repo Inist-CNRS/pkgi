@@ -829,7 +829,7 @@ function pkgi_ls($dir, $mask /*.php$|.txt$*/)
     while ($file = readdir($d))
     {
         if ($file == '.' || $file == '..' ||
-            $file == 'CVS' || $file == '.svn' || $file == '.git' || $file == '.dummy' || preg_match('/~$/',$file) ||
+            $file == 'CVS' || $file == '.svn' || $file == '.git' || $file == '.gitignore' || $file == '.dummy' || preg_match('/~$/',$file) ||
             !preg_match($mask, $file)) continue;
         $empty = false;
         if (is_dir($dir.'/'.$file) && !is_link($dir.'/'.$file))
