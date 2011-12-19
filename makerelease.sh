@@ -12,6 +12,10 @@ if [ "`git tag -l | grep $VERSION`" != "" ] ; then
   exit 2
 fi
 
+echo $VERSION > version
+git commit -m "Version $VERSION" ./version
+git push
+
 git tag -d latest
 git push origin :latest
 git tag -a -m "Version $VERSION" latest
