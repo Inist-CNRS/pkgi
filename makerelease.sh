@@ -7,7 +7,7 @@ fi
 VERSION=$1
 
 git pull --tags
-if [ "`git tag -l | grep $VERSION`" != 0 ] ; then
+if [ "`git tag -l | grep $VERSION`" != "" ] ; then
   echo "Warning: version $VERISON already exists. Aborting ..."
   exit 2
 fi
