@@ -1,0 +1,1 @@
+../../var/lib/dokuwiki/acl/acl.auth.php

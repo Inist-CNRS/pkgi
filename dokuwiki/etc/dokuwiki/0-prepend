@@ -5,22 +5,3 @@ if (!file_exists($f)) {
   $content = file_get_contents(dirname(__FILE__).'/local.php.dist');
   file_put_contents($f, $content);
 }
-
-$f = getenv('APPNAME_HOME').'/etc/dokuwiki/users.auth.php';
-if (!file_exists($f)) {
-  $content = file_get_contents(dirname(__FILE__).'/users.auth.php.dist');
-
-  $content .= "\n".join(":", array(
-    getenv('APPNAME_DOKUWIKI_LOGIN'),
-    md5(getenv('APPNAME_DOKUWIKI_PASSWORD')),
-    'Administrateur',
-    getenv('APPNAME_ADMIN_MAIL'),
-    'admin,user'));
-
-  file_put_contents($f, $content);
-}
-
-$f = getenv('APPNAME_HOME').'/etc/dokuwiki/acl.auth.php';
-if (!file_exists($f)) {
-  file_put_contents($f, file_get_contents(dirname(__FILE__).'/acl.auth.php.dist'));
-}
