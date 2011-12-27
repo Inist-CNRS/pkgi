@@ -42,6 +42,19 @@ $gopear = str_replace('PEAR_Config::singleton()',
                       'PEAR_Config::singleton(\''.getenv('APPNAME_HOME').'/usr/etc/pear.conf'.'\')',
                       $gopear);
 
+// corrige les mauvaises URLs
+$gopear = str_replace('http://svn.php.net/viewvc/pear/pear-core/branches/PEAR_1_4/PEAR.php?view=co',
+                      'http://svn.php.net/viewvc/pear/pear-core/branches/PEAR_1_4/PEAR.php?revision=208656&view=co&pathrev=319707',
+                      $gopear);
+$gopear = str_replace('http://svn.php.net/viewvc/pear/pear-core/branches/PEAR_1_4/Console/Getopt.php?view=co',
+                      'http://svn.php.net/viewvc/pear/pear-core/branches/PEAR_1_4/Console/Getopt.php?revision=208656&view=co&pathrev=319707',
+                      $gopear);
+
+// ajout de la dépendance a XML_Utils
+$gopear = str_replace("    'Structures_Graph'",
+                      " 'Structures_Graph', 'XML_Utils'",
+                      $gopear);
+                      
 // repond automatiquement aux questions et retire les "press Enter to continue"
 $gopear = str_replace('fgets($tty, 1024);','',$gopear);
 $gopear = str_replace('trim(fgets($tty, 1024));','"";',$gopear);
@@ -65,7 +78,7 @@ export PHPRC='.getenv('APPNAME_HOME').'/etc/php5
 FILE=`basename "$0"`
 DIR=`dirname "$0"`
 cd "$DIR"
-$PHP -C -q -d output_buffering=1 "$FILE" $@
+$PHP -C -q -d output_buffering=1 -d display_errors=0 "$FILE" $@
 mkdir -p '.getenv('APPNAME_HOME').'/tmp/pear/cache
 $PHP -r \'$f="'.getenv('APPNAME_HOME').'/usr/bin/pear"; file_put_contents($f,str_replace("pearcmd.php \\"$@\\"","pearcmd.php -c '.getenv('APPNAME_HOME').'/usr/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
 $PHP -r \'$f="'.getenv('APPNAME_HOME').'/usr/bin/peardev"; file_put_contents($f,str_replace("pearcmd.php \\"$@\\"","pearcmd.php -c '.getenv('APPNAME_HOME').'/usr/etc/pear.conf \\"$@\\"",file_get_contents($f)));\'
