@@ -50,10 +50,13 @@ $gopear = str_replace('http://svn.php.net/viewvc/pear/pear-core/branches/PEAR_1_
                       'http://svn.php.net/viewvc/pear/pear-core/branches/PEAR_1_4/Console/Getopt.php?revision=208656&view=co&pathrev=319707',
                       $gopear);
 
-// ajout de la dépendance a XML_Utils
+// ajout de la dépendance a XML_Utils 
+// (je commente car ne fonctionne pas sur debian lenny et ce n'est pas bloquant)
+/*
 $gopear = str_replace("    'Structures_Graph'",
                       " 'Structures_Graph', 'XML_Utils'",
                       $gopear);
+*/
                       
 // repond automatiquement aux questions et retire les "press Enter to continue"
 $gopear = str_replace('fgets($tty, 1024);','',$gopear);
