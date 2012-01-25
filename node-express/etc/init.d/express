@@ -143,10 +143,21 @@ running() {
 	return $status
 }
 
+showurl() {
+    HOST=`hostname --fqdn`
+    PORT=`grep "^app.listen" <?php echo getenv('APPNAME_HOME'); ?>/var/express/app.js | sed "s/[^0-9]//g"`
+    echo -n " [ http://"
+    echo -n $HOST
+    echo -n ":"
+    echo -n $PORT
+    echo -n " ]"
+}
+
 case "$1" in
 	start)
 		[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
 		do_start
+		showurl
 		case "$?" in
 			0|1) 
 				log_end_msg 0 
@@ -173,6 +184,7 @@ case "$1" in
 		case "$?" in
 			0) 
 				[ "$VERBOSE" != no ] && log_daemon_msg "$NAME" "is running" 
+                showurl
 				log_end_msg 0 
 				;;
 			4) 
