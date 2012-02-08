@@ -1,4 +1,4 @@
-<?php echo getenv('APPNAME_HOME') ?>/var/log/php.error.log {
+<?php echo getenv('APPNAME_HOME') ?>/var/log/php.error.log <?php echo getenv('APPNAME_HOME') ?>/var/log/php-suhosin.error.log {
 	weekly
 	missingok
 	rotate 52
