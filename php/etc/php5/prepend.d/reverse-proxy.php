@@ -1,4 +1,5 @@
-<?php echo '<?php'; ?>
+<?php echo '<?php'; ?> 
+
 <?php if (getenv('APPNAME_APACHE_BEHIND_REVERSE_PROXY') == 'yes') { ?>
 
 // this code make reverse proxy transparent for the hosted PHP application
