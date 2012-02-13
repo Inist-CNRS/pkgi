@@ -1,0 +1,1 @@
+../../../etc/phpmyadmin/config.inc.php
