@@ -106,6 +106,11 @@ EOF
             <?php echo getenv('APPNAME_HOME') ?>/bin/<?php echo basename(__FILE__); ?> init  2>&1
             rm -f <?php echo getenv('APPNAME_HOME') ?>/tmp/mysql-init-flag
         fi
+        <?php if (strtolower(trim(getenv('APPNAME_MYSQL_AUTOBACKUP'))) == 'yes') { ?>
+        <?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-mysqltools -backup-cron install
+        <?php } else { ?>
+        <?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-mysqltools -backup-cron uninstall
+        <?php } ?>
     ;;
 
     -rp | -rootpassword | rootpassword)
