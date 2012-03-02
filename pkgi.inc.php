@@ -131,6 +131,13 @@ class Pkgi
                 $this->MODULES_LIST[] = $file;
         }
         closedir($d);
+        
+        // load extra modules (../pkgi.*)
+        foreach(glob($dir.'/../pkgi.*') as $extramodule) {
+            if (is_dir($extramodule)) {
+                $this->MODULES_LIST[] = preg_replace('/^pkgi\./', '', basename($extramodule));
+            }
+        }
     }
   
     function choose_modules(&$env)
@@ -184,14 +191,24 @@ class Pkgi
     {
         $this->hook_generic('preinst');
     }
-
+    
+    private function calculate_module_path($m)
+    {
+        $paths = array(dirname(__FILE__).'/'.$m,  dirname(__FILE__).'/../pkgi.'.$m);
+        foreach($paths as $path) {
+            if (is_dir($path)) {
+                return $path;
+            }
+        }
+    }
+    
     private function hook_generic($name)
     {
         // construit une liste des scripts de hook a exécuter ensuite
         $scripts = array();
         foreach($this->MODULES as $m)
         {
-            $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+            $ini_path = $this->calculate_module_path($m).'/config.ini';
             if (!file_exists($ini_path)) continue;
 
             // execute les balises php eventuelles contenues dans config.ini
@@ -393,7 +410,7 @@ class Pkgi
         }
         foreach($modules as $m)
         {
-            $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+            $ini_path = $this->calculate_module_path($m).'/config.ini';
             if (!file_exists($ini_path)) continue;
 
             // execute les balises php eventuelles contenues dans config.ini
@@ -424,7 +441,7 @@ class Pkgi
         $dep = array();
         foreach($this->MODULES as $m)
         {
-            $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+            $ini_path = $this->calculate_module_path($m).'/config.ini';
             if (!file_exists($ini_path)) continue;
 
             // execute les balises php eventuelles contenues dans config.ini
@@ -543,7 +560,7 @@ class Pkgi
         $dreload_list  = array();
         foreach($this->MODULES as $m)
         {
-            $ini_path = dirname(__FILE__).'/'.$m.'/config.ini';
+            $ini_path = $this->calculate_module_path($m).'/config.ini';
             if (!file_exists($ini_path)) continue;
             $ini_data = parse_ini_file($ini_path);
             if (isset($ini_data['start-daemon']) && $ini_data['start-daemon'] != '')
@@ -579,11 +596,11 @@ class Pkgi
         $ret = array();
         foreach($this->MODULES as $m)
         {
-            $list[$m] = array_values(pkgi_ls($this->tpl_path.'/'.$m,"//i"));
+            $list[$m] = array_values(pkgi_ls($this->calculate_module_path($m),"//i"));
             $n = 0;
             foreach( $list[$m] as $l)
             {
-                $list[$m][$n] = str_replace($this->tpl_path.'/'.$m.'/', '', $list[$m][$n]);
+                $list[$m][$n] = str_replace($this->calculate_module_path($m).'/', '', $list[$m][$n]);
                 if (is_file($l))
                     if ( dirname($l) == $this->tpl_path )
                         unset($list[$m][$n]);
@@ -660,7 +677,7 @@ class Pkgi
             {
                 if ($t == 'pkgi.env') continue; // special case for this file, do not touch it ! 
 
-                $t_src     = $this->tpl_path.'/'.$m.'/'.$t;
+                $t_src     = $this->calculate_module_path($m).'/'.$t;
                 $t_dst     = $this->dst_path.'/'.$t;
                 $t_dst_md5 = $this->dst_path.'/.pkgi/lastmd5/'.$t;
 
@@ -717,8 +734,8 @@ class Pkgi
     {
         $modules_to_remove = array_diff($this->MODULES_LIST, $this->MODULES);
         foreach($modules_to_remove as $m) {
-            if (is_dir($this->tpl_path.'/'.$m)) {
-                $dir = $this->tpl_path.'/'.$m;
+            if (is_dir($this->calculate_module_path($m))) {
+                $dir = $this->calculate_module_path($m);
                 $this->pkgi_log("Suppression de ".$dir."\n");
                 pkgi_rmdir($dir, true);
             }
