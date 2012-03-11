@@ -83,11 +83,13 @@ do_start()
 {
 	# Return
 	#   0 if daemon has been started
-	#   1 if daemon was already running
+	#   1 if daemon was already running 
 	#   2 if daemon could not be started
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
+	! running \
 		|| return 1
-	start-stop-daemon --start --quiet --make-pidfile --pidfile $PIDFILE --background --exec $DAEMON -- \
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
+		|| return 2
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --background --exec $DAEMON -- \
 		$DAEMON_ARGS \
 		|| return 2
 	[ -n "$STARTTIME" ] && sleep $STARTTIME 
@@ -157,9 +159,9 @@ case "$1" in
 	start)
 		[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
 		do_start
-		showurl
 		case "$?" in
 			0|1) 
+				showurl
 				log_end_msg 0 
 				;;
 			2)
@@ -241,4 +243,3 @@ case "$1" in
 		exit 3
 		;;
 esac
-
