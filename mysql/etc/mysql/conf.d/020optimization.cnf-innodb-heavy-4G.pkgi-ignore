@@ -1,3 +1,4 @@
+<?php $nb_cpu = `cat /proc/cpuinfo | grep processor | wc -l`; ?>
 #BEGIN CONFIG INFO
 #DESCR: 4GB RAM, InnoDB only, ACID, few connections, heavy queries
 #TYPE: SYSTEM
@@ -108,7 +109,7 @@ thread_cache_size = 8
 # value only makes sense on systems that support the thread_concurrency()
 # function call (Sun Solaris, for example).
 # You should try [number of CPUs]*(2..4) for thread_concurrency
-thread_concurrency = 8
+thread_concurrency = <?php echo $nb_cpu*2; ?> 
 
 # Query cache is used to cache SELECT results and later return them
 # without actual executing the same query once again. Having the query
