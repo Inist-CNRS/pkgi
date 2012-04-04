@@ -1,0 +1,4 @@
+<?php echo '#!/bin/bash'; ?> 
+
+echo "$@"
+/usr/sbin/monit "$@"
