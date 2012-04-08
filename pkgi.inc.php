@@ -426,11 +426,11 @@ class Pkgi
                     $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-desc'][$i];
                     $env_to_check[$ini_data['env'][$i]][] = $ini_data['env-choix'][$i] != '' ? explode(',',$ini_data['env-choix'][$i]) : array();
                     $env_to_check[$ini_data['env'][$i]][] = isset($ini_data['env-default'][$i]) ? $ini_data['env-default'][$i] : '';
+                    $env_to_check[$ini_data['env'][$i]][] = isset($ini_data['env-format'][$i]) ? $ini_data['env-format'][$i] : '';
                 }
             }
             unlink($ini_path);
         }
-
         return $env_to_check;
     }
 
@@ -501,8 +501,26 @@ class Pkgi
                             $this->pkgi_log("Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n");
                         $v_default = $e_option[2] != '' ? "[defaut=".$e_option[2]."] " : '';
                         $prompt = "La variable $e est indefinie, entrez sa valeur ".$v_default.": ";
-                        $v = readline($prompt);
-                        if ($v == '') $v = $e_option[2]; // si on a rien repondu, on prend la valeur par defaut
+
+                        // load the "format" function from config.ini
+                        // (used to be sure the variables is well formatted)
+                        $format_func_path = tempnam(dirname(__FILE__), 'pkgi_check_func');
+                        $format_func_name = uniqid('format_func');
+                        $format_func = '<?php function '.$format_func_name.'($var) { '.$e_option[3].' };';
+                        file_put_contents($format_func_path, $format_func);
+                        include($format_func_path);
+                        unlink($format_func_path);
+
+                        // loop while wrong choice (only if possible values are given)
+                        $wrong_choice = false;
+                        do {
+                            if ($wrong_choice) {
+                                $this->pkgi_log("Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n");
+                            }
+                            $v = readline($prompt);            // ask user
+                            $v = $format_func_name($v);        // format response value
+                        } while(count($e_option[1]) > 0 && !in_array($v, $e_option[1]) && $wrong_choice = true);
+                        $v = $v == '' ? $e_option[2] : $v; // take default value if nothing has been answered
                     }
                     $env[$e] = $v;
                     putenv("$e=$v");
