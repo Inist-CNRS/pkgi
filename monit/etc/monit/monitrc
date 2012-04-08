@@ -28,14 +28,14 @@ set daemon <?php  echo getenv('APPNAME_MONIT_DAEMON_INTERVAL') ?>
 ## omitted, Monit will use 'user' facility by default. If you want to log to 
 ## a standalone log file instead, specify the full path to the log file
 #
-set logfile <?php $var = getenv('APPNAME_HOME') ; echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>var/log/monit.log
+set logfile <?php echo getenv('APPNAME_HOME'); ?>/var/log/monit.log
 #
 #
 ### Set the location of the Monit id file which stores the unique id for the
 ### Monit instance. The id is generated and stored on first Monit start. By 
 ### default the file is placed in $HOME/.monit.id.
 #
-set idfile <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var)  ?>var/.monit.id
+set idfile <?php echo getenv('APPNAME_HOME'); ?>/var/.monit.id
 #
 ### Set the location of the Monit state file which saves monitoring states
 ### on each cycle. By default the file is placed in $HOME/.monit.state. If
@@ -43,7 +43,7 @@ set idfile <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"
 ### the monitoring state across reboots. If it is on temporary filesystem, the
 ### state will be lost on reboot which may be convenient in some situations.
 #
-set statefile <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>var/.monit.state
+set statefile <?php echo getenv('APPNAME_HOME'); ?>/var/.monit.state
 #
 ## Set the list of mail servers for alert delivery. Multiple servers may be 
 ## specified using a comma separator. By default Monit uses port 25 - it is
@@ -64,7 +64,7 @@ set mailserver localhost
 ## available in the back end filesystem).
 #
 set eventqueue
-     basedir <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var)?>var/monit  # set the base directory where events will be stored
+     basedir <?php echo getenv('APPNAME_HOME'); ?>/var/monit  # set the base directory where events will be stored
 #     slots 100           # optionally limit the queue size
 #
 #
@@ -243,5 +243,5 @@ set httpd port <?php echo getenv('APPNAME_MONIT_HTTPD_PORT')?> and
 ## directories.
 #
 
-include <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>etc/monit/conf.d/*
+include <?php echo getenv('APPNAME_HOME'); ?>/etc/monit/conf.d/*
 

@@ -12,20 +12,20 @@
 # Stefan Alfredsson, alfs@debian.org
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=<?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>usr/sbin/monit
-CONFIG=<?php $var = getenv('APPNAME_HOME'); echo "\"".(strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>etc/monit/monitrc"
-DELAY=<?php $var = getenv('APPNAME_HOME'); echo "\"".(strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>etc/monit/monit_delay"
+DAEMON=<?php echo getenv('APPNAME_HOME'); ?>/usr/sbin/monit
+CONFIG=<?php echo getenv('APPNAME_HOME'); ?>/etc/monit/monitrc
+DELAY=<?php echo getenv('APPNAME_HOME'); ?>/etc/monit/monit_delay
 NAME=monit
 DESC="daemon monitor"
 
 # Check if DAEMON binary exist
 test -f $DAEMON || exit 0
 
-if [ -f <?php  $var = getenv('APPNAME_HOME'); echo "\"".(strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>etc/default/monit" ]; then
-     . <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>etc/default/monit
+if [ -f <?php echo getenv('APPNAME_HOME'); ?>/etc/default/monit ]; then
+     . <?php echo getenv('APPNAME_HOME'); ?>/etc/default/monit
 fi
 
-ARGS="-c $CONFIG -s <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var)."var/lib/monit/monit.state"?> -p <?php $var = getenv('APPNAME_HOME'); echo  (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>var/run/monit.pid"
+ARGS="-c $CONFIG -s <?php echo getenv('APPNAME_HOME'); ?>/var/lib/monit/monit.state -p <?php echo getenv('APPNAME_HOME'); ?>/var/run/monit.pid"
 
 monit_not_configured () {
     printf "%b\n" "monit won't be started/stopped\n\tunless it it's configured"
@@ -59,8 +59,7 @@ monit_delayed_monitoring () {
     if [ -x $DELAY ]; then
       $DELAY &
     elif [ -f $DELAY ]; then
-      echo
-      echo "[WARNING] A delayed start file exists ($DELAY) but it is not executable."
+        echo "[WARNING] A delayed start file exists ($DELAY) but it is not executable."
     fi
 }
 
@@ -92,7 +91,7 @@ case "$1" in
 	echo -n "Starting $DESC: "
     monit_checks $1
 	echo -n "$NAME"
-	start-stop-daemon --start --quiet --pidfile  <?php $var = getenv('APPNAME_HOME'); echo  (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>var/run/$NAME.pid \
+	start-stop-daemon --start --quiet --pidfile <?php echo getenv('APPNAME_HOME'); ?>/var/run/$NAME.pid \
 		--exec $DAEMON > /dev/null 2>&1 -- $ARGS
    monit_delayed_monitoring
 	echo "."
@@ -101,9 +100,9 @@ case "$1" in
 	echo -n "Stopping $DESC: "
     #monit_checks $1
 	echo -n "$NAME"
-	#start-stop-daemon --retry 5 --oknodo --stop --quiet --pidfile  <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>var/run/$NAME.pid \
+	#start-stop-daemon --retry 5 --oknodo --stop --quiet --pidfile <?php echo getenv('APPNAME_HOME'); ?>/var/run/$NAME.pid \
 	#	--exec $DAEMON  > /dev/null 2>&1
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"),"/") ? $var."/" : $var) ?>var/run/$NAME.pid
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile <?php echo getenv('APPNAME_HOME'); ?>/var/run/$NAME.pid
 	echo "."
 	;;
   restart|force-reload)
