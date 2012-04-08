@@ -583,6 +583,12 @@ class Pkgi
         {
             $ini_path = $this->calculate_module_path($m).'/config.ini';
             if (!file_exists($ini_path)) continue;
+            
+            // execute les balises php eventuelles contenues dans config.ini
+            $output = shell_exec($this->php_path.' '.$ini_path);
+            $ini_path = dirname(__FILE__).'/config.ini.tmp';
+            file_put_contents($ini_path,$output);
+            
             $ini_data = parse_ini_file($ini_path);
             if (isset($ini_data['start-daemon']) && $ini_data['start-daemon'] != '')
                 $dstart_list[$m] = $ini_data['start-daemon'];
