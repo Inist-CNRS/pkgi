@@ -3,11 +3,16 @@
 $dir_src  = trim(ini_get('extension_dir'))."/";
 $dir_dst = getenv('APPNAME_HOME').'/usr/lib/php5/extensions/';
 
-var_dump($dir_src, $dir_dst);
-foreach( glob($dir_src.'*') as $f ) {
-    if (file_exists($dir_dst.basename($f)) && is_link($dir_dst.basename($f))) {
-        unlink($dir_dst.basename($f));
+// nettoyage des vieux liens symboliques
+foreach( glob($dir_dst.'*') as $f ) {
+    $f = $dir_dst.basename($f);
+    if (is_link($f) || filesize($f) == 0) {
+        unlink($f);
     }
+}
+
+// création des liens symboliques
+foreach( glob($dir_src.'*') as $f ) {
     symlink($f, $dir_dst.basename($f));
     pkgi_track_instance($dir_dst.basename($f));
 }
