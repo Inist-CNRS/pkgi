@@ -521,8 +521,8 @@ class Pkgi
                                 $this->pkgi_log("Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n");
                             }
                             $v = readline($prompt); // ask user
+                            $v = trim($v) == '' ? $e_option[2] : $v; // take default value if nothing has been answered
                             $v = $format_func_name ? $format_func_name($v) : $v; // format response value
-                            $v = $v == '' ? $e_option[2] : $v; // take default value if nothing has been answered
                         } while(count($e_option[1]) > 0 && !in_array($v, $e_option[1]) && $wrong_choice = true);
                     }
                     $env[$e] = $v;
