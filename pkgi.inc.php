@@ -504,23 +504,26 @@ class Pkgi
 
                         // load the "format" function from config.ini
                         // (used to be sure the variables is well formatted)
-                        $format_func_path = tempnam(dirname(__FILE__), 'pkgi_check_func');
-                        $format_func_name = uniqid('format_func');
-                        $format_func = '<?php function '.$format_func_name.'($var) { '.$e_option[3].' };';
-                        file_put_contents($format_func_path, $format_func);
-                        include($format_func_path);
-                        unlink($format_func_path);
-
+                        $format_func_name = '';
+                        if ($e_option[3]) {
+                            $format_func_name = uniqid('format_func');
+                            $format_func_path = tempnam(dirname(__FILE__), 'pkgi_check_func');
+                            $format_func = '<?php function '.$format_func_name.'($var) { '.$e_option[3].' };';
+                            file_put_contents($format_func_path, $format_func);
+                            include($format_func_path);
+                            unlink($format_func_path);
+                        }
+                        
                         // loop while wrong choice (only if possible values are given)
                         $wrong_choice = false;
                         do {
                             if ($wrong_choice) {
                                 $this->pkgi_log("Valeurs possibles de $e : ".implode(' ou ', $e_option[1])."\n");
                             }
-                            $v = readline($prompt);            // ask user
-                            $v = $format_func_name($v);        // format response value
+                            $v = readline($prompt); // ask user
+                            $v = $format_func_name ? $format_func_name($v) : $v; // format response value
+                            $v = $v == '' ? $e_option[2] : $v; // take default value if nothing has been answered
                         } while(count($e_option[1]) > 0 && !in_array($v, $e_option[1]) && $wrong_choice = true);
-                        $v = $v == '' ? $e_option[2] : $v; // take default value if nothing has been answered
                     }
                     $env[$e] = $v;
                     putenv("$e=$v");
