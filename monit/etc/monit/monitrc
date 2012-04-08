@@ -54,7 +54,8 @@ set statefile <?php $var = getenv('APPNAME_HOME'); echo (strcmp(strrchr($var,"/"
 #                localhost                   # fallback relay
 #
 #
-set mailserver <?php echo getenv('APPNAME_MONIT_SMTP_SERVER')." port ".getenv('APPNAME_MONIT_SMTP_PORT')?> 
+set mailserver localhost
+
 ## By default Monit will drop alert events if no mail servers are available. 
 ## If you want to keep the alerts for later delivery retry, you can use the 
 ## EVENTQUEUE statement. The base directory where undelivered alerts will be 
