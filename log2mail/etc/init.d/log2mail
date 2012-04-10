@@ -18,6 +18,8 @@ PIDFILE=<?php echo getenv('APPNAME_HOME') ?>/var/run/$NAME.pid
 
 test -f $DAEMON || exit 1
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 set -e
 
 . /lib/lsb/init-functions

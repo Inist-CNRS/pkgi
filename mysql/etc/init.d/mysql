@@ -20,6 +20,8 @@ ${DEBIAN_SCRIPT_DEBUG:+ set -v -x}
 
 test -x /usr/sbin/mysqld || exit 0
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 . /lib/lsb/init-functions
 
 # Load the pkgi profile

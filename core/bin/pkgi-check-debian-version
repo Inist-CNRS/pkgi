@@ -1,0 +1,12 @@
+<?php echo '#!/bin/bash'; ?> 
+# affiche un message si la version de l'os a été mise à jour entre le dernier pkgi/build 
+# et le moment où cette commande est lancée
+
+if [  -f <?php echo getenv('APPNAME_HOME'); ?>/etc/debian_version ] ; then
+    if [ "`cat /etc/debian_version`" != "`cat <?php echo getenv('APPNAME_HOME'); ?>/etc/debian_version`" ]; then
+        echo "Attention : le système d'exploitation a été mise à jour depuis le dernier ./pkgi/build"
+        echo "            Pensez à relancer ./pkgi/build"
+        echo "            Version lors de votre dernier pkgi/build : `cat <?php echo getenv('APPNAME_HOME'); ?>/etc/debian_version`"
+        echo "            Version actuelle : `cat /etc/debian_version`"
+    fi
+fi

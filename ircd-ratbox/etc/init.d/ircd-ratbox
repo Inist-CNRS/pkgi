@@ -30,6 +30,8 @@ test -f $DAEMON || exit 0
 [ -f /etc/default/rcS ] && . /etc/default/rcS
 . /lib/lsb/init-functions
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 set -e
 
 ratbox_start()

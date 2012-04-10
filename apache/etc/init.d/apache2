@@ -17,6 +17,8 @@ $version = explode(',',getenv('APPNAME_VERSION'));
 $options = explode(',',getenv('APPNAME_APACHE_OPTIONS'));
 ?>
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 set -e
 
 SCRIPTNAME="${0##*/}"

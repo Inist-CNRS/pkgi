@@ -48,6 +48,8 @@ PIDFILE=<?php echo getenv('APPNAME_HOME'); ?>/var/run/$NAME/$NAME.pid
 
 test -x $DAEMON || exit 0
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 . /lib/lsb/init-functions
 
 # Default options, these can be overriden by the information

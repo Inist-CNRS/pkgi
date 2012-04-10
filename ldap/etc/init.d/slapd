@@ -12,6 +12,8 @@
 # Specify path variable
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 # Kill me on all errors
 set -e
 

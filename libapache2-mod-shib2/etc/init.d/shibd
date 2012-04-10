@@ -42,6 +42,8 @@ DAEMON_OPTS="$DAEMON_OPTS -p $PIDFILE"
 # Exit if the package is not installed.
 [ -x "$DAEMON" ] || exit 0
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 # Read configuration if it is present.
 [ -r <?php echo getenv('APPNAME_HOME') ?>/etc/default/$NAME ] && . <?php echo getenv('APPNAME_HOME') ?>/etc/default/$NAME
 

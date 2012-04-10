@@ -15,9 +15,10 @@ pkgi_track_instance($applink);
 
 ?>
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 case "$1" in
     start)
-	echo -n "Starting $DESC: "
 	<?php
 	$dstart_list = unserialize(getenv('APPNAME_DSTART_LIST'));
 	foreach($dstart_list as $module => $cmd) { ?>

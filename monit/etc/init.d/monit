@@ -18,6 +18,8 @@ DELAY=<?php echo getenv('APPNAME_HOME'); ?>/etc/monit/monit_delay
 NAME=monit
 DESC="daemon monitor"
 
+<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
+
 # Check if DAEMON binary exist
 test -f $DAEMON || exit 0
 
