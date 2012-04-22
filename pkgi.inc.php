@@ -49,12 +49,12 @@ class Pkgi
             echo "    Affiche le numéro de version de pkgi.\n";
             echo "  --help\n";
             echo "    Affiche cette page.\n";
-            die();
+            exit(0);
         }
 
         if (in_array('--version',$this->options)) {
             echo $this->version."\n";
-            die();
+            exit(0);
         }
     
         $env = array();
@@ -87,10 +87,12 @@ class Pkgi
         {
             $dst = $env[$this->APPNAME.'_HOME'];
             if (!file_exists($dst)) @mkdir($dst, 0777, true);
-            if (file_exists($dst))
+            if (file_exists($dst)) {
                 $this->dst_path = $dst;
-            else
-                die("$dst doesn't exist");
+            } else {
+                echo "$dst doesn't exist";
+                exit(1);
+            }
         }
 
         if (in_array('--autoremove',$this->options)) {
@@ -325,7 +327,7 @@ class Pkgi
             }
         }
 
-        if ($error) die();
+        if ($error) exit(1);
     }
 
     function _filter_valide_modules($modules_to_check)
@@ -694,8 +696,10 @@ class Pkgi
                     "Voulez vous les écraser (o/n) ? :\n";
                 $answer = readline($prompt);
             } while (!preg_match('/^[on]+/i',$answer));
-            if (preg_match('/^n/i',$answer))
-                die("Build interrompu !\n");
+            if (preg_match('/^n/i',$answer)) {
+                echo "Build interrompu !\n";
+                exit(1);
+            }
         }
     
         // then we instanciate the templates
