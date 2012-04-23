@@ -26,6 +26,9 @@ then
     exit 1
 fi
 
+# pkgi needs system php.ini to calculate few paths
+unset PHPRC
+
 exec $PHP -C -q -d output_buffering=1 "$FILE" $@ 
 exit $?
 <?php
