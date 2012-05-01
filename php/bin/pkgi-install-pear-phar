@@ -26,8 +26,6 @@ HOME="`pwd`" pear/bin/pear config-set php_ini      <?php echo getenv('APPNAME_HO
 HOME="`pwd`" pear/bin/pear config-set www_dir      <?php echo getenv('APPNAME_HOME'); ?>/var/www
 HOME="`pwd`" pear/bin/pear config-set download_dir <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install
 HOME="`pwd`" pear/bin/pear config-set auto_discover 1
-#HOME="`pwd`" pear/bin/pear list -a
-#HOME="`pwd`" pear/bin/pear upgrade-all
 
 # create pear and pecl pkgi's commands wrappers
 cat <<EOF > <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pear
