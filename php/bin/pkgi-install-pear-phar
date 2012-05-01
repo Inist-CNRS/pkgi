@@ -1,6 +1,7 @@
 <?php echo '#!/bin/bash'; ?> 
 
-set -e -x
+#set -e -x
+set -e
 
 # download go-pear.phar
 mkdir -p <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/
@@ -9,14 +10,27 @@ if [ ! -f go-pear.phar ]; then
   wget http://pear.php.net/go-pear.phar
 fi
 
+# create a script to execute go-pear.phar and automaticaly answer questions
+GO_PEAR_INSTALLER_FILE=`tempfile -d <?php echo getenv('APPNAME_HOME'); ?>/tmp`
+cat <<EOF > $GO_PEAR_INSTALLER_FILE
+#!/usr/bin/expect
+set env(TMPDIR) "<?php echo getenv('APPNAME_HOME'); ?>/tmp"
+set env(PHPRC) "<?php echo getenv('APPNAME_HOME'); ?>/etc/php5/php.ini"
+set env(HOME) "<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear"
+spawn php -d suhosin.executor.include.whitelist="phar" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/go-pear.phar 
+expect "1-11, 'all' or Enter to continue:"
+send "\r"
+expect eof
+EOF
+
 # install pear via go-pear.phar
-TMPDIR="<?php echo getenv('APPNAME_HOME'); ?>/tmp" \
-PHPRC="<?php echo getenv('APPNAME_HOME'); ?>/etc/php5/php.ini" \
-HOME="`pwd`" \
-php -d suhosin.executor.include.whitelist="phar" ./go-pear.phar 
+chmod +x $GO_PEAR_INSTALLER_FILE
+$GO_PEAR_INSTALLER_FILE
+rm -f $GO_PEAR_INSTALLER_FILE
 
 # configure PEAR directories
-HOME="`pwd`" pear/bin/pear config-show 
+#HOME="`pwd`" pear/bin/pear config-show 
+
 HOME="`pwd`" pear/bin/pear config-set php_dir      <?php echo getenv('APPNAME_HOME'); ?>/usr/share/php/pear
 HOME="`pwd`" pear/bin/pear config-set cache_dir    <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/cache
 HOME="`pwd`" pear/bin/pear config-set temp_dir     <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install
