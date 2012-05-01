@@ -20,6 +20,7 @@ HOME="`pwd`" pear/bin/pear config-show
 HOME="`pwd`" pear/bin/pear config-set php_dir      <?php echo getenv('APPNAME_HOME'); ?>/usr/share/php/pear
 HOME="`pwd`" pear/bin/pear config-set cache_dir    <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/cache
 HOME="`pwd`" pear/bin/pear config-set temp_dir     <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install
+HOME="`pwd`" pear/bin/pear config-set bin_dir      <?php echo getenv('APPNAME_HOME'); ?>/usr/bin
 HOME="`pwd`" pear/bin/pear config-set ext_dir      <?php echo getenv('APPNAME_HOME'); ?>/usr/lib/php5/extensions
 HOME="`pwd`" pear/bin/pear config-set php_prefix   <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/
 HOME="`pwd`" pear/bin/pear config-set php_ini      <?php echo getenv('APPNAME_HOME'); ?>/etc/php5/php.ini
@@ -27,26 +28,18 @@ HOME="`pwd`" pear/bin/pear config-set www_dir      <?php echo getenv('APPNAME_HO
 HOME="`pwd`" pear/bin/pear config-set download_dir <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install
 HOME="`pwd`" pear/bin/pear config-set auto_discover 1
 
-# create pear and pecl pkgi's commands wrappers
-cat <<EOF > <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pear
-#!/bin/bash
-. <?php echo getenv('APPNAME_HOME'); ?>/etc/profile
-HOME="<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/pear \$*
-EOF
-chmod +x <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pear
+# copy pear commands to correct place
+#cp -f <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/* <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/
+#ls -ail <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/
 
-cat <<EOF > <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/peardev
-#!/bin/bash
-. <?php echo getenv('APPNAME_HOME'); ?>/etc/profile
-HOME="<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/peardev \$*
-EOF
-chmod +x <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/peardev
-
-cat <<EOF > <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pecl
-#!/bin/bash
-. <?php echo getenv('APPNAME_HOME'); ?>/etc/profile
-HOME="<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/pecl \$*
-EOF
-chmod +x <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pecl
+# patch pear and pecl commands (adds specific HOME at script begining)
+for cmd in "pear" "pecl"
+do
+  cp -f <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/$cmd <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/
+  SECOND_LINE=`head -n 2 <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/$cmd | tail -n 1`
+  if [ "`echo $SECOND_LINE | grep ^HOME`" == "" ]; then
+    sed -i 's%^#!/bin/sh%#!/bin/sh\nHOME="<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear"%g' <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/$cmd
+  fi
+done
 
 exit 0
