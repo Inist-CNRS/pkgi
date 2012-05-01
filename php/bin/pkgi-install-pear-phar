@@ -1,0 +1,54 @@
+<?php echo '#!/bin/bash'; ?> 
+
+set -e -x
+
+# download go-pear.phar
+mkdir -p <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/
+cd <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/
+if [ ! -f go-pear.phar ]; then
+  wget http://pear.php.net/go-pear.phar
+fi
+
+# install pear via go-pear.phar
+TMPDIR="<?php echo getenv('APPNAME_HOME'); ?>/tmp" \
+PHPRC="<?php echo getenv('APPNAME_HOME'); ?>/etc/php5/php.ini" \
+HOME="`pwd`" \
+php -d suhosin.executor.include.whitelist="phar" ./go-pear.phar 
+
+# configure PEAR directories
+HOME="`pwd`" pear/bin/pear config-show 
+HOME="`pwd`" pear/bin/pear config-set php_dir      <?php echo getenv('APPNAME_HOME'); ?>/usr/share/php/pear
+HOME="`pwd`" pear/bin/pear config-set cache_dir    <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/cache
+HOME="`pwd`" pear/bin/pear config-set temp_dir     <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install
+HOME="`pwd`" pear/bin/pear config-set ext_dir      <?php echo getenv('APPNAME_HOME'); ?>/usr/lib/php5/extensions
+HOME="`pwd`" pear/bin/pear config-set php_prefix   <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/
+HOME="`pwd`" pear/bin/pear config-set php_ini      <?php echo getenv('APPNAME_HOME'); ?>/etc/php5/php.ini
+HOME="`pwd`" pear/bin/pear config-set www_dir      <?php echo getenv('APPNAME_HOME'); ?>/var/www
+HOME="`pwd`" pear/bin/pear config-set download_dir <?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install
+HOME="`pwd`" pear/bin/pear config-set auto_discover 1
+#HOME="`pwd`" pear/bin/pear list -a
+#HOME="`pwd`" pear/bin/pear upgrade-all
+
+# create pear and pecl pkgi's commands wrappers
+cat <<EOF > <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pear
+#!/bin/bash
+. <?php echo getenv('APPNAME_HOME'); ?>/etc/profile
+HOME="<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/pear \$*
+EOF
+chmod +x <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pear
+
+cat <<EOF > <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/peardev
+#!/bin/bash
+. <?php echo getenv('APPNAME_HOME'); ?>/etc/profile
+HOME="<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/peardev \$*
+EOF
+chmod +x <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/peardev
+
+cat <<EOF > <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pecl
+#!/bin/bash
+. <?php echo getenv('APPNAME_HOME'); ?>/etc/profile
+HOME="<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/pear/bin/pecl \$*
+EOF
+chmod +x <?php echo getenv('APPNAME_HOME'); ?>/usr/bin/pecl
+
+exit 0
