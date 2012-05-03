@@ -19,6 +19,10 @@ set env(PHPRC) "<?php echo getenv('APPNAME_HOME'); ?>/etc/php5/php.ini"
 set env(HOME) "<?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear"
 spawn php -d suhosin.executor.include.whitelist="phar" <?php echo getenv('APPNAME_HOME'); ?>/usr/share/pear/go-pear.phar 
 expect "1-11, 'all' or Enter to continue:"
+send "2\r"
+send "<?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install\r"
+send "3\r"
+send "<?php echo getenv('APPNAME_HOME'); ?>/tmp/pear/install\r"
 send "\r"
 expect eof
 EOF
