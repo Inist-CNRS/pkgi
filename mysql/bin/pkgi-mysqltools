@@ -55,48 +55,128 @@ case ${1} in
     ;;
 
     -i | -init | init)
-        # Initialisation de la base avec creation et reglage de l'utilisateur de maintenance: debian-sys-maint
+        # Initialisation de la base :
+        # - création et reglage de l'utilisateur de maintenance debian-sys-maint
 
-        # On vérifie si le démon tourne ou pas pour éventuellement le relancer après la phase d'initialisation
-        # qui va obligatoirement l'éteindre
-        <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql status
-        MYSQL_WAS_STARTED=$?
-        
-        # Le serveur doit être éteint pour l'oppération
-        <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql stop > /dev/null
-        if [ "$?" != "0" ]; then
-            echo "Database cannot be initialized because mysql server cannot be stopped..." >&2
+        LOGINIT=`mktemp`
+
+        # La phase d'initialisation ne peut se faire que si le démon est stoppé
+        <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql status 2>&1 >$LOGINIT
+        if [ "$?" == 0 ]; then
+            echo "Database cannot be initialized because mysql serveur is running. Please stop it and try again." >&2
+            rm -f $LOGINIT
             exit 1
         fi
-        <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql_install_db > /dev/null
+        
+        # Database intitialization
+        <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql_install_db 2>$LOGINIT 1>$LOGINIT
 
-        # reglage du mot de passe debian-sys-maint
+        # Setup debian-sys-maint password
         pass="`sed -n 's/^[ 	]*password *= *// p'  <?php echo getenv('APPNAME_HOME') ?>/etc/mysql/debian.cnf | sed 's/\s// p' | head -n 1`"
         tfile=`mktemp`
         if [ ! -f "$tfile" ]; then
-            echo "Erreur inattendue"  >&2
+            cat $LOGINIT >&2
+            echo "Unexpected error"  >&2
+            rm -f $LOGINIT
             exit 1
         fi
         cat << EOF > $tfile
 USE mysql;
-REPLACE INTO user SET host='localhost', user='debian-sys-maint', password=password('$pass'), Select_priv='Y', Insert_priv='Y', Update_priv='Y', Delete_priv='Y', Create_priv='Y', Drop_priv='Y', Reload_priv='Y', Shutdown_priv='Y', Process_priv='Y',  File_priv='Y', Grant_priv='Y', References_priv='Y', Index_priv='Y', Alter_priv='Y', Show_db_priv='Y', Super_priv='Y', Create_tmp_table_priv='Y', Lock_tables_priv='Y', Execute_priv='Y', Repl_slave_priv='Y', Repl_client_priv='Y', Create_user_priv='Y', Alter_routine_priv='Y', Create_routine_priv='Y', Show_view_priv='Y', Create_view_priv='Y';
+REPLACE INTO user SET host='localhost', user='debian-sys-maint', password=password('$pass'), Select_priv='Y', Insert_priv='Y', Update_priv='Y', Delete_priv='Y', Create_priv='Y', Drop_priv='Y', Reload_priv='Y', Shutdown_priv='Y', Process_priv='Y',  File_priv='Y', Grant_priv='Y', References_priv='Y', Index_priv='Y', Alter_priv='Y', Show_db_priv='Y', Super_priv='Y', Create_tmp_table_priv='Y', Lock_tables_priv='Y', Execute_priv='Y', Repl_slave_priv='Y', Repl_client_priv='Y', Create_user_priv='Y', Alter_routine_priv='Y', Create_routine_priv='Y', Show_view_priv='Y', Create_view_priv='Y', Event_priv='Y', Trigger_priv='Y' ;
 EOF
         MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
-        $MYSQL_BOOTSTRAP <$tfile
+        $MYSQL_BOOTSTRAP <$tfile 2>$LOGINIT
         if [ "$?" != "0" ]; then
+            cat $LOGINIT >&2
             echo "Error: debian-sys-maint cannot be created." >&2
+            rm -f $tfile $LOGINIT
+            exit 1
+        fi
+
+        echo "MySQL database has been initialized"
+        rm -f $tfile $LOGINIT
+    ;;
+
+
+    -ai | -appli-init | appli-init)
+        # - création d'une table ayant pour nom l'application
+        # - création et réglage de l'utilisateur du même nom que la table (avec droits restreints)
+        <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql status 2>/dev/null 1>/dev/null
+        if [ "$?" != 0 ]; then
+            echo "Appli database cannot be initialized because mysql serveur is not running. Please start it and try again." >&2
+            exit 1
+        fi
+
+        DBNAME="<?php echo getenv('APPNAME_MYSQL_DEFAULT_DB') ?>"
+
+        echo "CREATE USER '$DBNAME'@'%' IDENTIFIED BY '';" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        if [ "$?" != 0 ]; then
+            echo "Error: cannot create $DBNAME user." >&2
+            exit 1
+        fi
+        echo "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, TRIGGER, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON *.* TO '$DBNAME'@'%' IDENTIFIED BY '' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        if [ "$?" != 0 ]; then
+            echo "Error: cannot setup $DBNAME user's rights." >&2
+            exit 1
+        fi
+        echo "CREATE DATABASE IF NOT EXISTS $DBNAME" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        if [ "$?" != 0 ]; then
+            echo "Error: cannot create $DBNAME database." >&2
+            exit 1
+        fi
+        echo "GRANT ALL PRIVILEGES ON $DBNAME.* TO '$DBNAME'@'%';" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        if [ "$?" != 0 ]; then
+            echo "Error: cannot setup $DBNAME user's rights on $DBNAME database." >&2
+            exit 1
+        fi
+
+        echo "$DBNAME database and $DBNAME user have been created."
+    ;;
+
+
+    -ap | -appli-password | appli-password)
+        # initialisation du mot de passe de l'application
+        if [ ${#} -lt 2 ]; then
+            echo "Error: missing parameter (application password)." >&2
+            echo "Example: bin/pkgi-mysqltools -ap k1zef3fz22" >&2
+            exit 1
+        fi
+
+
+        DBNAME="<?php echo getenv('APPNAME_MYSQL_DEFAULT_DB') ?>"
+
+        <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql stop > /dev/null
+        if [ "$?" != "0" ]; then
+            echo "$DBNAME password cannot be changed because mysql server cannot be stopped..." >&2
+            exit 1
+        fi
+        LOGINIT=`mktemp`
+        APP_PASSWORD=$2
+        MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
+        tfile=`mktemp`
+        if [ ! -f "$tfile" ]; then
+            return 1
+        fi
+        cat << EOF > $tfile
+USE mysql;
+UPDATE user SET password=PASSWORD("$APP_PASSWORD") WHERE user='$DBNAME';
+FLUSH PRIVILEGES;
+EOF
+        $MYSQL_BOOTSTRAP <$tfile 2>$LOGINIT
+        if [ "$?" != "0" ]; then
+            cat $LOGINIT >&2
+            echo "$DBNAME password cannot be changed." >&2
+            echo "Please initialize the mysql database (bin/pkgi-mysqltools init) and create $DBNAME (bin/pkgi-mysqltools -ai)" >&2
+            rm -f $LOGINIT
             rm -f $tfile
             exit 1
         else
-            echo "Database has been initialized"
+            echo "$DBNAME password has been initialized to $APP_PASSWORD"
+            rm -f $LOGINIT
             rm -f $tfile
-            
-            # On démarre le démon si il l'était avant l'exécution de ce script
-            if [ "$MYSQL_WAS_STARTED" == 0 ]; then
-                <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql start
-            fi
         fi
     ;;
+
 
     -postinst-init | postinst-init)
         # Cette option est appelée par le build de pkgi lorsque le build est terminé (postinst)
@@ -104,6 +184,9 @@ EOF
         # le fichier tmp/mysql-init-flag est positionné par l'instanciation du fichier etc/mysql/debian.cnf
         if [ -f <?php echo getenv('APPNAME_HOME') ?>/tmp/mysql-init-flag ]; then
             <?php echo getenv('APPNAME_HOME') ?>/bin/<?php echo basename(__FILE__); ?> init  2>&1
+            <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql start 2>&1
+            <?php echo getenv('APPNAME_HOME') ?>/bin/<?php echo basename(__FILE__); ?> appli-init  2>&1
+            <?php echo getenv('APPNAME_HOME') ?>/etc/init.d/mysql stop 2>&1
             rm -f <?php echo getenv('APPNAME_HOME') ?>/tmp/mysql-init-flag
         fi
         <?php if (strtolower(trim(getenv('APPNAME_MYSQL_AUTOBACKUP'))) == 'yes') { ?>
@@ -113,7 +196,7 @@ EOF
         <?php } ?>
     ;;
 
-    -rp | -rootpassword | rootpassword)
+    -rp | -root-password | root-password | -rootpassword | rootpassword)
         # initialisation du mot de passe root
         if [ ${#} -lt 2 ]; then
             echo "Error: missing parameter (root password)." >&2
@@ -125,6 +208,7 @@ EOF
             echo "Root password cannot be changed because mysql server cannot be stopped..." >&2
             exit 1
         fi
+        LOGINIT=`mktemp`
         ROOT_PASSWORD=$2
         MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
         tfile=`mktemp`
@@ -136,15 +220,16 @@ USE mysql;
 UPDATE user SET password=PASSWORD("$ROOT_PASSWORD") WHERE user='root';
 FLUSH PRIVILEGES;
 EOF
-        $MYSQL_BOOTSTRAP <$tfile
+        $MYSQL_BOOTSTRAP <$tfile 2>$LOGINIT
         if [ "$?" != "0" ]; then
+            cat $LOGINIT >&2
             echo "Root password cannot be changed because mysql database has not been initialized." >&2
             echo "Please firstly initialize the mysql database: bin/pkgi-mysqltools init" >&2
-            rm -f $tfile
+            rm -f $tfile $LOGINIT
             exit 1
         else
             echo "Root password has been initialized to $ROOT_PASSWORD"
-            rm -f $tfile
+            rm -f $tfile $LOGINIT
         fi
     ;;
 
@@ -217,7 +302,9 @@ EOF
 
    -q  | -query                           - Permet de lancer la commande mysql (placez vos paramètres à la suite)
    -i  | -init                            - Initialisation de la base
-   -rp | -rootpassword                    - Réglage du mot de passe root (passé en paramètre)
+   -ai | -appli-init                      - Initialisation d'une base de données applicative et d'un utilisateur dédié à cette base
+   -rp | -root-password                   - Réglage du mot de passe root (passé en paramètre)
+   -ap | -appli-password                  - Réglage du mot de passe de l'utilisateur de l'application (passé en paramètre)
    -d  | -dump                            - Permet de lancer la commande mysqldump (placez vos parametres à la suite)
    -b  | -backup                          - Équivalent de dump mais sans dumper les tables systèmes
    -bc | -backup-cron [install|uninstall] - (Dés)installation d'un script de sauvegarde mysql quotidien en crontab
