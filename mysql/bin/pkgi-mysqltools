@@ -84,7 +84,7 @@ case ${1} in
 USE mysql;
 REPLACE INTO user SET host='localhost', user='debian-sys-maint', password=password('$pass'), Select_priv='Y', Insert_priv='Y', Update_priv='Y', Delete_priv='Y', Create_priv='Y', Drop_priv='Y', Reload_priv='Y', Shutdown_priv='Y', Process_priv='Y',  File_priv='Y', Grant_priv='Y', References_priv='Y', Index_priv='Y', Alter_priv='Y', Show_db_priv='Y', Super_priv='Y', Create_tmp_table_priv='Y', Lock_tables_priv='Y', Execute_priv='Y', Repl_slave_priv='Y', Repl_client_priv='Y', Create_user_priv='Y', Alter_routine_priv='Y', Create_routine_priv='Y', Show_view_priv='Y', Create_view_priv='Y', Event_priv='Y', Trigger_priv='Y' ;
 EOF
-        MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables --skip-innodb"
+        MYSQL_BOOTSTRAP="<?php echo getenv('APPNAME_HOME') ?>/usr/sbin/mysqld --bootstrap --datadir=<?php echo getenv('APPNAME_HOME') ?>/var/lib/mysql --skip-grant-tables "
         $MYSQL_BOOTSTRAP <$tfile 2>$LOGINIT
         if [ "$?" != "0" ]; then
             cat $LOGINIT >&2
@@ -114,7 +114,7 @@ EOF
             echo "Error: cannot create $DBNAME user." >&2
             exit 1
         fi
-        echo "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, TRIGGER, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON *.* TO '$DBNAME'@'%' IDENTIFIED BY '' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        echo "GRANT USAGE ON *.* TO '$DBNAME'@'%' IDENTIFIED BY '' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
         if [ "$?" != 0 ]; then
             echo "Error: cannot setup $DBNAME user's rights." >&2
             exit 1

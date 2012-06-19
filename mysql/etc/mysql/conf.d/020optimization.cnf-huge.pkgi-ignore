@@ -9,7 +9,6 @@
 
 # The MySQL server
 [mysqld]
-skip-locking
 key_buffer = 384M
 max_allowed_packet = 1M
 table_cache = 512
