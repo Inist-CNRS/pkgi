@@ -114,7 +114,17 @@ EOF
             echo "Error: cannot create $DBNAME user." >&2
             exit 1
         fi
+        echo "CREATE USER '$DBNAME'@'localhost' IDENTIFIED BY '';" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        if [ "$?" != 0 ]; then
+            echo "Error: cannot create $DBNAME user." >&2
+            exit 1
+        fi
         echo "GRANT USAGE ON *.* TO '$DBNAME'@'%' IDENTIFIED BY '' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        if [ "$?" != 0 ]; then
+            echo "Error: cannot setup $DBNAME user's rights." >&2
+            exit 1
+        fi
+        echo "GRANT USAGE ON *.* TO '$DBNAME'@'localhost' IDENTIFIED BY '' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
         if [ "$?" != 0 ]; then
             echo "Error: cannot setup $DBNAME user's rights." >&2
             exit 1
@@ -129,10 +139,14 @@ EOF
             echo "Error: cannot setup $DBNAME user's rights on $DBNAME database." >&2
             exit 1
         fi
+        echo "GRANT ALL PRIVILEGES ON $DBNAME.* TO '$DBNAME'@'localhost';" | <?php echo getenv('APPNAME_HOME') ?>/usr/bin/mysql
+        if [ "$?" != 0 ]; then
+            echo "Error: cannot setup $DBNAME user's rights on $DBNAME database." >&2
+            exit 1
+        fi
 
         echo "$DBNAME database and $DBNAME user have been created."
     ;;
-
 
     -ap | -appli-password | appli-password)
         # initialisation du mot de passe de l'application
