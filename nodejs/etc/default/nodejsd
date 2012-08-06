@@ -1,0 +1,5 @@
+# Defaults for restify initscript
+
+# Server log file
+#LOGFILE=
+
