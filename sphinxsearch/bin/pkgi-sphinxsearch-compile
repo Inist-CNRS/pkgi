@@ -17,11 +17,14 @@ done
 # download and compile sphinx
 cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/
 if [ ! -d <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release ]; then 
-  curl http://sphinxsearch.com/files/sphinx-$SPHINX_VERSION-release.tar.gz | tar -xzf -
+  echo "---> Downloading sphinx sources"
+  curl -s http://sphinxsearch.com/files/sphinx-$SPHINX_VERSION-release.tar.gz | tar -xzf -
 fi
-cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release
-./configure
-make
+if [ ! -f <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release/src/searchd ]; then 
+  cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release
+  ./configure
+  make
+fi
 
 # create symlink in order to have a unique folder for sphinx
 ln -s -f <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx
