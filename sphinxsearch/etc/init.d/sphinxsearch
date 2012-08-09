@@ -39,7 +39,7 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-DAEMON="<?php echo getenv('APPNAME_HOME') ?>/usr/src/sphinx/src/searchd"
+DAEMON="<?php echo getenv('APPNAME_HOME') ?>/usr/local/bin/searchd"
 NAME="searchd"
 DESC="Sphinx"
 LOGDIR=<?php echo getenv('APPNAME_HOME'); ?>/var/log/sphinx

@@ -1,6 +1,6 @@
 <?php echo '#!/bin/sh'; ?> 
 if [ "x$1" = "x" -o "x$1" = "x-h" -o "x$1" = "x--help" ]; then
-	exec <?php echo getenv('APPNAME_HOME') ?>/usr/src/sphinx/src/indextool
+	exec <?php echo getenv('APPNAME_HOME') ?>/usr/local/bin/indextool
 else
-	exec <?php echo getenv('APPNAME_HOME') ?>/usr/src/sphinx/src/indextool -c <?php echo getenv('APPNAME_HOME') ?>/etc/sphinx/sphinx.conf $*
+	exec <?php echo getenv('APPNAME_HOME') ?>/usr/local/bin/indextool -c <?php echo getenv('APPNAME_HOME') ?>/etc/sphinx/sphinx.conf $*
 fi

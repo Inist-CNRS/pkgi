@@ -14,6 +14,8 @@ do
     esac
 done
 
+set -e
+
 # download and compile sphinx
 cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/
 if [ ! -d <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release ]; then 
@@ -22,8 +24,15 @@ if [ ! -d <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-r
 fi
 if [ ! -f <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release/src/searchd ]; then 
   cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release
-  ./configure
-  make
+  ./configure --prefix=<?php echo getenv('APPNAME_HOME'); ?>/usr/local
+  make && make install
+fi
+
+# compile libsphinxclient
+if [ ! -f <?php echo getenv('APPNAME_HOME'); ?>/usr/local/include/sphinxclient.h ]; then 
+  cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx/api/libsphinxclient
+  ./configure --prefix=<?php echo getenv('APPNAME_HOME'); ?>/usr/local
+  make && make install
 fi
 
 # create symlink in order to have a unique folder for sphinx
