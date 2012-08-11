@@ -30,7 +30,7 @@ fi
 
 # compile libsphinxclient
 if [ ! -f <?php echo getenv('APPNAME_HOME'); ?>/usr/local/include/sphinxclient.h ]; then 
-  cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx/api/libsphinxclient
+  cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release/api/libsphinxclient
   ./configure --prefix=<?php echo getenv('APPNAME_HOME'); ?>/usr/local
   make && make install
 fi
