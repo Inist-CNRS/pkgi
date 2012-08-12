@@ -1,4 +1,4 @@
-# Defaults for restify initscript
+# Defaults for nodejsd initscript
 
 # Server log file
 #LOGFILE=
