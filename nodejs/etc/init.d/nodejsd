@@ -81,18 +81,24 @@ VERBOSE=yes
 #
 do_start()
 {
-	# Return
-	#   0 if daemon has been started
-	#   1 if daemon was already running
-	#   2 if daemon could not be started
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
-		|| return 1
-	start-stop-daemon --start --quiet --make-pidfile --pidfile $PIDFILE --background --exec $DAEMON -- \
-		$DAEMON_ARGS \
-		|| return 2
-	[ -n "$STARTTIME" ] && sleep $STARTTIME 
-	running \
-		|| return 2
+  # Return
+  #   0 if daemon has been started
+  #   1 if daemon was already running
+  #   2 if daemon could not be started
+  running
+  if [ $? = 0 ]; then
+    return 1
+  fi
+  
+  # doesn't work (start twice will bug)
+  #start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
+  #  || return 1
+  start-stop-daemon --start --quiet --make-pidfile --pidfile $PIDFILE --background --exec $DAEMON -- \
+    $DAEMON_ARGS \
+    || return 2
+  [ -n "$STARTTIME" ] && sleep $STARTTIME 
+  running \
+    || return 2
 }
 
 #
