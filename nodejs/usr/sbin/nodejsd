@@ -12,7 +12,7 @@
 #                        Configuration                                         # 
 ##                                                                            ##
 ################################################################################
-NODE=`which node`
+NODE="<?php echo getenv('APPNAME_HOME') ?>/usr/bin/node"
 
 ROOT_PATH="<?php echo getenv('APPNAME_HOME') ?>"
 ROOT_PATH=`readlink -f $ROOT_PATH`

@@ -1,0 +1,3 @@
+<?php echo '#!/bin/bash'; ?> 
+
+<?php echo getenv('APPNAME_HOME') ?>/nvm/<?php echo getenv('APPNAME_NODEJS_VERSION') ?>/bin/npm $*

@@ -1,0 +1,3 @@
+. <?php echo getenv('APPNAME_ENV_FILE_PATH') ?>/nvm/nvm.sh
+
+[[ -r $NVM_DIR/bash_completion ]] && . $NVM_DIR/bash_completion
