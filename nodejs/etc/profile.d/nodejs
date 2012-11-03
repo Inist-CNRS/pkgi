@@ -1,3 +1,7 @@
 . <?php echo getenv('APPNAME_HOME') ?>/nvm/nvm.sh
 
 [[ -r $NVM_DIR/bash_completion ]] && . $NVM_DIR/bash_completion
+
+# add nodejs modules bin to the PATH
+NPM_MODULES_PATH=`npm prefix -g`/bin
+export PATH="$NPM_MODULES_PATH:$PATH"
