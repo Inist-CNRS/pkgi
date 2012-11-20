@@ -28,6 +28,7 @@ case ${1} in
         APP_BASES=`echo "SHOW DATABASES;" | $APP_HOME/usr/bin/mysql \
                 | grep -v "^Database$" \
                 | grep -v "^information_schema$" \
+                | grep -v "^performance_schema$" \
                 | grep -v "^mysql$"`
         if [ "$APP_BASES" == "" ]; then
             echo "Rien à dumper car aucune base de données trouvée."  >&2
