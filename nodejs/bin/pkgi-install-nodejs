@@ -1,0 +1,15 @@
+<?php echo '#!/bin/bash'; ?> 
+
+set -e
+
+if [ ! -f <?php echo getenv('APPNAME_HOME') ?>/nvm/nvm.sh ]; then
+  wget https://raw.github.com/creationix/nvm/master/nvm.sh -O <?php echo getenv('APPNAME_HOME') ?>/nvm/nvm.sh
+fi
+chmod +x <?php echo getenv('APPNAME_HOME') ?>/nvm/nvm.sh
+
+if [ ! -f <?php echo getenv('APPNAME_HOME') ?>/nvm/bash_completion ]; then
+  wget https://raw.github.com/creationix/nvm/master/bash_completion -O <?php echo getenv('APPNAME_HOME') ?>/nvm/bash_completion
+fi
+
+. <?php echo getenv('APPNAME_HOME') ?>/nvm/nvm.sh
+nvm install <?php echo getenv('APPNAME_NODEJS_VERSION') ?>

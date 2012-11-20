@@ -19,93 +19,107 @@ pkgi_track_instance($applink);
 
 case "$1" in
     start)
-	<?php
-	$dstart_list = unserialize(getenv('APPNAME_DSTART_LIST'));
-	foreach($dstart_list as $module => $cmd) { ?>
-            # Démarrage de <?php echo $module; ?> 
-            <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
-            <?php foreach( $cmd as $c ) { ?>
-		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
-            <?php } ?>
-	    if [ ${?} -ne 0 ] ; then
-		exit ${?}
-	    fi
-            echo "----"
-	<?php } ?>	
-	;;
+      EXIT_CODE=0
+      <?php
+      $dstart_list = unserialize(getenv('APPNAME_DSTART_LIST'));
+      foreach($dstart_list as $module => $cmd) { ?>
+        # Démarrage de <?php echo $module; ?> 
+        <?php
+        if (!is_array($cmd)) $cmd = array($cmd);
+        foreach( $cmd as $c ) {
+          echo getenv('APPNAME_HOME').'/'.$c;
+        } ?>
+        
+        if [ ${?} -ne 0 ] ; then
+          EXIT_CODE=${?}
+        fi
+        echo "----"
+      <?php } ?>	
+      exit $EXIT_CODE
+    ;;
 
-    stop) 
-	<?php
-	$dstop_list = unserialize(getenv('APPNAME_DSTOP_LIST'));
-	foreach($dstop_list as $module => $cmd) { ?>
-	    # Arret de <?php echo $module; ?> 
-            <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
-            <?php foreach( $cmd as $c ) { ?>
-		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
-                RCODE=${?}
-		if [ ${RCODE} -ne 0 ]; then
-		    exit ${RCODE}
-		fi
-            <?php } ?>
-            echo "----"	    
-	<?php } ?>
-	;;
-		
-    restart) 
-	<?php
-	$drestart_list = unserialize(getenv('APPNAME_DRESTART_LIST'));
-	foreach($drestart_list as $module => $cmd) { ?>
-	    # Redemarrage de <?php echo $module; ?> 
-            <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
-            <?php foreach( $cmd as $c ) { ?>
-		<?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
-                RCODE=${?}
-		if [ ${RCODE} -ne 0 ]; then
-		    exit ${RCODE}
-		fi
-            <?php } ?>
-	    echo "----"
-	<?php } ?>
-	;;
+    stop)
+      EXIT_CODE=0
+      <?php
+      $dstop_list = unserialize(getenv('APPNAME_DSTOP_LIST'));
+      foreach($dstop_list as $module => $cmd) { ?>
+        # Arret de <?php echo $module; ?> 
+        <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+        <?php foreach( $cmd as $c ) { ?>
+        <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+        
+        RCODE=${?}
+        if [ ${RCODE} -ne 0 ]; then
+          EXIT_CODE=${RCODE}
+        fi
+        <?php } ?>
+        echo "----"
+      <?php } ?>
+      exit $EXIT_CODE
+    ;;
+
+    restart)
+      EXIT_CODE=0
+      <?php
+      $drestart_list = unserialize(getenv('APPNAME_DRESTART_LIST'));
+      foreach($drestart_list as $module => $cmd) { ?>
+        # Redemarrage de <?php echo $module; ?> 
+        <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+        <?php foreach( $cmd as $c ) { ?>
+        <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+        
+        RCODE=${?}
+        if [ ${RCODE} -ne 0 ]; then
+          EXIT_CODE=${RCODE}
+        fi
+        <?php } ?>
+        echo "----"
+      <?php } ?>
+      exit $EXIT_CODE
+    ;;
 
     reload) 
-    <?php
-    $dreload_list = unserialize(getenv('APPNAME_DRELOAD_LIST'));
-    foreach($dreload_list as $module => $cmd) { ?>
-        # Redemarrage de <?php echo $module; ?> 
-            <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
-            <?php foreach( $cmd as $c ) { ?>
-        <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
-                RCODE=${?}
-        if [ ${RCODE} -ne 0 ]; then
-            exit ${RCODE}
-        fi
-            <?php } ?>
-        echo "----"
-    <?php } ?>
+      <?php
+      $dreload_list = unserialize(getenv('APPNAME_DRELOAD_LIST'));
+      foreach($dreload_list as $module => $cmd) { ?>
+          # Redemarrage de <?php echo $module; ?> 
+          <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+          <?php foreach( $cmd as $c ) { ?>
+          <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+          
+          RCODE=${?}
+          if [ ${RCODE} -ne 0 ]; then
+            EXIT_CODE=${RCODE}
+          fi
+          <?php } ?>
+          echo "----"
+      <?php } ?>
+      exit $EXIT_CODE
     ;;
 
     status)
-	<?php
-	$dstatus_list = unserialize(getenv('APPNAME_DSTATUS_LIST'));
-	foreach($dstatus_list as $module => $cmd) { ?>
-            # Status de <?php echo $module; ?> 
-            <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
-            <?php foreach( $cmd as $c ) { ?>
-                <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
-                RCODE=${?}
-		if [ ${RCODE} -ne 0 ]; then
-		    exit ${RCODE}
-		fi
-	    <?php } ?>
-	    echo "----"
-	<?php } ?>
-	;;
+      EXIT_CODE=0
+      <?php
+      $dstatus_list = unserialize(getenv('APPNAME_DSTATUS_LIST'));
+      foreach($dstatus_list as $module => $cmd) { ?>
+        # Status de <?php echo $module; ?> 
+        <?php if (!is_array($cmd)) $cmd = array($cmd); ?>
+        <?php foreach( $cmd as $c ) { ?>
+          <?php echo getenv('APPNAME_HOME'); ?>/<?php echo $c; ?> 
+          RCODE=${?}
+        if [ ${RCODE} -ne 0 ]; then
+            EXIT_CODE=${RCODE}
+        fi
+        <?php } ?>
+        echo "----"
+      <?php } ?>
+      exit $EXIT_CODE
+    ;;
 
     *)
-        # parametre invalide
-	echo "usage: $0 ( start | stop | restart | status | help )"
-	cat <<EOF
+      # parametre invalide
+      echo "usage: $0 ( start | stop | restart | status | help )"
+      cat <<EOF
 
    start   - demarrage de <?php echo implode(', ',array_keys($dstart_list)); ?> 
    stop    - arret de <?php echo implode(', ',array_keys($dstop_list)); ?> 
@@ -114,7 +128,7 @@ case "$1" in
    help    - cette page
 
 EOF
-	;;
+      ;;
 esac
 
 exit 0

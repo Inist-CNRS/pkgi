@@ -1,0 +1,5 @@
+# Defaults for nodejsd initscript
+
+# Server log file
+#LOGFILE=
+

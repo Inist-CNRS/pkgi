@@ -2,19 +2,19 @@
 ##3.5...10...15...20...25...30...35...40...45...50...55...60...65...70...75...80
 ## 
 ##  Debian / Linux / Ubuntu / LSB
-##  Startup script for Express / Node.js application with start-stop-daemon
+##  Startup script for NODE.JS application with start-stop-daemon
 ##
 ##
 
 ### BEGIN INIT INFO
-# Provides:          express
+# Provides:          nodejs
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Express/NodeJS startup script
+# Short-Description: NODE.JS startup script
 # Description:       This file provide a startup script for
-#                    Express / NodeJS application  with
+#                    NODE.JS application  with
 #                    the standard start-stop-daemon script
 #                    and standard LSB directories 
 ### END INIT INFO
@@ -26,7 +26,6 @@
 
 # Do NOT "set -e"
 
-<?php echo getenv('APPNAME_HOME') ?>/bin/pkgi-check-debian-version
 
 ################################################################################
 ################################################################################
@@ -36,14 +35,15 @@
 ################################################################################
 ################################################################################
 
-DESC="Express server"
-NAME=express
+
+DESC="NODE.JS DAEMON"
+NAME=nodejsd
 DAEMON_ARGS=""            
 STARTTIME=2               # Time to wait for the server to start, in seconds
 
 ################################################################################
 
-ROOT=`dirname $(readlink -f $0)`"/../.."
+ROOT="<?php echo getenv('APPNAME_HOME') ?>"
 ROOT=`readlink -f $ROOT`
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 PATH=$ROOT/sbin:$ROOT/usr/sbin:$ROOT/bin:$ROOT/usr/bin:$ROOT/local/bin:$PATH
@@ -81,20 +81,24 @@ VERBOSE=yes
 #
 do_start()
 {
-	# Return
-	#   0 if daemon has been started
-	#   1 if daemon was already running 
-	#   2 if daemon could not be started
-	! running \
-		|| return 1
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
-		|| return 2
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --background --exec $DAEMON -- \
-		$DAEMON_ARGS \
-		|| return 2
-	[ -n "$STARTTIME" ] && sleep $STARTTIME 
-	running \
-		|| return 2
+  # Return
+  #   0 if daemon has been started
+  #   1 if daemon was already running
+  #   2 if daemon could not be started
+  running
+  if [ $? = 0 ]; then
+    return 1
+  fi
+  
+  # doesn't work (start twice will bug)
+  #start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
+  #  || return 1
+  start-stop-daemon --start --quiet --make-pidfile --pidfile $PIDFILE --background --exec $DAEMON -- \
+    $DAEMON_ARGS \
+    || return 2
+  [ -n "$STARTTIME" ] && sleep $STARTTIME 
+  running \
+    || return 2
 }
 
 #
@@ -145,23 +149,12 @@ running() {
 	return $status
 }
 
-showurl() {
-    HOST=`hostname --fqdn`
-    PORT=`grep "^app.listen" <?php echo getenv('APPNAME_HOME'); ?>/var/express/app.js | sed "s/[^0-9]//g"`
-    echo -n " [ http://"
-    echo -n $HOST
-    echo -n ":"
-    echo -n $PORT
-    echo -n " ]"
-}
-
 case "$1" in
 	start)
 		[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
 		do_start
 		case "$?" in
 			0|1) 
-				showurl
 				log_end_msg 0 
 				;;
 			2)
@@ -186,7 +179,6 @@ case "$1" in
 		case "$?" in
 			0) 
 				[ "$VERBOSE" != no ] && log_daemon_msg "$NAME" "is running" 
-                showurl
 				log_end_msg 0 
 				;;
 			4) 
@@ -243,3 +235,4 @@ case "$1" in
 		exit 3
 		;;
 esac
+

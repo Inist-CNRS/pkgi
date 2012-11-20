@@ -1,0 +1,39 @@
+#!/bin/bash 
+# 
+# Script in charge of compiling sphinxsearch code source
+#
+
+SPHINX_VERSION="2.0.5"
+
+for i in $*
+do
+  case $i in
+    --version=*)
+      SPHINX_VERSION=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+    esac
+done
+
+set -e
+
+# download and compile sphinx
+cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/
+if [ ! -d <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release ]; then 
+  echo "---> Downloading sphinx sources"
+  curl -s http://sphinxsearch.com/files/sphinx-$SPHINX_VERSION-release.tar.gz | tar -xzf -
+fi
+if [ ! -f <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release/src/searchd ]; then 
+  cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release
+  ./configure --prefix=<?php echo getenv('APPNAME_HOME'); ?>/usr/local
+  make && make install
+fi
+
+# compile libsphinxclient
+if [ ! -f <?php echo getenv('APPNAME_HOME'); ?>/usr/local/include/sphinxclient.h ]; then 
+  cd <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release/api/libsphinxclient
+  ./configure --prefix=<?php echo getenv('APPNAME_HOME'); ?>/usr/local
+  make && make install
+fi
+
+# create symlink in order to have a unique folder for sphinx
+ln -s -f <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx-$SPHINX_VERSION-release <?php echo getenv('APPNAME_HOME'); ?>/usr/src/sphinx

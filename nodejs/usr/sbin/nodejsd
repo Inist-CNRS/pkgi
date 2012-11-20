@@ -1,7 +1,7 @@
 <?php echo '#!/bin/sh'; ?> 
 ##3.5...10...15...20...25...30...35...40...45...50...55...60...65...70...75...80
 ## 
-##  LSB Startup script for Express / NodeJS
+##  LSB Startup script for  NODE.JS
 ##
 ##
 ## Author: Nicolas Thouvenin <nthouvenin@gmail.com>
@@ -12,15 +12,14 @@
 #                        Configuration                                         # 
 ##                                                                            ##
 ################################################################################
-NODE=`which node`
+NODE="<?php echo getenv('APPNAME_HOME') ?>/usr/bin/node"
 
-ROOT_PATH=`dirname $(readlink -f $0)`"/../.."
+ROOT_PATH="<?php echo getenv('APPNAME_HOME') ?>"
 ROOT_PATH=`readlink -f $ROOT_PATH`
 
-APP_JS=${ROOT_PATH}/var/express/app.js
-ERROR_LOG=${ROOT_PATH}/var/log/express/error.log
-CONSOLE_LOG=${ROOT_PATH}/var/log/express/console.log
-PIDFILE=${ROOT_PATH}/var/run/express.pid
+APP_JS="<?php echo getenv('APPNAME_NODEJS_HOME') ?>/app.js"
+ERROR_LOG=${ROOT_PATH}/var/log/nodejs/error.log
+CONSOLE_LOG=${ROOT_PATH}/var/log/nodejs/console.log
 
 ################################################################################
 ##                                                                            ##
@@ -30,14 +29,11 @@ PIDFILE=${ROOT_PATH}/var/run/express.pid
 touch $ERROR_LOG || { echo "Unable to write $ERROR_LOG"; exit 1; }
 exec 2>>$ERROR_LOG
 
-touch $CONSOLE_LOG || { echo "Unable to write $CONSOLE_LOG" >&2; exit 1; }
+touch $CONSOLE_LOG || { echo "Unable to write $CONSOLE_LOG"; exit 1; }
 exec >>$CONSOLE_LOG
 
-touch $PIDFILE || { echo "Unable to write $PIDFILE" >&2; exit 1; }
 [ -x "$NODE" ] || { echo "Unable to exec $NODE" >&2; exit 1; }
 [ -f "$APP_JS" ] || { echo "Unable to read $APP_JS" >&2; exit 1; }
 
-echo $$ > $PIDFILE
-echo "Express server launched with pid $$ at "`date`
-
+echo "NODE.JS Daemon launched with pid $$ at "`date`
 exec $NODE $APP_JS $*
