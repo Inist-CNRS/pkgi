@@ -13,4 +13,5 @@ fi
 
 . <?php echo getenv('APPNAME_HOME') ?>/nvm/nvm.sh
 nvm install <?php echo getenv('APPNAME_NODEJS_VERSION') ?>  
-nvm alias default <?php echo substr(getenv('APPNAME_NODEJS_VERSION'), 1) ?>
+nvm alias default <?php echo substr(getenv('APPNAME_NODEJS_VERSION'), 1) ?>  
+
