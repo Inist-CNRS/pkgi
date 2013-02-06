@@ -12,5 +12,5 @@ if [ ! -f <?php echo getenv('APPNAME_HOME') ?>/nvm/bash_completion ]; then
 fi
 
 . <?php echo getenv('APPNAME_HOME') ?>/nvm/nvm.sh
-nvm install <?php echo getenv('APPNAME_NODEJS_VERSION') ?>
+nvm install <?php echo getenv('APPNAME_NODEJS_VERSION') ?>  
 nvm alias default <?php echo getenv('APPNAME_NODEJS_VERSION') ?>
