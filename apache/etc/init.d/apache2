@@ -75,7 +75,8 @@ test -f /etc/default/rcS && . /etc/default/rcS
 test -f <?php echo getenv('APPNAME_HOME') ?>/etc/default/apache2 && . <?php echo getenv('APPNAME_HOME') ?>/etc/default/apache2
 
 # Load the pkgi profile
-test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+test -f <?php echo getenv('APPNAME_HOME') ?>/pkgi.env && . <?php echo getenv('APPNAME_HOME') ?>/pkgi.env
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile.d/php && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile.d/php
 
 . $APACHE_ENVVARS
 
