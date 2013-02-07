@@ -8,7 +8,7 @@ VERSION=$1
 
 git fetch --tags
 if [ "`git tag -l | grep $VERSION`" != "" ] ; then
-  echo "Warning: version $VERISON already exists. Aborting ..."
+  echo "Warning: version $VERSION already exists. Aborting ..."
   exit 2
 fi
 
