@@ -25,7 +25,7 @@ test -x /usr/sbin/mysqld || exit 0
 . /lib/lsb/init-functions
 
 # Load the pkgi profile
-test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile
+test -f <?php echo getenv('APPNAME_HOME') ?>/etc/profile.d/core && . <?php echo getenv('APPNAME_HOME') ?>/etc/profile.d/core
 
 SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
 CONF=<?php echo getenv('APPNAME_HOME') ?>/etc/mysql/my.cnf
